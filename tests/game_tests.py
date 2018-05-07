@@ -10,7 +10,7 @@ Dora = RandomPlayer(name="Dora")
 
 playerlist = [Alfons, Bertl, Chrissie, Dora]
 
-testgame = Game(players=playerlist, leading_player=0)
+testgame = Game(players=playerlist, leading_player_index=0)
 
 testgame.decide_game_mode()
 #testgame.define_trumpcards()
@@ -20,5 +20,6 @@ print("trumpcards :  ",  testgame._trump_cards)
 while not testgame.finished():
     testgame.play_next_card()
     print("current player :    ", testgame.get_current_playerindex())
-    print("current trick  :    ", testgame.get_current_trick())
+    print("current trick  :    ", testgame.get_current_trick().cards)
     print("Tricks :     " , testgame.get_tricks())
+    testgame.trick_finished()
