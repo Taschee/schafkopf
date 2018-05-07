@@ -219,6 +219,9 @@ class Game:
         else:
             self.next_player()
 
+    def get_last_trick(self):
+        return self._tricks[-1]
+
     def finished(self):
         if len(self._tricks) == self._num_tricks:
             return True
