@@ -17,6 +17,15 @@ class RandomPlayer:
     def get_hand(self):
         return self._hand
 
+    def sort_hand(self, trumpcards):
+        trumps_in_hand = [trump for trump in trumpcards if trump in self._hand]
+        schellen = [(i, 0) for i in range(8) if (i, 0) in self._hand and (i, 0) not in trumpcards]
+        herz = [(i, 1) for i in range(8) if (i, 1) in self._hand and (i, 1) not in trumpcards]
+        gras = [(i, 2) for i in range(8) if (i, 2) in self._hand and (i, 2) not in trumpcards]
+        eichel = [(i, 3) for i in range(8) if (i, 3) in self._hand and (i, 3) not in trumpcards]
+        sorted_hand = trumps_in_hand + eichel + gras + herz + schellen
+        self._hand = sorted_hand
+
     def choose_game_mode(self, options):
         return random.choice(tuple(options))
 

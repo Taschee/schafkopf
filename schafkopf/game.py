@@ -130,6 +130,9 @@ class Game:
     def get_current_player(self):
         return  self._playerlist[self._current_player_index]
 
+    def get_players(self):
+        return self._playerlist
+
     def get_tricks(self):
         return self._tricks
 
