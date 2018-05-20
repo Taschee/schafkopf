@@ -1,4 +1,3 @@
-
 import random
 
 SIEBEN = 0
@@ -32,6 +31,7 @@ def determine_possible_partnermodes(hand):
                     break
     return possible_modes
 
+
 def determine_possible_game_modes(hand, mode_to_beat=(WEITER, None)):
     possible_modes = {(WEITER, None)}
     if mode_to_beat[0] == WEITER:
@@ -42,6 +42,7 @@ def determine_possible_game_modes(hand, mode_to_beat=(WEITER, None)):
     elif mode_to_beat[0] == WENZ:
         possible_modes |= {(SOLO, SCHELLEN), (SOLO, HERZ), (SOLO, GRAS), (SOLO, EICHEL)}
     return possible_modes
+
 
 def calculate_points(trick):
     points = 0
@@ -58,10 +59,11 @@ def calculate_points(trick):
             points += 11
     return points
 
+
 class Trick:
     def __init__(self, playerlist, leading_player):
         self.cards = [None for player in playerlist]
-        self.score = []
+        self.score = 0
         self.winner = None
         self.num_cards = 0
         self.leading_player_index = leading_player
@@ -81,6 +83,7 @@ class Trick:
             elif card[0] == AS:
                 points += 11
         self.score = points
+        return points
 
     def determine_trickwinner(self, trumpcards):
         # returns index of winning card / player
@@ -94,6 +97,7 @@ class Trick:
             played_suit = first_card[1]
             best_card = (max([i for (i, j) in self.cards if j == played_suit]), played_suit)
             self.winner = self.cards.index(best_card)
+
 
 class Game:
     def __init__(self, players, leading_player_index=0, cards=[(i % 8, i // 8) for i in range(32)]):
@@ -109,6 +113,7 @@ class Game:
         self._current_trick = Trick(players, leading_player_index)
         self._current_player_index = leading_player_index
         self._leading_player_index = leading_player_index
+        self._winners = None
 
         # deal cards
         random.shuffle(cards)
@@ -127,8 +132,11 @@ class Game:
     def get_current_playerindex(self):
         return self._current_player_index
 
+    def get_trump_cards(self):
+        return self._trump_cards
+
     def get_current_player(self):
-        return  self._playerlist[self._current_player_index]
+        return self._playerlist[self._current_player_index]
 
     def get_players(self):
         return self._playerlist
@@ -145,7 +153,7 @@ class Game:
                 self._deciding_players.remove(player)
             else:
                 self._game_mode = chosen_mode
-                self._offensive_players = [player]
+                self._offensive_players = [self._playerlist.index(player)]
         self.next_player()
 
     def game_mode_decided(self):
@@ -161,7 +169,7 @@ class Game:
         if self._game_mode[0] == 1:
             for player in self._playerlist:
                 if (7, self._game_mode[1]) in player.get_hand():
-                    self._offensive_players.append(player)
+                    self._offensive_players.append(self._playerlist.index(player))
         self.define_trumpcards()
 
     def get_game_mode(self):
@@ -171,13 +179,13 @@ class Game:
         # trumpcards defined in order, lower index means stronger trump
         if self._game_mode[0] == RUFSPIEL:
             self._trump_cards = [(OBER, i) for i in SUITS] + [(UNTER, i) for i in SUITS] \
-                   + [(AS, HERZ), (ZEHN, HERZ), (KOENIG, HERZ), (NEUN, HERZ), (ACHT, HERZ), (SIEBEN, HERZ)]
+                                + [(AS, HERZ), (ZEHN, HERZ), (KOENIG, HERZ), (NEUN, HERZ), (ACHT, HERZ), (SIEBEN, HERZ)]
         elif self._game_mode[0] == WENZ:
             self._trump_cards = [(UNTER, i) for i in SUITS]
         elif self._game_mode[0] == SOLO:
             suit = self._game_mode[1]
             self._trump_cards = [(OBER, i) for i in SUITS] + [(UNTER, i) for i in SUITS] \
-                   + [(AS, suit), (ZEHN, suit), (KOENIG, suit), (NEUN, suit), (ACHT, suit), (SIEBEN, suit)]
+                                + [(AS, suit), (ZEHN, suit), (KOENIG, suit), (NEUN, suit), (ACHT, suit), (SIEBEN, suit)]
 
     def suit_in_hand(self, suit, hand):
         suit_cards = [card for card in hand if card[1] == suit and card not in self._trump_cards]
@@ -216,8 +224,10 @@ class Game:
 
     def trick_finished(self):
         if self._current_trick.num_cards == 4:
+            self._current_trick.calculate_points()
             self._current_trick.determine_trickwinner(self._trump_cards)
             self._current_player_index = self._current_trick.winner
+            self._scores[self._current_player_index] += self._current_trick.score
             self.reset_current_trick()
         else:
             self.next_player()
@@ -230,3 +240,13 @@ class Game:
             return True
         else:
             return False
+
+    def score_offensive_players(self):
+        return sum([self._scores[i] for i in self._offensive_players])
+
+    def determine_winners(self):
+        if self.score_offensive_players() > 60:
+            self._winners = self._offensive_players
+        else:
+            self._winners = [pl for pl in range(len(self._playerlist)) if pl not in self._offensive_players]
+        return self._winners
