@@ -196,7 +196,12 @@ class Game:
 
     def possible_cards(self, current_trick, hand):
         if current_trick.num_cards == 0:
-            return hand
+            if self._game_mode[0] == RUFSPIEL and (7, self._game_mode[1]) in hand:
+                forbidden_cards = [card for card in hand if card not in self._trump_cards
+                                and card[1] == self._game_mode[1] and card[0] != 7]
+                return [card for card in hand if card not in forbidden_cards]
+            else:
+                return hand
         else:
             first_card = current_trick.cards[current_trick.leading_player_index]
         if first_card in self._trump_cards:
@@ -205,6 +210,8 @@ class Game:
                 return players_trumpcards
             else:
                 return hand
+        elif self._game_mode[0] == RUFSPIEL and first_card[1] == self._game_mode[1] and (7, self._game_mode[1]) in hand:
+            return (7,self._game_mode[1])
         else:
             suit = first_card[1]
             return self.suit_in_hand(suit, hand)
