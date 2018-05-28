@@ -44,22 +44,6 @@ def determine_possible_game_modes(hand, mode_to_beat=(WEITER, None)):
     return possible_modes
 
 
-def calculate_points(trick):
-    points = 0
-    for card in trick["cards"]:
-        if card[0] == ZEHN:
-            points += 10
-        elif card[0] == UNTER:
-            points += 2
-        elif card[0] == OBER:
-            points += 3
-        elif card[0] == KOENIG:
-            points += 4
-        elif card[0] == AS:
-            points += 11
-    return points
-
-
 class Trick:
     def __init__(self, playerlist, leading_player):
         self.cards = [None for player in playerlist]
@@ -144,6 +128,9 @@ class Game:
     def get_tricks(self):
         return self._tricks
 
+    def get_game_mode(self):
+        return self._game_mode
+
     def next_proposed_game_mode(self):
         player = self._playerlist[self._current_player_index]
         if player in self._deciding_players:
@@ -157,7 +144,7 @@ class Game:
         self.next_player()
 
     def game_mode_decided(self):
-        if len(self._deciding_players) == 1 and len(self._offensive_players) == 1:
+        if len(self._deciding_players) == 1 and len(self._offensive_players) == 1 or len(self._deciding_players) == 0:
             self._current_player_index = self._leading_player_index
             return True
         else:
@@ -171,9 +158,6 @@ class Game:
                 if (7, self._game_mode[1]) in player.get_hand():
                     self._offensive_players.append(self._playerlist.index(player))
         self.define_trumpcards()
-
-    def get_game_mode(self):
-        return self._game_mode
 
     def define_trumpcards(self):
         # trumpcards defined in order, lower index means stronger trump

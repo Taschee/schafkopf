@@ -6,6 +6,8 @@ from schafkopf.game import Game
 from schafkopf.players import RandomPlayer
 
 pygame.init()
+pygame.font.init()
+myfont = pygame.font.SysFont(None, 50)
 
 SUITS = {"0": "Schellen", "1": "Herz", "2": "Gras", "3": "Eichel"}
 SYMBOLS = {"0": "7", "1": "8", "2": "9", "3": "U", "4": "O", "5": "K", "6": "10", "7": "A"}
@@ -82,6 +84,7 @@ class TableViewer:
                 curr_trick_sprites.append(sprite)
         return curr_trick_sprites
 
+
 def main():
     screensize = (700, 700)
     screen = pygame.display.set_mode(screensize)
@@ -128,6 +131,9 @@ def main():
             if ev.type == pygame.MOUSEBUTTONUP:
 
                 if not game.finished():
+                    game_mode = game.get_game_mode()
+
+
                     game.play_next_card()
 
                     screen.fill(brown)
@@ -149,7 +155,12 @@ def main():
                     screen.fill(brown)
                     winner_indices = game.determine_winners()
                     winner_names = [playerlist[i]._name for i in winner_indices]
-
+                    text = "Winners : "
+                    for name in winner_names:
+                        text += name + " "
+                    scoretext = myfont.render(text, 1, (255, 255, 255))
+                    screen.blit(scoretext, (5, 5))
+                    pygame.display.flip()
 
 
 if __name__ == "__main__":

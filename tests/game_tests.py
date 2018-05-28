@@ -14,6 +14,7 @@ testgame = Game(players=playerlist, leading_player_index=0)
 
 testgame.decide_game_mode()
 #testgame.define_trumpcards()
+print("offensive players : ", testgame._offensive_players)
 print("game mode :    ",testgame.get_game_mode())
 print("trumpcards :  ",  testgame._trump_cards)
 
@@ -23,3 +24,6 @@ while not testgame.finished():
     print("current trick  :    ", testgame.get_current_trick().cards)
     print("Tricks :     " , testgame.get_tricks())
     testgame.trick_finished()
+
+print("Final Scores : ", testgame._scores)
+print("Winners : ", testgame.determine_winners())
