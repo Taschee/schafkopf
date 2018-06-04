@@ -1,5 +1,5 @@
-from schafkopf.twocardgame import TwoCardGame
-from schafkopf.players import RandomPlayer
+from twocardgame.players import RandomPlayer
+from twocardgame.twocardgame import TwoCardGame
 
 Alfons = RandomPlayer(name="Alfons")
 Bertl = RandomPlayer(name="Bertha")
@@ -23,4 +23,5 @@ while not testgame.finished():
     testgame.trick_finished()
 
 print("Tricks : ", testgame.get_tricks())
+print("Final score : ", testgame._scores)
 print("Winners : ", testgame.determine_winners())

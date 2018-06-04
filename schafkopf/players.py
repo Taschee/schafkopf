@@ -1,8 +1,7 @@
 
 import random
 
-
-class RandomPlayer:
+class Player:
     def __init__(self, name="Rando Calrissian"):
         self._name = name
         self._hand = []
@@ -25,6 +24,8 @@ class RandomPlayer:
         eichel = [(i, 3) for i in range(7, -1, -1) if (i, 3) in self._hand and (i, 3) not in trumpcards]
         sorted_hand = trumps_in_hand + eichel + gras + herz + schellen
         self._hand = sorted_hand
+
+class RandomPlayer(Player):
 
     def choose_game_mode(self, options):
         return random.choice(tuple(options))
