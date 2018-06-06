@@ -28,7 +28,7 @@ class RandomPlayer(Player):
     def choose_game_mode(self, options):
         return random.choice(tuple(options))
 
-    def play_card(self, previous_cards, options=None):
+    def play_card(self, previous_cards, options=None, card=None):
         if options is None:
             card = random.choice(self._hand)
         else:
@@ -39,15 +39,21 @@ class RandomPlayer(Player):
 class CFRPlayer(Player):
 
     def choose_game_mode(self, options):
-        return random.choice(tuple(options))
+        return 0
 
-    def play_card(self, previous_cards, options=None):
-        if options is None:
-            card = random.choice(self._hand)
-        else:
-            card = random.choice(options)
-        self._hand.remove(card)
-        return card
+    def play_card(self, previous_cards, options=None, card=None):
+        if card is not None:
+            if card not in options:
+                print("Card not legal")
+            else:
+                self._hand.remove(card)
+                return card
+        if card is None:
+            if options is None:
+                return random.choice(self._hand)
+            else:
+                return random.choice(options)
+
 
 class Node:
     def __init__(self, infoset):

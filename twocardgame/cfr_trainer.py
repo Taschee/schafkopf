@@ -1,8 +1,10 @@
 import random
-from twocardgame.twocardgame import TwoCardGame
+from twocardgame import TwoCardGame
+from players import CFRPlayer
 
 WEITER = 0
 SOLO = 1
+
 
 class Node:
     def __init__(self, infoset):
@@ -32,6 +34,7 @@ class Node:
             av_strategy = [1 / norm_sum * strat for strat in self.cumulative_strategies]
         return av_strategy
 
+
 class NodeMap:
     def __init__(self):
         self._nodes = []
@@ -44,16 +47,114 @@ class NodeMap:
     def get_node(self, infoset):
         if infoset in self._infosets:
             index = self._infosets.index(infoset)
-            return self._nodes[index]
+            node = self._nodes[index]
+        else:
+            node = Node(infoset)
+            self.add_node(node)
+        return node
+
 
 class CFRTrainer:
-    def __init__(self, agent):
+    def __init__(self, playerlist):
         self.node_map = NodeMap()
-        self.player = agent
+        self.playerlist = playerlist
 
-    def cfr(self):
-        return
+    def adapt_payout(self, game):
+        player = game.get_current_playerindex()
+        next_player = (player + 1) % 3
+        prev_player = (player + 2) % 3
+        if game.is_offensive_player(player):
+            return -2
+        elif game.is_offensive_player(next_player):
+            return -0.5
+        elif game.is_offensive_player(prev_player):
+            return 1
+        else:
+            return 1
+
+    def cfr(self, game, p0, p1, p2):
+
+        # if state is terminal, get payout
+        if game.finished():
+            if game.get_game_mode() is not WEITER:
+                playerindex = game.get_tricks()[-1].leading_player_index
+                return game.get_payout(playerindex)
+            else:
+                return 0
+
+        else:
+            playerindex = game.get_current_playerindex()
+            infoset = game.get_infoset(playerindex)
+            node = self.node_map.get_node(infoset)
+            strategy = node.get_strategy()
+            node_util = 0
+
+            # compute action utilities recursively
+
+            if not game.game_mode_decided():
+                possible_actions = [WEITER, SOLO]
+                num_actions = 2
+                util = [0 for action in range(num_actions)]
+                for action in possible_actions:
+                    game.next_proposed_game_mode(proposal=action)
+
+                    if playerindex == 0:
+                        util[action] = self.adapt_payout(game) * self.cfr(game, strategy[action] * p0, p1, p2)
+                    elif playerindex == 1:
+                        util[action] = self.adapt_payout(game) * self.cfr(game, p0, strategy[action] * p1, p2)
+                    elif playerindex == 3:
+                        util[action] = self.adapt_payout(game) * self.cfr(game, p0, p1, strategy[action] * p2)
+
+                    node_util += strategy[action] * util[action]
+
+            else:
+                hand = infoset["private_cards"]
+                possible_actions = game.possible_cards(game.get_current_trick(), hand)
+                num_actions = len(possible_actions)
+                util = [0 for action in range(num_actions)]
+                for action_num in range(len(possible_actions)):
+                    action = possible_actions[action_num]
+                    game.play_next_card(action)
+                    if playerindex == 0:
+                        util[action_num] = self.adapt_payout(game) * self.cfr(game, strategy[action_num] * p0, p1, p2)
+                    elif playerindex == 1:
+                        util[action_num] = self.adapt_payout(game) * self.cfr(game, p0, strategy[action_num] * p1, p2)
+                    else:
+                        util[action_num] = self.adapt_payout(game) * self.cfr(game, p0, p1, strategy[action_num] * p2)
+
+                    node_util += strategy[action_num] * util[action_num]
+
+            # compute counterfactual regrets
+            for i in range(num_actions):
+                regret = util[i] - node_util
+                if playerindex == 0:
+                    counterfact_probab = p1 * p2
+                elif playerindex == 1:
+                    counterfact_probab = p0 * p2
+                else:
+                    counterfact_probab = p0 * p1
+                node.cumulative_regrets[i] += counterfact_probab * regret
+
+        return node_util
 
     def train(self, iterations):
+        util = 0
         for i in range(iterations):
-            game = TwoCardGame([self.player, self.player, self.player])
+            game = TwoCardGame(self.playerlist)  # cards shuffled, dealt -> chance sampling
+            util += self.cfr(game, 1, 1, 1)
+            print("Average Game Value : ", util / iterations)
+            for node in self.node_map._nodes:
+                strat = node.get_strategy()
+                print("Infoset : ",node.infoset, "\nStrategy : ", strat)
+
+
+def main():
+    player0 = CFRPlayer()
+    player1 = CFRPlayer()
+    player2 = CFRPlayer()
+    cfr_trainer = CFRTrainer(playerlist=[player0, player1, player2])
+    cfr_trainer.train(iterations=1000)
+
+
+if __name__ == "__main__":
+    main()
