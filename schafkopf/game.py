@@ -145,7 +145,6 @@ class Game:
 
     def game_mode_decided(self):
         if len(self._deciding_players) == 1 and len(self._offensive_players) == 1 or len(self._deciding_players) == 0:
-            self._current_player_index = self._leading_player_index
             return True
         else:
             return False
@@ -158,6 +157,7 @@ class Game:
                 if (7, self._game_mode[1]) in player.get_hand():
                     self._offensive_players.append(self._playerlist.index(player))
         self.define_trumpcards()
+        self._current_player_index = self._leading_player_index
 
     def define_trumpcards(self):
         # trumpcards defined in order, lower index means stronger trump
