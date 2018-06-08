@@ -37,6 +37,7 @@ class TwoCardGame:
     def __init__(self, players, leading_player_index=0, cards=cards):
         self._playerlist = players
         self._game_mode = WEITER
+        self._mode_proposals = [0 for player in self._playerlist]
         self._trump_cards = trumpcards
         self._cards = cards
         self._num_tricks = len(cards) / len(players)
@@ -90,7 +91,7 @@ class TwoCardGame:
         hand = self._playerlist[playerindex].get_hand()
         infoset = {"relative_player_position": relative_player_position,
                    "private_cards": hand}
-        if self.game_mode_decided:
+        if self.game_mode_decided():
             infoset["game_mode"] = self._game_mode,
             infoset["offensive_players"] = self._offensive_players,
             infoset["current_trick"] = self._current_trick,
@@ -101,7 +102,7 @@ class TwoCardGame:
         player = self._playerlist[self._current_player_index]
         if player in self._deciding_players:
             options = [WEITER, SOLO]
-            if proposal == None:
+            if proposal is None:
                 chosen_mode = self._playerlist[self._current_player_index].choose_game_mode(options=options)
             else:
                 chosen_mode = proposal
@@ -110,7 +111,18 @@ class TwoCardGame:
             else:
                 self._game_mode = chosen_mode
                 self._offensive_players = [self._playerlist.index(player)]
+            self._mode_proposals[self._current_player_index] = chosen_mode
         self.next_player()
+
+    def reverse_proposal(self):
+        self._mode_proposals[self._current_player_index] = 0
+        self._current_player_index = (self._current_player_index - 1) % NUMBER_OF_PLAYERS
+        self._game_mode = 0
+        if self._playerlist[self._current_player_index] not in self._deciding_players:
+            self._deciding_players.add(self._playerlist[self._current_player_index])
+        for proposal in self._mode_proposals:
+            if proposal > self._game_mode:
+                self._game_mode = proposal
 
     def game_mode_decided(self):
         if len(self._deciding_players) == 1 and len(self._offensive_players) == 1 or len(self._deciding_players) == 0:
@@ -157,6 +169,15 @@ class TwoCardGame:
         next_card = current_player.play_card(previous_cards=self._current_trick.cards, options=options, card=card)
         self._current_trick.cards[self._current_player_index] = next_card
         self._current_trick.num_cards += 1
+
+    def reverse_card(self):
+        self._current_player_index = (self._current_player_index - 1) % NUMBER_OF_PLAYERS
+        current_player = self.get_current_player()
+        hand = current_player.get_hand()
+        last_card = self._current_trick.cards[self._current_player_index]
+        hand.append(last_card)
+        current_player.pick_up_cards(hand)
+        self._current_trick.cards[self._current_player_index] = None
 
     def trick_finished(self):
         if self._current_trick.num_cards == 3:
