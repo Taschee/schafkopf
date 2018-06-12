@@ -11,6 +11,7 @@ testgame = TwoCardGame(players=playerlist, leading_player_index=0)
 
 testgame.decide_game_mode()
 
+
 print("offensive player : ", testgame._offensive_players)
 print("game mode :    ",testgame.get_game_mode())
 print("trumpcards :  ",  testgame._trump_cards)
@@ -23,5 +24,7 @@ while not testgame.finished():
     testgame.trick_finished()
 
 print("Tricks : ", testgame.get_tricks())
-print("Final score : ", testgame._scores)
+print("Final scores : ", testgame._scores)
 print("Winners : ", testgame.determine_winners())
+
+

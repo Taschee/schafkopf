@@ -34,7 +34,7 @@ class ThreePlayerTrick:
 
 
 class TwoCardGame:
-    def __init__(self, players, leading_player_index=0, cards=cards):
+    def __init__(self, players, leading_player_index=0, cards=cards, shuffle_cards=True):
         self._playerlist = players
         self._game_mode = WEITER
         self._mode_proposals = [0 for player in self._playerlist]
@@ -49,8 +49,9 @@ class TwoCardGame:
         self._current_player_index = leading_player_index
         self._leading_player_index = leading_player_index
         self._winners = None
-
-        random.shuffle(cards)
+        if shuffle_cards:
+            random.shuffle(cards)
+        self._starting_deck = cards
         number_of_cards = len(cards) // len(self._playerlist)
         for player in self._playerlist:
             player.pick_up_cards(cards[:number_of_cards])
@@ -80,6 +81,15 @@ class TwoCardGame:
     def get_game_mode(self):
         return self._game_mode
 
+    def get_mode_proposals(self):
+        return self._mode_proposals
+
+    def get_deciding_players(self):
+        return self._deciding_players
+
+    def get_offensive_players(self):
+        return self._offensive_players
+
     def is_offensive_player(self, player):
         if player in self._offensive_players:
             return True
@@ -97,6 +107,32 @@ class TwoCardGame:
             infoset["current_trick"] = self._current_trick,
             infoset["possible_cards"] = self.possible_cards(self._current_trick, hand)
         return infoset
+
+    def get_history(self):
+        history = {
+            "game_mode": self._game_mode,
+            "mode_proposals": self._mode_proposals,
+            "deciding_players": self._deciding_players,
+            "offensive_players": self._offensive_players,
+            "tricks": self._tricks,
+            "current_trick": self._current_trick,
+            "current_player_index": self._current_player_index
+        }
+        return history
+
+    def prepare_state(self, history):
+        self._game_mode = history["game_mode"]
+        self._mode_proposals = history["mode_proposals"]
+        self._deciding_players = history["deciding_players"]
+        self._offensive_players = history["offensive_players"]
+        self._tricks = history["tricks"]
+        self._current_trick = history["current_trick"]
+        self._current_player_index = history["current_player_index"]
+        for i in range(len(self._playerlist)):
+            played_cards = [trick.cards[i] for trick in self._tricks]
+            remaining_hand = [card for card in self._starting_deck[i * 2:(i + 1) * 2] if card not in played_cards]
+            player = self._playerlist[i]
+            player.pick_up_cards(remaining_hand)
 
     def next_proposed_game_mode(self, proposal=None):
         player = self._playerlist[self._current_player_index]
@@ -133,7 +169,6 @@ class TwoCardGame:
     def decide_game_mode(self):
         while not self.game_mode_decided():
             self.next_proposed_game_mode()
-        self._current_player_index = self._leading_player_index
 
     def suit_in_hand(self, suit, hand):
         suit_cards = [card for card in hand if card[1] == suit and card not in self._trump_cards]
@@ -162,6 +197,9 @@ class TwoCardGame:
         self._current_trick = ThreePlayerTrick(self._playerlist, self._current_player_index)
 
     def play_next_card(self, card=None):
+        # start playing after game mode decided: reset current player index
+        if len(self._tricks) == 0 and self._current_trick.cards[self._leading_player_index] is None:
+            self._current_player_index = self._leading_player_index
         current_player = self._playerlist[self._current_player_index]
         if self._current_trick.num_cards == 0:
             self._current_trick.leading_player_index = self._current_player_index
