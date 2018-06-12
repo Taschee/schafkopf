@@ -100,7 +100,7 @@ class Game:
         self._winners = None
 
         # deal cards
-        random.shuffle(cards)
+        self._shuffled_cards = random.shuffle(cards)
         number_of_cards = len(cards) // len(self._playerlist)
 
         for player in self._playerlist:
@@ -157,7 +157,6 @@ class Game:
                 if (7, self._game_mode[1]) in player.get_hand():
                     self._offensive_players.append(self._playerlist.index(player))
         self.define_trumpcards()
-        self._current_player_index = self._leading_player_index
 
     def define_trumpcards(self):
         # trumpcards defined in order, lower index means stronger trump
@@ -205,6 +204,8 @@ class Game:
         self._current_trick = Trick(self._playerlist, self._current_player_index)
 
     def play_next_card(self):
+        if len(self._tricks) == 0 and self._current_trick.cards[self._leading_player_index] is None:
+            self._current_player_index = self._leading_player_index
         current_player = self._playerlist[self._current_player_index]
         if self._current_trick.num_cards == 0:
             self._current_trick.leading_player_index = self._current_player_index
