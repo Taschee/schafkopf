@@ -84,7 +84,7 @@ class Trick:
 
 
 class Game:
-    def __init__(self, players, leading_player_index=0, cards=[(i % 8, i // 8) for i in range(32)]):
+    def __init__(self, players, leading_player_index=0, cards=[(i % 8, i // 8) for i in range(32)], shuffle_cards=True):
         self._playerlist = players
         self._game_mode = (WEITER, None)
         self._trump_cards = []
@@ -100,7 +100,9 @@ class Game:
         self._winners = None
 
         # deal cards
-        self._shuffled_cards = random.shuffle(cards)
+        if shuffle_cards:
+            random.shuffle(cards)
+        self._starting_deck = cards
         number_of_cards = len(cards) // len(self._playerlist)
 
         for player in self._playerlist:
