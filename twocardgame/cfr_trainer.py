@@ -75,7 +75,11 @@ class CFRTrainer:
     def cfr(self, history, cards, p0, p1, p2):
 
         game = TwoCardGame(players=self.playerlist, cards=cards)
+
         game.prepare_state(history)
+        print("\nGame state : \nCurrent player: {}, game mode decided: {}".format(game.get_current_playerindex(),
+                                                                                game.game_mode_decided()))
+
         print("\nCFR : current player : {},  game mode : {}".format(game.get_current_playerindex(), game.get_game_mode()))
         print("Tricks : ", [trick.cards for trick in game.get_tricks()])
         print("Current trick: ", game.get_current_trick().cards)
@@ -100,8 +104,6 @@ class CFRTrainer:
             print("current player : ", playerindex)
             infoset = game.get_infoset(playerindex)
 
-            ############  game state restoring from this infoset!!!
-
             node = self.node_map.get_node(infoset)
             print("New Node : ", node.infoset)
             print("NodeMap:", self.node_map._infosets)
@@ -116,8 +118,11 @@ class CFRTrainer:
                 util = [0 for action in range(num_actions)]
                 for action in possible_actions:
 
+                    print(" Action : ", action)
                     game.next_proposed_game_mode(proposal=action)
+                    print(" history: ", history)
                     new_history = game.get_history()
+                    print(" new history: ", new_history)
 
                     if playerindex == 0:
                         util[action] = self.adapt_payout(game, playerindex) * \
@@ -141,6 +146,7 @@ class CFRTrainer:
                     print("possible actions : ", possible_actions)
 
                     action = possible_actions[action_num]
+                    print(" Action : ", action)
                     game.play_next_card(action)
                     game.trick_finished()
                     new_history = game.get_history()
@@ -178,11 +184,11 @@ class CFRTrainer:
         util = 0
         for i in range(iterations):
 
-            cards = [(1, 0), (2, 0), (3, 0), (1, 1), (2, 1), (3, 1)]  # cards shuffled, dealt -> chance sampling
+            cards = [(3, 0), (2, 0), (1, 0), (1, 1), (2, 1), (3, 1)]  # cards shuffled, dealt -> chance sampling
             random.shuffle(cards)
 
             history = {"game_mode": 0,
-            "mode_proposals": [0, 0, 0],
+            "mode_proposals": [None, None, None],
             "deciding_players": set(self.playerlist),
             "offensive_players": [],
             "tricks": [],

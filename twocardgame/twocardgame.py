@@ -37,7 +37,7 @@ class TwoCardGame:
     def __init__(self, players, leading_player_index=0, cards=cards, shuffle_cards=True):
         self._playerlist = players
         self._game_mode = WEITER
-        self._mode_proposals = [0 for player in self._playerlist]
+        self._mode_proposals = [None for player in self._playerlist]
         self._trump_cards = trumpcards
         self._cards = cards
         self._num_tricks = len(cards) / len(players)
@@ -114,7 +114,7 @@ class TwoCardGame:
             "mode_proposals": self._mode_proposals,
             "deciding_players": self._deciding_players,
             "offensive_players": self._offensive_players,
-            "tricks": self._tricks,
+            "tricks": self._tricks[:],
             "current_trick": self._current_trick,
             "current_player_index": self._current_player_index
         }
