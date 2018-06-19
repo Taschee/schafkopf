@@ -137,12 +137,16 @@ class History:
                 return player
 
     def determine_trickwinner(self, trick, leading_player):
-        # trick cards in order how they were played
+        # cards in order how they were played
         winning_card = trick[0]
         winner = leading_player
         for card, i in zip(trick[1:], [1,2]):
             if winning_card not in TRUMPCARDS:
-                if card in TRUMPCARDS or card[0] > winning_card[0]:
+                if card in TRUMPCARDS or card[0] > winning_card[0] and card[1] == winning_card[1]:
+                    winning_card = card
+                    winner = (leading_player + i) % 3
+            else:
+                if card in TRUMPCARDS and card[0] > winning_card[0]:
                     winning_card = card
                     winner = (leading_player + i) % 3
         return winner
@@ -255,7 +259,7 @@ class CFRTrainer:
                     node.cumulative_regrets[action_num] += counterfactual_probability * regret
 
                 print("Node: ", node.infoset, "  strategy : ", node.get_strategy(),
-                      "regrets :  ", node.cumulative_regrets)
+                      " regrets :  ", node.cumulative_regrets, "  node util : ", node_util)
 
             return node_util
 
@@ -265,7 +269,7 @@ class CFRTrainer:
         util2 = 0
         for i in range(iterations):
 
-            cards = [(3, 0), (2, 0), (2, 1), (3, 1), (1, 1), (1, 0)]  # cards shuffled, dealt -> chance sampling
+            cards = [(1, 0), (2, 1), (2, 0), (3, 0), (1, 1), (3, 1)]  # cards shuffled, dealt -> chance sampling
             if shuffle:
                 random.shuffle(cards)
 
