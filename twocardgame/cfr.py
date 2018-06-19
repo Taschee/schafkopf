@@ -1,6 +1,5 @@
 import random
-from twocardgame.twocardgame import TwoCardGame, ThreePlayerTrick
-from twocardgame.players import CFRPlayer
+
 
 WEITER = 0
 SOLO = 1
@@ -78,6 +77,9 @@ class NodeMap:
             node = Node(infoset)
             self.add_node(node)
         return node
+
+    def get_infosets(self):
+        return self._infosets
 
 
 class History:
@@ -209,6 +211,7 @@ class CFRTrainer:
             else:
                 weight = p2
             strategy = node.get_strategy(weight)
+            print("node : ", node.infoset, "   regrets:  ", node.cumulative_regrets)
             node_util = 0
 
         # for each action: update history, call cfr recursively with updated probabilities
@@ -243,14 +246,15 @@ class CFRTrainer:
 
             return node_util
 
-    def train(self, iterations):
+    def train(self, iterations, shuffle=True):
         util0 = 0
         util1 = 0
         util2 = 0
         for i in range(iterations):
 
-            cards = [(3, 0), (2, 0), (1, 0), (1, 1), (2, 1), (3, 1)]  # cards shuffled, dealt -> chance sampling
-            random.shuffle(cards)
+            cards = [(3, 0), (2, 0), (2, 1), (3, 1), (1, 1), (1, 0)]  # cards shuffled, dealt -> chance sampling
+            if shuffle:
+                random.shuffle(cards)
 
             history = History(mode_proposals=[], cards_played=[], starting_deck=cards)
 
