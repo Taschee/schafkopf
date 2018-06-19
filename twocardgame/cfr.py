@@ -18,6 +18,8 @@ class Node:
         self.number_of_actions = len(self.actions)
         self.cumulative_regrets = [0 for n in range(self.number_of_actions)]
         self.cumulative_strategies = [0 for n in range(self.number_of_actions)]
+        self.current_strategy = None
+        self.update_strategy()
 
     def possible_cards(self):
         if len(self.infoset[2]) == 0:
@@ -41,7 +43,7 @@ class Node:
         else:
             return hand
 
-    def get_strategy(self, weight=1):
+    def update_strategy(self, weight=1):
         norm_sum = sum([regret for regret in self.cumulative_regrets if regret > 0])
         if norm_sum == 0:
             strategy = [1/self.number_of_actions for i in range(self.number_of_actions)]
@@ -49,7 +51,11 @@ class Node:
             strategy = [max(1 / norm_sum * regret, 0) for regret in self.cumulative_regrets]
         for i in range(self.number_of_actions):
             self.cumulative_strategies[i] += weight * strategy[i]
+        self.current_strategy = strategy
         return strategy
+
+    def get_strategy(self):
+        return self.current_strategy
 
     def get_average_strategy(self):
         norm_sum = sum(self.cumulative_strategies)
@@ -80,6 +86,9 @@ class NodeMap:
 
     def get_infosets(self):
         return self._infosets
+
+    def get_nodes(self):
+        return self._nodes
 
 
 class History:
@@ -201,21 +210,17 @@ class CFRTrainer:
 
         # get infoset of player and corresponding node
         else:
+            #print("Node Map : ", self.node_map.get_infosets())
             private_cards = cards[2 * current_player: 2 * current_player + 2 ]
             infoset = (private_cards, history.mode_proposals, history.cards_played)
             node = self.node_map.get_node(infoset)
-            if player == 0:
-                weight = p0
-            elif player == 1:
-                weight = p1
-            else:
-                weight = p2
-            strategy = node.get_strategy(weight)
-            print("node : ", node.infoset, "   regrets:  ", node.cumulative_regrets)
+
+            strategy = node.get_strategy()
+            #print("node : ", node.infoset, "   regrets:  ", node.cumulative_regrets)
             node_util = 0
+            util = [0 for i in range(node.number_of_actions)]
 
         # for each action: update history, call cfr recursively with updated probabilities
-            util = [0 for i in range(node.number_of_actions)]
             for action_num in range(node.number_of_actions):
 
                 action = node.actions[action_num]
@@ -234,15 +239,23 @@ class CFRTrainer:
         # for each action: compute and update counterfactual regrets
 
             if current_player == player:
+                print(current_player)
+
                 for action_num in range(node.number_of_actions):
                     regret = util[action_num] - node_util
+                    print("regret for action {}  :   {}".format(node.actions[action_num], regret))
                     if current_player == 0:
                         counterfactual_probability = p1 * p2
                     elif current_player == 1:
                         counterfactual_probability = p0 * p2
                     else:
                         counterfactual_probability = p0 * p1
+                    print("p0, p1, p2 : ", p0, p1, p2)
+                    print("cf probability : ", counterfactual_probability)
                     node.cumulative_regrets[action_num] += counterfactual_probability * regret
+
+                print("Node: ", node.infoset, "  strategy : ", node.get_strategy(),
+                      "regrets :  ", node.cumulative_regrets)
 
             return node_util
 
@@ -258,11 +271,14 @@ class CFRTrainer:
 
             history = History(mode_proposals=[], cards_played=[], starting_deck=cards)
 
-            util0 += self.cfr(history=history, cards=cards, player=0, p0=1, p1=1, p2=1)
-            util1 += self.cfr(history=history, cards=cards, player=1, p0=1, p1=1, p2=1)
             util2 += self.cfr(history=history, cards=cards, player=2, p0=1, p1=1, p2=1)
+            util1 += self.cfr(history=history, cards=cards, player=1, p0=1, p1=1, p2=1)
+            util0 += self.cfr(history=history, cards=cards, player=0, p0=1, p1=1, p2=1)
 
-            if i % 100 == 0:
+            for node in self.node_map.get_nodes():
+                node.update_strategy()
+
+            if i % 2 == 0:
                 print("\n Iteration {}".format(i))
                 print("Player 0: Average Game Value : {}\n".format(util0 / iterations))
                 print("Player 1: Average Game Value : {}\n".format(util1 / iterations))
