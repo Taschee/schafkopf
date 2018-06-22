@@ -20,6 +20,10 @@ RUFSPIEL = 1
 WENZ = 2
 SOLO = 3
 
+BASIC_PAYOUT_RUFSPIEL = 20
+BASIC_PAYOUT_SOLO = 50
+EXTRA_PAYOUT = 10
+
 
 def determine_possible_partnermodes(hand):
     possible_modes = set()
@@ -244,3 +248,95 @@ class Game:
         else:
             self._winners = [pl for pl in range(len(self._playerlist)) if pl not in self._offensive_players]
         return self._winners
+
+    def get_payout(self, player):
+        if self.finished():
+            if self._game_mode is WEITER:
+                return 0
+            else:
+                if self._game_mode[0] == RUFSPIEL:
+                    return self.get_payout_partnermode(player)
+                else:
+                    return self.get_payout_solo(player)
+
+    def schneider(self):
+        offensive_score = self.score_offensive_players()
+        if offensive_score > 90 or offensive_score < 31:
+            return True
+        else:
+            return False
+
+    def schwarz(self):
+        trick_winners = {trick.winner for trick in self._tricks}
+        off_players = set(self._offensive_players)
+        num_off_tricks = len(trick_winners & off_players)
+        if num_off_tricks == 0 or num_off_tricks == 8:
+            return True
+        else:
+            return False
+
+    def get_payout_partnermode(self, playerindex):
+        payout = BASIC_PAYOUT_RUFSPIEL
+        if self.schneider():
+            payout += EXTRA_PAYOUT
+            if self.schwarz():
+                payout += EXTRA_PAYOUT
+        # laufende!
+        if playerindex in self._offensive_players:
+            if self.score_offensive_players() > 60:
+                return payout
+            else:
+                return -payout
+        else:
+            if self.score_offensive_players() > 60:
+                return -payout
+            else:
+                return payout
+
+    def get_payout_solo(self, playerindex):
+        payout = BASIC_PAYOUT_SOLO
+        if self.schneider():
+            payout += EXTRA_PAYOUT
+            if self.schwarz():
+                payout += EXTRA_PAYOUT
+        # laufende!
+        if playerindex in self._offensive_players:
+            if self.score_offensive_players() > 60:
+                return 3 * payout
+            else:
+                return -3 * payout
+        else:
+            if self.score_offensive_players() > 60:
+                return -payout
+            else:
+                return payout
+
+    def num_laufende(self):
+        num = 1
+        if self.player_with_highest_trump() in self._offensive_players:
+            team_with_laufende = self._offensive_players
+        else:
+            team_with_laufende = [player for player in range(len(self._playerlist))
+                                  if player not in self._offensive_players]
+        team_cards = self.get_teamcards(team_with_laufende)
+        next_highest_trump_in_team = True
+        while next_highest_trump_in_team:
+            next_trump = self._trump_cards[num]
+            if next_trump in team_cards:
+                num += 1
+            else:
+                next_highest_trump_in_team = False
+        return num
+
+    def player_with_highest_trump(self):
+        highest_trump = [self._trump_cards[0]]
+        for player in self._playerlist:
+            if highest_trump in player.get_starting_hand():
+                return self._playerlist.index(player)
+
+    def get_teamcards(self, team):
+        teamcards = []
+        for playerindex in team:
+            player = self._playerlist[playerindex]
+            teamcards += player.get_starting_hand()
+        return teamcards

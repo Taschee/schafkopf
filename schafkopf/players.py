@@ -5,16 +5,21 @@ class Player:
     def __init__(self, name="Rando Calrissian"):
         self._name = name
         self._hand = []
+        self._starting_hand = []
         return
 
     def pick_up_cards(self, hand):
         self._hand = hand
+        self._starting_hand = hand[:]
 
     def number_of_cards(self):
         return len(self._hand)
 
     def get_hand(self):
         return self._hand
+
+    def get_starting_hand(self):
+        return self._starting_hand
 
     def sort_hand(self, trumpcards):
         trumps_in_hand = [trump for trump in trumpcards if trump in self._hand]
