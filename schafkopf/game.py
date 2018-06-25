@@ -281,7 +281,9 @@ class Game:
             payout += EXTRA_PAYOUT
             if self.schwarz():
                 payout += EXTRA_PAYOUT
-        # laufende!
+        num_laufende = self.num_laufende()
+        if num_laufende >= 3:
+            payout += num_laufende * EXTRA_PAYOUT
         if playerindex in self._offensive_players:
             if self.score_offensive_players() > 60:
                 return payout
@@ -299,7 +301,13 @@ class Game:
             payout += EXTRA_PAYOUT
             if self.schwarz():
                 payout += EXTRA_PAYOUT
-        # laufende!
+        num_laufende = self.num_laufende()
+        if self._game_mode[0] == WENZ:
+            if num_laufende >= 2:
+                payout += num_laufende * EXTRA_PAYOUT
+        else:
+            if num_laufende >= 3:
+                payout += num_laufende * EXTRA_PAYOUT
         if playerindex in self._offensive_players:
             if self.score_offensive_players() > 60:
                 return 3 * payout
@@ -329,7 +337,7 @@ class Game:
         return num
 
     def player_with_highest_trump(self):
-        highest_trump = [self._trump_cards[0]]
+        highest_trump = self._trump_cards[0]
         for player in self._playerlist:
             if highest_trump in player.get_starting_hand():
                 return self._playerlist.index(player)
