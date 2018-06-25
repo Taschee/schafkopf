@@ -1,5 +1,5 @@
 import random
-
+import itertools
 
 WEITER = 0
 SOLO = 1
@@ -95,7 +95,7 @@ class History:
     def __init__(self, mode_proposals, cards_played, starting_deck):
         self.mode_proposals = mode_proposals
         self.cards_played = cards_played
-        self.starting_deck = starting_deck
+        self.starting_deck = self.sort_cards(starting_deck)
 
     def __add__(self, action):
         new_proposals = self.mode_proposals[:]
@@ -110,6 +110,14 @@ class History:
 
     def to_string(self):
         return str(self.mode_proposals) + str(self.cards_played)
+
+    def sort_cards(self, cards):
+        sorted_cards = []
+        for i in range(3):
+            trump_cards = [(j, 0) for j in [3, 2, 1] if (j, 0) in cards[2 * i: 2 * i + 2]]
+            non_trump_cards = [(j, 1) for j in [3, 2, 1] if (j, 1) in cards[2 * i: 2 * i + 2]]
+            sorted_cards += trump_cards + non_trump_cards
+        return sorted_cards
 
     def game_mode_decided(self):
         if len(self.mode_proposals) == 3:
@@ -192,8 +200,24 @@ class CFRTrainer:
     def __init__(self):
         self.node_map = NodeMap()
 
+    def all_deck_combinations(self):
+        combinations = []
+        cards = [(3, 0), (2, 0), (1, 0), (3, 1), (2, 1), (1, 1)]
+        possible_first_hands = list(itertools.combinations(cards, 2))
+        for first_hand in possible_first_hands:
+            rest_cards = cards[:]
+            for card in first_hand:
+                rest_cards.remove(card)
+            possible_second_hands = list(itertools.combinations(rest_cards, 2))
+            for second_hand in possible_second_hands:
+                third_hand = rest_cards[:]
+                for card in second_hand:
+                    third_hand.remove(card)
+                combinations.append(list(first_hand) + list(second_hand) + list(third_hand))
+        return combinations
+
     def adapt_payout(self, history, new_history):
-        # not sure if useful
+        # not sure if useful. only works after game mode decision
         player = history.get_current_player()
         next_player = new_history.get_current_player()
         if player == history.get_offensive_player():
@@ -203,10 +227,11 @@ class CFRTrainer:
         else:
             return 1
 
-    def cfr(self, history, cards, player, p0, p1, p2):
+    def cfr(self, history, player, p0, p1, p2):
 
         # determine current player
         current_player = history.get_current_player()
+        cards = history.starting_deck
 
         # determine payout if state is terminal
         if history.is_terminal():
@@ -232,58 +257,56 @@ class CFRTrainer:
                 new_history = history + action
 
                 if current_player == 0:
-                    util[action_num] = self.cfr(new_history, cards, player, strategy[action_num] * p0, p1, p2)
+                    util[action_num] = self.cfr(new_history, player, strategy[action_num] * p0, p1, p2)
                 elif current_player == 1:
-                    util[action_num] = self.cfr(new_history, cards, player, p0, strategy[action_num] * p1, p2)
+                    util[action_num] = self.cfr(new_history, player, p0, strategy[action_num] * p1, p2)
                 else:
-                    util[action_num] = self.cfr(new_history, cards, player, p0, p1, strategy[action_num] * p2)
+                    util[action_num] = self.cfr(new_history, player, p0, p1, strategy[action_num] * p2)
 
                 node_util += strategy[action_num] * util[action_num]
 
         # for each action: compute and update counterfactual regrets
 
             if current_player == player:
-                print(current_player)
+                #print(current_player)
 
                 for action_num in range(node.number_of_actions):
                     regret = util[action_num] - node_util
-                    print("regret for action {}  :   {}".format(node.actions[action_num], regret))
+                    #print("regret for action {}  :   {}".format(node.actions[action_num], regret))
                     if current_player == 0:
                         counterfactual_probability = p1 * p2
                     elif current_player == 1:
                         counterfactual_probability = p0 * p2
                     else:
                         counterfactual_probability = p0 * p1
-                    print("p0, p1, p2 : ", p0, p1, p2)
-                    print("cf probability : ", counterfactual_probability)
+                    #print("p0, p1, p2 : ", p0, p1, p2)
+                    #print("cf probability : ", counterfactual_probability)
                     node.cumulative_regrets[action_num] += counterfactual_probability * regret
 
-                print("Node: ", node.infoset, "  strategy : ", node.get_strategy(),
-                      " regrets :  ", node.cumulative_regrets, "  node util : ", node_util)
+                #print("Node: ", node.infoset, "  strategy : ", node.get_strategy(),
+                 #     " regrets :  ", node.cumulative_regrets, "  node util : ", node_util)
 
             return node_util
 
-    def train(self, iterations, shuffle=True):
+    def train(self, iterations):
         util0 = 0
         util1 = 0
         util2 = 0
-        for i in range(iterations):
 
-            cards = [(1, 0), (2, 1), (2, 0), (3, 0), (1, 1), (3, 1)]  # cards shuffled, dealt -> chance sampling
-            if shuffle:
-                random.shuffle(cards)
+        for i in range(1, iterations + 1):
 
-            history = History(mode_proposals=[], cards_played=[], starting_deck=cards)
+            print("\nIteration {}\n".format(i))
 
-            util2 += self.cfr(history=history, cards=cards, player=2, p0=1, p1=1, p2=1)
-            util1 += self.cfr(history=history, cards=cards, player=1, p0=1, p1=1, p2=1)
-            util0 += self.cfr(history=history, cards=cards, player=0, p0=1, p1=1, p2=1)
+            possible_starting_decks = self.all_deck_combinations()
 
-            for node in self.node_map.get_nodes():
-                node.update_strategy()
+            for cards in possible_starting_decks:
 
-            if i % 2 == 0:
-                print("\n Iteration {}".format(i))
-                print("Player 0: Average Game Value : {}\n".format(util0 / iterations))
-                print("Player 1: Average Game Value : {}\n".format(util1 / iterations))
-                print("Player 2: Average Game Value : {}\n".format(util2 / iterations))
+                history = History(mode_proposals=[], cards_played=[], starting_deck=cards)
+
+                util2 += self.cfr(history=history, player=2, p0=1, p1=1, p2=1)
+                util1 += self.cfr(history=history, player=1, p0=1, p1=1, p2=1)
+                util0 += self.cfr(history=history, player=0, p0=1, p1=1, p2=1)
+
+                for node in self.node_map.get_nodes():
+                    node.update_strategy()
+

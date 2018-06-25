@@ -6,6 +6,10 @@ WEITER = 0
 SOLO = 1
 
 
+# Not working like this
+
+
+
 class Node:
     def __init__(self, infoset):
         self.infoset = infoset
