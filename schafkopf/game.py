@@ -57,6 +57,9 @@ class Trick:
         self.leading_player_index = leading_player
         self.current_player = leading_player
 
+    def __str__(self):
+        return str(self.cards)
+
     def calculate_points(self):
         points = 0
         for card in self.cards:
@@ -131,11 +134,18 @@ class Game:
     def get_players(self):
         return self._playerlist
 
+    def get_offensive_players(self):
+        return self._offensive_players
+
     def get_tricks(self):
         return self._tricks
 
     def get_game_mode(self):
         return self._game_mode
+
+    def set_game_mode(self, mode, offensive_players):
+        self._game_mode = mode
+        self._offensive_players = offensive_players
 
     def next_proposed_game_mode(self):
         player = self._playerlist[self._current_player_index]
