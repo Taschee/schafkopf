@@ -95,7 +95,8 @@ def test_player_hands(game, example_game_state_mode_decision):
     game.initialize_game_state(example_game_state_mode_decision)
     player_hands =  example_game_state_mode_decision[0]
     players = game.get_players()
-    assert player_hands[0] == players[0].get_hand()
+    for player, hand in zip(players, player_hands):
+        assert hand == player.get_hand()
 
 # testing the trick playing part
 
@@ -106,6 +107,14 @@ def test_mode_initializing(game, example_game_state_trick_playing):
     assert game.get_game_mode() == (SOLO, EICHEL)
     assert game.game_mode_decided()
 
-def test_number_of_previous_tricks(game, example_game_state_trick_playing):
+def test_previous_tricks(game, example_game_state_trick_playing):
     game.initialize_game_state(example_game_state_trick_playing)
-    assert len(game._tricks) == 1
+    assert len(game.get_tricks()) == 1
+    assert game.get_tricks()[0].score == 15
+
+def test_current_trick(game, example_game_state_trick_playing):
+    game.initialize_game_state(example_game_state_trick_playing)
+    curr_trick = game.get_current_trick()
+    assert curr_trick.num_cards == 2
+    assert curr_trick.current_player == 0
+    assert curr_trick.cards[2] == (OBER, EICHEL)
