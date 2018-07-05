@@ -15,6 +15,7 @@ GRAS = 2
 EICHEL = 3
 SUITS = [EICHEL, GRAS, HERZ, SCHELLEN]
 
+# every game mode is a tuple (game_type, suit). possible game_types are:
 WEITER = 0
 RUFSPIEL = 1
 WENZ = 2
@@ -49,13 +50,13 @@ def determine_possible_game_modes(hand, mode_to_beat=(WEITER, None)):
 
 
 class Trick:
-    def __init__(self, playerlist, leading_player):
-        self.cards = [None for player in playerlist]
+    def __init__(self, leading_player_index):
+        self.cards = [None for player in range(4)]
         self.score = 0
         self.winner = None
         self.num_cards = 0
-        self.leading_player_index = leading_player
-        self.current_player = leading_player
+        self.leading_player_index = leading_player_index
+        self.current_player = leading_player_index
 
     def __str__(self):
         return str(self.cards)
@@ -94,14 +95,15 @@ class Game:
     def __init__(self, players, leading_player_index=0, cards=[(i % 8, i // 8) for i in range(32)], shuffle_cards=True):
         self._playerlist = players
         self._game_mode = (WEITER, None)
+        self._mode_proposals = [None for player in self._playerlist]
         self._trump_cards = []
         self._cards = cards
-        self._num_tricks = len(cards) / len(players)
+        self._max_num_tricks = len(cards) / len(players)
         self._deciding_players = set(players)
         self._offensive_players = []
         self._scores = [0 for player in self._playerlist]
         self._tricks = []
-        self._current_trick = Trick(players, leading_player_index)
+        self._current_trick = Trick(leading_player_index)
         self._current_player_index = leading_player_index
         self._leading_player_index = leading_player_index
         self._winners = None
@@ -147,8 +149,67 @@ class Game:
         self._game_mode = mode
         self._offensive_players = offensive_players
 
+    def initialize_game_state(self, game_state):
+        # a game state should be given by a tuple:
+        # (player_hands, leading_player_index, mode_proposals, previous_tricks, current_trick)
+        player_hands = game_state[0]
+        leading_player_index = game_state[1]
+        mode_proposals =  game_state[2]
+        tricks = game_state[3]
+        current_trick = game_state[4]
+
+        self._leading_player_index = leading_player_index
+        self._mode_proposals = mode_proposals
+        self.initialize_game_mode(leading_player_index, mode_proposals)
+        if self.game_mode_decided():
+            self.define_trumpcards()
+            if self._game_mode[0] == RUFSPIEL:
+                self.find_offensive_partner(game_state)
+        self._tricks = tricks
+        self.initialize_scores(tricks)
+        self._current_trick = current_trick
+        for player, hand in zip(self._playerlist, player_hands):
+            player.pick_up_cards(hand)
+
+    def initialize_game_mode(self, leading_player_index, mode_proposals):
+        self._current_player_index = leading_player_index
+        for proposal in mode_proposals:
+            # find out who made the proposal
+            while True:
+                player = self.get_current_player()
+                if player in self._deciding_players:
+                    break
+                else:
+                    self.next_player()
+            # change game mode according to proposal
+            if proposal[0] <= self._game_mode[0]:
+                self._deciding_players.remove(player)
+            else:
+                self._game_mode = proposal
+                self._offensive_players = [self._playerlist.index(player)]
+            self.next_player()
+
+    def find_offensive_partner(self, game_state):
+        player_hands = game_state[0]
+        previous_tricks = game_state[3]
+        current_trick = game_state[4]
+        for playerindex in range(len(self._playerlist)):
+            hand = player_hands[playerindex]
+            for trick in previous_tricks:
+                hand.append(trick.cards[playerindex])
+            current_card = current_trick.cards[playerindex]
+            if current_card is not None:
+                hand.append(current_card)
+            if (7, self._game_mode[1]) in hand:
+                self._offensive_players.append(playerindex)
+                break
+
+    def initialize_scores(self, tricks):
+        for trick in tricks:
+            self._scores[trick.winner] += trick.score
+
     def next_proposed_game_mode(self):
-        player = self._playerlist[self._current_player_index]
+        player = self.get_current_player()
         if player in self._deciding_players:
             options = determine_possible_game_modes(player.get_hand(), mode_to_beat=self._game_mode)
             chosen_mode = self._playerlist[self._current_player_index].choose_game_mode(options=options)
@@ -168,7 +229,7 @@ class Game:
     def decide_game_mode(self):
         while not self.game_mode_decided():
             self.next_proposed_game_mode()
-        if self._game_mode[0] == 1:
+        if self._game_mode[0] == RUFSPIEL:
             for player in self._playerlist:
                 if (7, self._game_mode[1]) in player.get_hand():
                     self._offensive_players.append(self._playerlist.index(player))
@@ -217,7 +278,7 @@ class Game:
 
     def reset_current_trick(self):
         self._tricks.append(self._current_trick)
-        self._current_trick = Trick(self._playerlist, self._current_player_index)
+        self._current_trick = Trick(self._current_player_index)
 
     def play_next_card(self):
         if len(self._tricks) == 0 and self._current_trick.cards[self._leading_player_index] is None:
@@ -244,7 +305,7 @@ class Game:
         return self._tricks[-1]
 
     def finished(self):
-        if len(self._tricks) == self._num_tricks:
+        if len(self._tricks) == self._max_num_tricks:
             return True
         else:
             return False
