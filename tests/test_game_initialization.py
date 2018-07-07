@@ -48,7 +48,11 @@ def example_game_state_mode_decision():
     tricks = []
     current_trick = Trick(leading_player_index)
     mode_proposals = [(WEITER, None), (RUFSPIEL, GRAS)]
-    game_state = (player_hands, leading_player_index, mode_proposals, tricks, current_trick)
+    game_state = {"player_hands": player_hands,
+                  "leading_player_index": leading_player_index,
+                  "mode_proposals": mode_proposals,
+                  "tricks": tricks,
+                  "current_trick": current_trick}
     return game_state
 
 @pytest.fixture
@@ -75,14 +79,18 @@ def example_game_state_trick_playing():
     current_trick.cards[3] = (ACHT, EICHEL)
     current_trick.num_cards = 2
     current_trick.current_player = 0
-    game_state = (player_hands, leading_player_index, mode_proposals, tricks, current_trick)
+    game_state = {"player_hands": player_hands,
+                  "leading_player_index": leading_player_index,
+                  "mode_proposals": mode_proposals,
+                  "tricks": tricks,
+                  "current_trick": current_trick}
     return game_state
 
 # testing the game mode decision part
 
 def test_game_mode_initializing(game, example_game_state_mode_decision):
-    mode_proposals = example_game_state_mode_decision[2]
-    leading_player_index = example_game_state_mode_decision[1]
+    mode_proposals = example_game_state_mode_decision["mode_proposals"]
+    leading_player_index = example_game_state_mode_decision["leading_player_index"]
     game.initialize_game_mode(leading_player_index, mode_proposals)
     assert game.get_game_mode() == (RUFSPIEL, GRAS)
     assert not game.game_mode_decided()
@@ -93,7 +101,7 @@ def test_current_player(game, example_game_state_mode_decision):
 
 def test_player_hands(game, example_game_state_mode_decision):
     game.initialize_game_state(example_game_state_mode_decision)
-    player_hands =  example_game_state_mode_decision[0]
+    player_hands =  example_game_state_mode_decision["player_hands"]
     players = game.get_players()
     for player, hand in zip(players, player_hands):
         assert hand == player.get_hand()
@@ -101,8 +109,8 @@ def test_player_hands(game, example_game_state_mode_decision):
 # testing the trick playing part
 
 def test_mode_initializing(game, example_game_state_trick_playing):
-    mode_proposals = example_game_state_trick_playing[2]
-    leading_player_index = example_game_state_trick_playing[1]
+    mode_proposals = example_game_state_trick_playing["mode_proposals"]
+    leading_player_index = example_game_state_trick_playing["leading_player_index"]
     game.initialize_game_mode(leading_player_index, mode_proposals)
     assert game.get_game_mode() == (SOLO, EICHEL)
     assert game.game_mode_decided()

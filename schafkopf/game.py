@@ -1,4 +1,5 @@
 import random
+from copy import deepcopy
 
 SIEBEN = 0
 ACHT = 1
@@ -149,14 +150,28 @@ class Game:
         self._game_mode = mode
         self._offensive_players = offensive_players
 
+    def get_public_info(self):
+        leading_player = deepcopy(self._leading_player_index)
+        tricks = deepcopy(self._tricks)
+        current_trick = deepcopy(self._current_trick)
+        mode_proposals = deepcopy(self._mode_proposals)
+        game_mode = deepcopy(self._game_mode)
+        trumpcards = deepcopy(self._trump_cards)
+        return {"leading_player_index": leading_player,
+                "mode_proposals": mode_proposals,
+                "game_mode": game_mode,
+                "trumpcards": trumpcards,
+                "tricks": tricks,
+                "current_trick": current_trick}
+
     def initialize_game_state(self, game_state):
-        # a game state should be given by a tuple:
-        # (player_hands, leading_player_index, mode_proposals, previous_tricks, current_trick)
-        player_hands = game_state[0]
-        leading_player_index = game_state[1]
-        mode_proposals =  game_state[2]
-        tricks = game_state[3]
-        current_trick = game_state[4]
+        # a game state should be given by a dictionary:
+        # {player_hands, leading_player_index, mode_proposals, tricks, current_trick}
+        player_hands = game_state["player_hands"]
+        leading_player_index = game_state["leading_player_index"]
+        mode_proposals =  game_state["mode_proposals"]
+        tricks = game_state["tricks"]
+        current_trick = game_state["current_trick"]
 
         self._leading_player_index = leading_player_index
         self._mode_proposals = mode_proposals
@@ -283,11 +298,12 @@ class Game:
     def play_next_card(self):
         if len(self._tricks) == 0 and self._current_trick.cards[self._leading_player_index] is None:
             self._current_player_index = self._leading_player_index
-        current_player = self._playerlist[self._current_player_index]
+        current_player = self.get_current_player()
         if self._current_trick.num_cards == 0:
             self._current_trick.leading_player_index = self._current_player_index
         options = self.possible_cards(self._current_trick, current_player.get_hand())
-        next_card = current_player.play_card(previous_cards=self._current_trick.cards, options=options)
+        info = self.get_public_info()
+        next_card = current_player.play_card(public_info=info, options=options)
         self._current_trick.cards[self._current_player_index] = next_card
         self._current_trick.num_cards += 1
 
