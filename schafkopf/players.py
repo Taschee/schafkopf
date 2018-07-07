@@ -35,7 +35,7 @@ class RandomPlayer(Player):
     def choose_game_mode(self, options):
         return random.choice(tuple(options))
 
-    def play_card(self, previous_cards, options=None):
+    def play_card(self, public_info, options=None):
         if options is None:
             card = random.choice(self._hand)
         else:
