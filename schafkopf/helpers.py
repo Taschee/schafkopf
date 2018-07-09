@@ -13,7 +13,7 @@ def sample_opponent_cards(tricks, current_trick, trumpcards, playerindex, player
 
 def opponent_cards_still_in_game(tricks, current_trick, player_hand):
     opp_cards = set([(i % 8, i // 8) for i in range(32)])
-    not_possible_cards = player_hand + current_trick.cards
+    not_possible_cards = player_hand + [card for card in current_trick.cards if card is not None]
     for trick in tricks:
         not_possible_cards += trick.cards
     for card in not_possible_cards:
@@ -24,7 +24,7 @@ def opponent_cards_still_in_game(tricks, current_trick, player_hand):
 def didnt_follow_trump(tricks, current_trick, trumpcards, playerindex):
     for trick in tricks + [current_trick]:
         first_card = trick.cards[trick.leading_player_index]
-        if first_card in trumpcards:
+        if first_card in trumpcards and first_card is not None:
             if trick.cards[playerindex] not in trumpcards:
                 return True
     else:
@@ -35,7 +35,7 @@ def suits_not_followed(tricks, current_trick, trumpcards, playerindex):
     missing_suits = []
     for trick in tricks + [current_trick]:
         first_card = trick.cards[trick.leading_player_index]
-        if first_card not in trumpcards:
+        if first_card not in trumpcards and first_card is not None:
             suit = first_card[1]
             if trick.cards[playerindex][1] != suit:
                 missing_suits.append(suit)
@@ -44,7 +44,8 @@ def suits_not_followed(tricks, current_trick, trumpcards, playerindex):
 
 def card_distribution_possible(tricks, current_trick, trumpcards, playerindex, opp_card_distribution):
 
-    opp_indices = list({0, 1, 2, 3}.remove(playerindex))
+    opp_indices = list({0, 1, 2, 3})
+    opp_indices.remove(playerindex)
 
     for opp_index in opp_indices:
 

@@ -17,7 +17,11 @@ testgame.decide_game_mode()
 print("Game mode : ", testgame.get_game_mode())
 print("Offensive players : ", testgame.get_offensive_players())
 print("Alfons cards : ", Alfons.get_hand())
-print("Possible opponent hands : ", hlp.sample_opponent_cards(testgame, Alfons))
+print("Possible opponent hands : ", hlp.sample_opponent_cards(tricks=testgame.get_tricks(),
+                                                              current_trick=testgame.get_current_trick(),
+                                                              trumpcards=testgame.get_trump_cards(),
+                                                              playerindex=testgame.get_current_playerindex(),
+                                                              player_hand=testgame.get_current_player().get_hand()))
 
 for i in range(24):
     testgame.play_next_card()
@@ -28,4 +32,8 @@ for trick in testgame.get_tricks():
 
 
 print("Alfons cards : ", Alfons.get_hand())
-print("Possible opponent hands : ", hlp.sample_opponent_cards(testgame, Alfons))
+print("Possible opponent hands : ", hlp.sample_opponent_cards(tricks=testgame.get_tricks(),
+                                                              current_trick=testgame.get_current_trick(),
+                                                              trumpcards=testgame.get_trump_cards(),
+                                                              playerindex=testgame.get_current_playerindex(),
+                                                              player_hand=testgame.get_current_player().get_hand()))

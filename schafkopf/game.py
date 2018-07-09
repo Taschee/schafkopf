@@ -134,6 +134,9 @@ class Game:
     def get_current_player(self):
         return self._playerlist[self._current_player_index]
 
+    def get_current_player_index(self):
+        return self._current_player_index
+
     def get_players(self):
         return self._playerlist
 
@@ -152,6 +155,7 @@ class Game:
 
     def get_public_info(self):
         leading_player = deepcopy(self._leading_player_index)
+        current_player = deepcopy(self._current_player_index)
         tricks = deepcopy(self._tricks)
         current_trick = deepcopy(self._current_trick)
         mode_proposals = deepcopy(self._mode_proposals)
@@ -162,7 +166,8 @@ class Game:
                 "game_mode": game_mode,
                 "trumpcards": trumpcards,
                 "tricks": tricks,
-                "current_trick": current_trick}
+                "current_trick": current_trick,
+                "current_player_index": current_player}
 
     def initialize_game_state(self, game_state):
         # a game state should be given by a dictionary:
