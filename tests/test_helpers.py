@@ -87,3 +87,8 @@ def test_distribution_possible():
                                               player_hands=not_poss_hands, playerindex=playerindex,
                                               trumpcards=trumpcards)
 
+def test_sampling():
+    player_hands = hlp.sample_opponent_hands(tricks=tricks, current_trick=current_trick, player_hand=player_hand,
+                                             playerindex=playerindex, trumpcards=trumpcards)
+    assert hlp.card_distribution_possible(tricks=tricks, current_trick=current_trick, trumpcards=trumpcards,
+                                          playerindex=playerindex, player_hands=player_hands)

@@ -6,8 +6,8 @@ def sample_opponent_hands(tricks, current_trick, trumpcards, playerindex, player
 
     while True:
         random.shuffle(opp_cards)
-        sample_hands = deal_player_hands(playerindex=playerindex, opp_card_distribution=opp_cards,
-                                         tricks=tricks, current_trick=current_trick)
+        sample_hands = deal_player_hands(playerindex=playerindex, opp_cards=opp_cards,
+                                         tricks=tricks, current_trick=current_trick, player_hand=player_hand)
         if card_distribution_possible(tricks, current_trick, trumpcards, playerindex, sample_hands):
             break
 
