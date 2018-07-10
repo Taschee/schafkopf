@@ -1,101 +1,17 @@
 import random
 from copy import deepcopy
-
-SIEBEN = 0
-ACHT = 1
-NEUN = 2
-UNTER = 3
-OBER = 4
-KOENIG = 5
-ZEHN = 6
-AS = 7
-
-SCHELLEN = 0
-HERZ = 1
-GRAS = 2
-EICHEL = 3
-SUITS = [EICHEL, GRAS, HERZ, SCHELLEN]
-
-# every game mode is a tuple (game_type, suit). possible game_types are:
-WEITER = 0
-RUFSPIEL = 1
-WENZ = 2
-SOLO = 3
-
-BASIC_PAYOUT_RUFSPIEL = 20
-BASIC_PAYOUT_SOLO = 50
-EXTRA_PAYOUT = 10
-
-
-def determine_possible_partnermodes(hand):
-    possible_modes = set()
-    for suit in [SCHELLEN, GRAS, EICHEL]:
-        if (AS, suit) not in hand:
-            for i in [SIEBEN, ACHT, NEUN, KOENIG, ZEHN]:
-                if (i, suit) in hand:
-                    possible_modes.add((1, suit))
-                    break
-    return possible_modes
-
-
-def determine_possible_game_modes(hand, mode_to_beat=(WEITER, None)):
-    possible_modes = {(WEITER, None)}
-    if mode_to_beat[0] == WEITER:
-        possible_modes |= determine_possible_partnermodes(hand) | {(WENZ, None), (SOLO, SCHELLEN), (SOLO, HERZ),
-                                                                   (SOLO, GRAS), (SOLO, EICHEL)}
-    elif mode_to_beat[0] == RUFSPIEL:
-        possible_modes |= {(WENZ, None), (SOLO, SCHELLEN), (SOLO, HERZ), (SOLO, GRAS), (SOLO, EICHEL)}
-    elif mode_to_beat[0] == WENZ:
-        possible_modes |= {(SOLO, SCHELLEN), (SOLO, HERZ), (SOLO, GRAS), (SOLO, EICHEL)}
-    return possible_modes
-
-
-class Trick:
-    def __init__(self, leading_player_index):
-        self.cards = [None for player in range(4)]
-        self.score = 0
-        self.winner = None
-        self.num_cards = 0
-        self.leading_player_index = leading_player_index
-        self.current_player = leading_player_index
-
-    def __str__(self):
-        return str(self.cards)
-
-    def calculate_points(self):
-        points = 0
-        for card in self.cards:
-            if card[0] == ZEHN:
-                points += 10
-            elif card[0] == UNTER:
-                points += 2
-            elif card[0] == OBER:
-                points += 3
-            elif card[0] == KOENIG:
-                points += 4
-            elif card[0] == AS:
-                points += 11
-        self.score = points
-        return points
-
-    def determine_trickwinner(self, trumpcards):
-        # returns index of winning card / player
-        trumps_in_trick = [card for card in self.cards if card in trumpcards]
-        if len(trumps_in_trick) > 0:
-            best_trump = min([trumpcards.index(trump) for trump in trumps_in_trick])
-            self.winner = self.cards.index(trumpcards[best_trump])
-        else:
-            starting_index = self.leading_player_index
-            first_card = self.cards[starting_index]
-            played_suit = first_card[1]
-            best_card = (max([i for (i, j) in self.cards if j == played_suit]), played_suit)
-            self.winner = self.cards.index(best_card)
+from schafkopf.suits import BELLS, HEARTS, LEAVES, ACORNS, SUITS
+from schafkopf.ranks import SEVEN, EIGHT, NINE, UNTER, OBER, KING, TEN, AS, RANKS
+from  schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
+from schafkopf.payouts import BASIC_PAYOUT_SOLO, BASIC_PAYOUT_PARTNER_MODE, EXTRA_PAYOUT
+from schafkopf.helpers import determine_possible_game_modes
+from schafkopf.trick import Trick
 
 
 class Game:
     def __init__(self, players, leading_player_index=0, cards=[(i % 8, i // 8) for i in range(32)], shuffle_cards=True):
         self._playerlist = players
-        self._game_mode = (WEITER, None)
+        self._game_mode = (NO_GAME, None)
         self._mode_proposals = [None for player in self._playerlist]
         self._trump_cards = []
         self._cards = cards
@@ -183,7 +99,7 @@ class Game:
         self.initialize_game_mode(leading_player_index, mode_proposals)
         if self.game_mode_decided():
             self.define_trumpcards()
-            if self._game_mode[0] == RUFSPIEL:
+            if self._game_mode[0] == PARTNER_MODE:
                 self.find_offensive_partner(game_state)
         self._tricks = tricks
         self.initialize_scores(tricks)
@@ -249,7 +165,7 @@ class Game:
     def decide_game_mode(self):
         while not self.game_mode_decided():
             self.next_proposed_game_mode()
-        if self._game_mode[0] == RUFSPIEL:
+        if self._game_mode[0] == PARTNER_MODE:
             for player in self._playerlist:
                 if (7, self._game_mode[1]) in player.get_hand():
                     self._offensive_players.append(self._playerlist.index(player))
@@ -257,15 +173,15 @@ class Game:
 
     def define_trumpcards(self):
         # trumpcards defined in order, lower index means stronger trump
-        if self._game_mode[0] == RUFSPIEL:
+        if self._game_mode[0] == PARTNER_MODE:
             self._trump_cards = [(OBER, i) for i in SUITS] + [(UNTER, i) for i in SUITS] \
-                                + [(AS, HERZ), (ZEHN, HERZ), (KOENIG, HERZ), (NEUN, HERZ), (ACHT, HERZ), (SIEBEN, HERZ)]
+                                + [(AS, HEARTS), (TEN, HEARTS), (KING, HEARTS), (NINE, HEARTS), (EIGHT, HEARTS), (SEVEN, HEARTS)]
         elif self._game_mode[0] == WENZ:
             self._trump_cards = [(UNTER, i) for i in SUITS]
         elif self._game_mode[0] == SOLO:
             suit = self._game_mode[1]
             self._trump_cards = [(OBER, i) for i in SUITS] + [(UNTER, i) for i in SUITS] \
-                                + [(AS, suit), (ZEHN, suit), (KOENIG, suit), (NEUN, suit), (ACHT, suit), (SIEBEN, suit)]
+                                + [(AS, suit), (TEN, suit), (KING, suit), (NINE, suit), (EIGHT, suit), (SEVEN, suit)]
 
     def suit_in_hand(self, suit, hand):
         suit_cards = [card for card in hand if card[1] == suit and card not in self._trump_cards]
@@ -276,7 +192,7 @@ class Game:
 
     def possible_cards(self, current_trick, hand):
         if current_trick.num_cards == 0:
-            if self._game_mode[0] == RUFSPIEL and (7, self._game_mode[1]) in hand:
+            if self._game_mode[0] == PARTNER_MODE and (7, self._game_mode[1]) in hand:
                 forbidden_cards = [card for card in hand if card not in self._trump_cards
                                 and card[1] == self._game_mode[1] and card[0] != 7]
                 return [card for card in hand if card not in forbidden_cards]
@@ -290,7 +206,7 @@ class Game:
                 return players_trumpcards
             else:
                 return hand
-        elif self._game_mode[0] == RUFSPIEL and first_card[1] == self._game_mode[1] and (7, self._game_mode[1]) in hand:
+        elif self._game_mode[0] == PARTNER_MODE and first_card[1] == self._game_mode[1] and (7, self._game_mode[1]) in hand:
             return (7,self._game_mode[1])
         else:
             suit = first_card[1]
@@ -343,10 +259,10 @@ class Game:
 
     def get_payout(self, player):
         if self.finished():
-            if self._game_mode is WEITER:
+            if self._game_mode is NO_GAME:
                 return 0
             else:
-                if self._game_mode[0] == RUFSPIEL:
+                if self._game_mode[0] == PARTNER_MODE:
                     return self.get_payout_partnermode(player)
                 else:
                     return self.get_payout_solo(player)
@@ -368,7 +284,7 @@ class Game:
             return False
 
     def get_payout_partnermode(self, playerindex):
-        payout = BASIC_PAYOUT_RUFSPIEL
+        payout = BASIC_PAYOUT_PARTNER_MODE
         if self.schneider():
             payout += EXTRA_PAYOUT
             if self.schwarz():

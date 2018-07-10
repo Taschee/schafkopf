@@ -1,4 +1,7 @@
 import random
+from schafkopf.suits import BELLS, HEARTS, LEAVES, ACORNS, SUITS
+from schafkopf.ranks import SEVEN, EIGHT, NINE, UNTER, OBER, KING, TEN, AS, RANKS
+from  schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
 
 
 def sample_opponent_hands(tricks, current_trick, trumpcards, playerindex, player_hand):
@@ -86,3 +89,26 @@ def card_distribution_possible(tricks, current_trick, trumpcards, playerindex, p
                     return False
 
     return True
+
+
+def determine_possible_partnermodes(hand):
+    possible_modes = set()
+    for suit in [BELLS, LEAVES, ACORNS]:
+        if (AS, suit) not in hand:
+            for i in [SEVEN, EIGHT, NINE, KING, TEN]:
+                if (i, suit) in hand:
+                    possible_modes.add((1, suit))
+                    break
+    return possible_modes
+
+
+def determine_possible_game_modes(hand, mode_to_beat=(NO_GAME, None)):
+    possible_modes = {(NO_GAME, None)}
+    if mode_to_beat[0] == NO_GAME:
+        possible_modes |= determine_possible_partnermodes(hand) | {(WENZ, None), (SOLO, BELLS), (SOLO, HEARTS),
+                                                                   (SOLO, LEAVES), (SOLO, ACORNS)}
+    elif mode_to_beat[0] == PARTNER_MODE:
+        possible_modes |= {(WENZ, None), (SOLO, BELLS), (SOLO, HEARTS), (SOLO, LEAVES), (SOLO, ACORNS)}
+    elif mode_to_beat[0] == WENZ:
+        possible_modes |= {(SOLO, BELLS), (SOLO, HEARTS), (SOLO, LEAVES), (SOLO, ACORNS)}
+    return possible_modes
