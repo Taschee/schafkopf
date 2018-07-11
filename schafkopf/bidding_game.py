@@ -38,7 +38,7 @@ class BiddingGame:
 
     def decide_game_mode(self):
         while not self.finished():
-            self.next_proposed_game_mode()
+            self.next_proposal()
         if self.game_mode[0] == PARTNER_MODE:
             for player in self.playerlist:
                 if (7, self.game_mode[1]) in player.get_hand():
