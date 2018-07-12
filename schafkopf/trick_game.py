@@ -5,40 +5,32 @@ from schafkopf.trick import Trick
 
 
 class TrickGame:
-    def __init__(self, playerlist, leading_player_index, offensive_player_indices, game_mode, mode_proposals):
+    def __init__(self, playerlist, game_state):
         self.playerlist = playerlist
         self.max_num_tricks = len(playerlist[0].get_hand())
-        self.leading_player_index = leading_player_index
-        self.current_player_index = leading_player_index
-        self.offensive_player_indices = offensive_player_indices
-        self.game_mode = game_mode
-        self.mode_proposals = mode_proposals
-        self.trumpcards = define_trumpcards(game_mode)
-        self.tricks = []
-        self.current_trick = Trick(leading_player_index=leading_player_index)
+        self.leading_player_index = game_state["leading_player_index"]
+        self.current_player_index = game_state["leading_player_index"]
+        self.game_mode = game_state["game_mode"]
+        self.mode_proposals = game_state["mode_proposals"]
+        self.trumpcards = define_trumpcards(self.game_mode)
+        self.tricks = game_state["tricks"]
+        self.current_trick = game_state["current_trick"]
         self.scores = [0 for player in playerlist]
 
     def next_player(self):
-        self.current_player_index = (self.current_player_index + 1)  % 4
+        self.current_player_index = (self.current_player_index + 1) % 4
 
     def get_current_player(self):
         return self.playerlist[self.current_player_index]
 
     def get_public_info(self):
-        leading_player = deepcopy(self.leading_player_index)
-        current_player = deepcopy(self.current_player_index)
-        tricks = deepcopy(self.tricks)
-        current_trick = deepcopy(self.current_trick)
-        mode_proposals = deepcopy(self.mode_proposals)
-        game_mode = deepcopy(self.game_mode)
-        trumpcards = deepcopy(self.trumpcards)
-        return {"leading_player_index": leading_player,
-                "mode_proposals": mode_proposals,
-                "game_mode": game_mode,
-                "trumpcards": trumpcards,
-                "tricks": tricks,
-                "current_trick": current_trick,
-                "current_player_index": current_player}
+        return deepcopy({"leading_player_index": self.leading_player_index,
+                         "mode_proposals": self.mode_proposals,
+                         "game_mode": self.game_mode,
+                         "trumpcards": self.trumpcards,
+                         "tricks": self.tricks,
+                         "current_trick": self.current_trick,
+                         "current_player_index": self.current_player_index})
 
     def suit_in_hand(self, suit, hand):
         suit_cards = [card for card in hand if card[1] == suit and card not in self.trumpcards]
@@ -52,7 +44,8 @@ class TrickGame:
         if current_trick.num_cards == 0:
             if self.game_mode[0] == PARTNER_MODE and (7, self.game_mode[1]) in hand:
                 forbidden_cards = [card for card in hand if card not in self.trumpcards
-                                and card[1] == self.game_mode[1] and card[0] != 7]
+                                   and card[1] == self.game_mode[1] and card[0] != 7]
+                # ToDo: Davonlaufen!
                 return [card for card in hand if card not in forbidden_cards]
             else:
                 return hand
@@ -66,7 +59,8 @@ class TrickGame:
                     return players_trumpcards
                 else:
                     return hand
-            elif self.game_mode[0] == PARTNER_MODE and first_card[1] == self.game_mode[1] and (7, self.game_mode[1]) in hand:
+            elif self.game_mode[0] == PARTNER_MODE and first_card[1] == self.game_mode[1] \
+                    and (7, self.game_mode[1]) in hand:
                 return (7, self.game_mode[1])
             else:
                 suit = first_card[1]

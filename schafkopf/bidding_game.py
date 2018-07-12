@@ -4,11 +4,11 @@ from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, AS
 
 
 class BiddingGame:
-    def __init__(self, playerlist, leading_player_index):
+    def __init__(self, playerlist, game_state):
         self.playerlist = playerlist
         self.deciding_players = set(playerlist)
         self.offensive_players = []
-        self.current_player_index = leading_player_index
+        self.current_player_index = game_state["leading_player_index"]
         self.game_mode = (NO_GAME, None)
         self.mode_proposals = []
 
@@ -44,11 +44,12 @@ class BiddingGame:
         if player in self.deciding_players:
             options = self.determine_possible_game_modes(player.get_hand(), mode_to_beat=self.game_mode)
             chosen_mode = self.playerlist[self.current_player_index].choose_game_mode(options=options)
-            if chosen_mode[0] <= self.game_mode[0]:
+            if chosen_mode[0] == NO_GAME:
                 self.deciding_players.remove(player)
             else:
                 self.game_mode = chosen_mode
                 self.set_offensive_players(player)
+            self.mode_proposals.append(chosen_mode)
         self.next_player()
 
     def set_offensive_players(self, player):
@@ -59,7 +60,7 @@ class BiddingGame:
                     self.offensive_players.append(self.playerlist.index(player))
 
     def finished(self):
-        if len(self.deciding_players) == 1 and len(self.offensive_players) == 1 or len(self.deciding_players) == 0:
+        if len(self.deciding_players) == 1 and len(self.offensive_players) in {1, 2} or len(self.deciding_players) == 0:
             return True
         else:
             return False
