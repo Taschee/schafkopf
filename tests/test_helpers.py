@@ -3,18 +3,18 @@ from schafkopf.game import Game, Trick
 from schafkopf.players import RandomPlayer
 import schafkopf.helpers as hlp
 from schafkopf.suits import BELLS, HEARTS, LEAVES, ACORNS, SUITS
-from schafkopf.ranks import SEVEN, EIGHT, NINE, UNTER, OBER, KING, TEN, AS, RANKS
+from schafkopf.ranks import SEVEN, EIGHT, NINE, UNTER, OBER, KING, TEN, ACE, RANKS
 
 
 trumpcards = [(OBER, i) for i in SUITS] + [(UNTER, i) for i in SUITS] \
-                    + [(AS, HEARTS), (TEN, HEARTS), (KING, HEARTS), (NINE, HEARTS), (EIGHT, HEARTS), (SEVEN, HEARTS)]
+                    + [(ACE, HEARTS), (TEN, HEARTS), (KING, HEARTS), (NINE, HEARTS), (EIGHT, HEARTS), (SEVEN, HEARTS)]
 
 first_trick = Trick(leading_player_index=0)
 first_trick.cards = [(NINE, HEARTS), (UNTER, ACORNS), (OBER, HEARTS), (TEN, BELLS)]
 first_trick.score = 15
 first_trick.winner = 2
 sec_trick = Trick(leading_player_index=2)
-sec_trick.cards = [(AS, LEAVES), (AS, HEARTS), (AS, ACORNS), (SEVEN, ACORNS)]
+sec_trick.cards = [(ACE, LEAVES), (ACE, HEARTS), (ACE, ACORNS), (SEVEN, ACORNS)]
 sec_trick.score = 26
 sec_trick.winner = 1
 
@@ -32,7 +32,7 @@ def test_opp_cards_still_in_game():
                                                  current_trick=current_trick,
                                                  player_hand=player_hand)
     assert set(opp_cards) == {(OBER, ACORNS), (UNTER, HEARTS), (SEVEN, HEARTS), (EIGHT, HEARTS),
-                              (KING, HEARTS), (EIGHT, ACORNS), (NINE, ACORNS), (TEN, ACORNS), (AS, BELLS),
+                              (KING, HEARTS), (EIGHT, ACORNS), (NINE, ACORNS), (TEN, ACORNS), (ACE, BELLS),
                               (KING, BELLS), (SEVEN, BELLS), (EIGHT, BELLS), (NINE, BELLS),
                               (KING, LEAVES), (KING, ACORNS), (EIGHT, LEAVES), (NINE, LEAVES)}
 
@@ -54,7 +54,7 @@ def test_distribution_possible():
     poss_hands = [[(OBER, ACORNS), (UNTER, HEARTS), (SEVEN, HEARTS), (EIGHT, HEARTS), (KING, HEARTS), (EIGHT, LEAVES)],
                   player_hand,
                   [(SEVEN, BELLS), (EIGHT, BELLS), (NINE, BELLS), (KING, LEAVES), (KING, ACORNS)],
-                  [(EIGHT, ACORNS), (NINE, ACORNS), (TEN, ACORNS), (AS, BELLS), (KING, BELLS), (NINE, LEAVES)]]
+                  [(EIGHT, ACORNS), (NINE, ACORNS), (TEN, ACORNS), (ACE, BELLS), (KING, BELLS), (NINE, LEAVES)]]
 
     assert hlp.card_distribution_possible(tricks=tricks, current_trick=current_trick, player_hands=poss_hands,
                                           playerindex=playerindex, trumpcards=trumpcards)
@@ -62,7 +62,7 @@ def test_distribution_possible():
     not_poss_hands = [[(SEVEN, BELLS), (NINE, ACORNS), (SEVEN, HEARTS), (EIGHT, HEARTS), (KING, HEARTS), (EIGHT, LEAVES)],
                       player_hand,
                       [(OBER, ACORNS), (EIGHT, BELLS), (NINE, BELLS), (KING, LEAVES), (KING, ACORNS)],
-                      [(EIGHT, ACORNS), (UNTER, HEARTS), (TEN, ACORNS), (AS, BELLS), (KING, BELLS), (NINE, LEAVES)]]
+                      [(EIGHT, ACORNS), (UNTER, HEARTS), (TEN, ACORNS), (ACE, BELLS), (KING, BELLS), (NINE, LEAVES)]]
 
     assert not hlp.card_distribution_possible(tricks=tricks, current_trick=current_trick,
                                               player_hands=not_poss_hands, playerindex=playerindex,

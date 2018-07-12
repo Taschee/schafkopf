@@ -1,4 +1,4 @@
-from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, AS
+from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 
 
 class Trick:
@@ -24,7 +24,7 @@ class Trick:
                 points += 3
             elif card[0] == KING:
                 points += 4
-            elif card[0] == AS:
+            elif card[0] == ACE:
                 points += 11
         self.score = points
         return points

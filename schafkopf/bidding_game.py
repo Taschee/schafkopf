@@ -1,6 +1,6 @@
 from schafkopf.game_modes import PARTNER_MODE, NO_GAME, WENZ, SOLO
 from schafkopf.suits import BELLS, ACORNS, HEARTS, LEAVES
-from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, AS
+from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 
 
 class BiddingGame:
@@ -21,7 +21,7 @@ class BiddingGame:
     def determine_possible_partnermodes(self, hand):
         possible_modes = set()
         for suit in [BELLS, LEAVES, ACORNS]:
-            if (AS, suit) not in hand:
+            if (ACE, suit) not in hand:
                 for i in [SEVEN, EIGHT, NINE, KING, TEN]:
                     if (i, suit) in hand:
                         possible_modes.add((1, suit))

@@ -1,7 +1,7 @@
 from schafkopf.game import Game, Trick
 from schafkopf.players import RandomPlayer
 from schafkopf.suits import BELLS, HEARTS, LEAVES, ACORNS, SUITS
-from schafkopf.ranks import SEVEN, EIGHT, NINE, UNTER, OBER, KING, TEN, AS, RANKS
+from schafkopf.ranks import SEVEN, EIGHT, NINE, UNTER, OBER, KING, TEN, ACE, RANKS
 from  schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
 import pytest
 
@@ -22,11 +22,11 @@ def example_game_state_mode_decision():
     hand1 = [(SEVEN, BELLS), (EIGHT, BELLS), (NINE, HEARTS), (SEVEN, ACORNS),
              (KING, ACORNS), (KING, LEAVES), (TEN, HEARTS), (TEN, BELLS)]
     hand2 = [(SEVEN, HEARTS), (OBER, BELLS), (EIGHT, HEARTS), (NINE, BELLS),
-             (KING, HEARTS), (UNTER, LEAVES), (TEN, LEAVES), (AS, ACORNS)]
+             (KING, HEARTS), (UNTER, LEAVES), (TEN, LEAVES), (ACE, ACORNS)]
     hand3 = [(NINE, ACORNS), (UNTER, BELLS), (UNTER, ACORNS), (OBER, ACORNS),
-             (OBER, LEAVES), (OBER, HEARTS), (TEN, ACORNS), (AS, BELLS)]
+             (OBER, LEAVES), (OBER, HEARTS), (TEN, ACORNS), (ACE, BELLS)]
     hand4 = [(SEVEN, LEAVES), (EIGHT, LEAVES), (EIGHT, ACORNS), (UNTER, HEARTS),
-             (NINE, LEAVES), (KING, BELLS), (AS, HEARTS), (AS, LEAVES)]
+             (NINE, LEAVES), (KING, BELLS), (ACE, HEARTS), (ACE, LEAVES)]
     player_hands = [hand1, hand2, hand3, hand4]
     leading_player_index = 0
     tricks = []
@@ -45,16 +45,16 @@ def example_game_state_trick_playing():
     hand1 = [(SEVEN, BELLS), (NINE, HEARTS), (SEVEN, ACORNS),
              (KING, ACORNS), (KING, LEAVES), (TEN, HEARTS), (TEN, BELLS)]
     hand2 = [(SEVEN, HEARTS), (OBER, BELLS), (EIGHT, HEARTS),
-             (KING, HEARTS), (UNTER, LEAVES), (TEN, LEAVES), (AS, ACORNS)]
+             (KING, HEARTS), (UNTER, LEAVES), (TEN, LEAVES), (ACE, ACORNS)]
     hand3 = [(NINE, ACORNS), (UNTER, BELLS), (UNTER, ACORNS),
              (OBER, LEAVES), (OBER, HEARTS), (TEN, ACORNS)]
     hand4 = [(SEVEN, LEAVES), (EIGHT, LEAVES), (UNTER, HEARTS),
-             (NINE, LEAVES), (AS, HEARTS), (AS, LEAVES)]
+             (NINE, LEAVES), (ACE, HEARTS), (ACE, LEAVES)]
     player_hands = [hand1, hand2, hand3, hand4]
     leading_player_index = 0
     mode_proposals = [(NO_GAME, None), (PARTNER_MODE, LEAVES), (SOLO, ACORNS), (NO_GAME, None), (NO_GAME, None)]
     first_trick = Trick(leading_player_index=0)
-    first_trick.cards = [(EIGHT, BELLS), (NINE, BELLS), (AS, BELLS), (KING, BELLS)]
+    first_trick.cards = [(EIGHT, BELLS), (NINE, BELLS), (ACE, BELLS), (KING, BELLS)]
     first_trick.winner = 2
     first_trick.num_cards = 4
     first_trick.score = 15

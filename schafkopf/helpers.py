@@ -1,6 +1,6 @@
 import random
 from schafkopf.suits import BELLS, HEARTS, LEAVES, ACORNS, SUITS
-from schafkopf.ranks import SEVEN, EIGHT, NINE, UNTER, OBER, KING, TEN, AS, RANKS
+from schafkopf.ranks import SEVEN, EIGHT, NINE, UNTER, OBER, KING, TEN, ACE, RANKS
 from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
 
 
@@ -95,13 +95,13 @@ def define_trumpcards(game_mode):
     # trumpcards defined in order, lower index means stronger trump
     if game_mode[0] == PARTNER_MODE:
         trumpcards = [(OBER, i) for i in SUITS] + [(UNTER, i) for i in SUITS] \
-                            + [(AS, HEARTS), (TEN, HEARTS), (KING, HEARTS), (NINE, HEARTS), (EIGHT, HEARTS), (SEVEN, HEARTS)]
+                            + [(ACE, HEARTS), (TEN, HEARTS), (KING, HEARTS), (NINE, HEARTS), (EIGHT, HEARTS), (SEVEN, HEARTS)]
     elif game_mode[0] == WENZ:
         trumpcards = [(UNTER, i) for i in SUITS]
     elif game_mode[0] == SOLO:
         suit = game_mode[1]
         trumpcards = [(OBER, i) for i in SUITS] + [(UNTER, i) for i in SUITS] \
-                            + [(AS, suit), (TEN, suit), (KING, suit), (NINE, suit), (EIGHT, suit), (SEVEN, suit)]
+                            + [(ACE, suit), (TEN, suit), (KING, suit), (NINE, suit), (EIGHT, suit), (SEVEN, suit)]
     else:
         trumpcards = []
     return trumpcards
