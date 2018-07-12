@@ -1,6 +1,5 @@
 import pytest
-from schafkopf.game import Game, Trick
-from schafkopf.players import RandomPlayer
+from schafkopf.trick import Trick
 import schafkopf.helpers as hlp
 from schafkopf.suits import BELLS, HEARTS, LEAVES, ACORNS, SUITS
 from schafkopf.ranks import SEVEN, EIGHT, NINE, UNTER, OBER, KING, TEN, ACE, RANKS
