@@ -1,5 +1,6 @@
 from copy import deepcopy
 from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
+from schafkopf.ranks import ACE
 from schafkopf.helpers import define_trumpcards
 from schafkopf.trick import Trick
 
@@ -12,6 +13,7 @@ class TrickGame:
         self.current_player_index = game_state["leading_player_index"]
         self.game_mode = game_state["game_mode"]
         self.mode_proposals = game_state["mode_proposals"]
+        self.offensive_players = game_state["offensive_players"]
         self.trumpcards = define_trumpcards(self.game_mode)
         self.tricks = game_state["tricks"]
         self.current_trick = game_state["current_trick"]
@@ -26,6 +28,7 @@ class TrickGame:
     def get_public_info(self):
         return deepcopy({"leading_player_index": self.leading_player_index,
                          "mode_proposals": self.mode_proposals,
+                         "declaring_player": self.offensive_players[0],
                          "game_mode": self.game_mode,
                          "trumpcards": self.trumpcards,
                          "tricks": self.tricks,
@@ -42,11 +45,12 @@ class TrickGame:
     def possible_cards(self, current_trick, hand):
 
         if current_trick.num_cards == 0:
-            if self.game_mode[0] == PARTNER_MODE and (7, self.game_mode[1]) in hand:
-                forbidden_cards = [card for card in hand if card not in self.trumpcards
-                                   and card[1] == self.game_mode[1] and card[0] != 7]
-                # ToDo: Davonlaufen!
-                return [card for card in hand if card not in forbidden_cards]
+            # " Check in case of PARTNER MODE if running away is possible"
+            if self.game_mode[0] == PARTNER_MODE and (ACE, self.game_mode[1]) in hand:
+                if len(self.suit_in_hand(suit=self.game_mode[1], hand=hand)) < 4:
+                    forbidden_cards = [card for card in hand if card not in self.trumpcards
+                                       and card[1] == self.game_mode[1] and card[0] != 7]
+                    return [card for card in hand if card not in forbidden_cards]
             else:
                 return hand
 
