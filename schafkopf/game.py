@@ -20,7 +20,7 @@ class Game:
 
     def initialize_game_state(self, game_state):
         # a game state should be given by a dictionary:
-        # {player_hands, leading_player_index, mode_proposals, tricks, current_trick}
+        # {player_hands, leading_player_index, mode_proposals, game_mode, offensive_players, tricks, current_trick}
         pass
 
     def initialize_game_mode(self, leading_player_index, mode_proposals):
@@ -35,7 +35,7 @@ class Game:
     def play(self):
         if not self.bidding_game.finished():
             self.bidding_game.decide_game_mode()
-        self.prepare_trick_game()
+            self.prepare_trick_game()
         if not self.trick_game.finished():
             self.trick_game.play()
 

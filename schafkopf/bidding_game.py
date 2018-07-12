@@ -7,10 +7,20 @@ class BiddingGame:
     def __init__(self, playerlist, game_state):
         self.playerlist = playerlist
         self.deciding_players = set(playerlist)
-        self.offensive_players = []
+        self.offensive_players = game_state["offensive_players"]
         self.current_player_index = game_state["leading_player_index"]
-        self.game_mode = (NO_GAME, None)
-        self.mode_proposals = []
+        self.game_mode = game_state["game_mode"]
+        self.mode_proposals = game_state["mode_proposals"]
+        # initializing deciding players
+        for proposal in self.mode_proposals:
+            player = self.playerlist[self.current_player_index]
+            while player not in self.deciding_players:
+                self.next_player()
+                player = self.playerlist[self.current_player_index]
+            if proposal == (NO_GAME, None):
+                self.deciding_players.remove(player)
+            self.next_player()
+
 
     def get_current_player(self):
         return self.playerlist[self.current_player_index]
@@ -18,21 +28,21 @@ class BiddingGame:
     def next_player(self):
         self.current_player_index = (self.current_player_index + 1) % 4
 
-    def determine_possible_partnermodes(self, hand):
+    def determine_possible_partner_modes(self, hand):
         possible_modes = set()
         for suit in [BELLS, LEAVES, ACORNS]:
             if (ACE, suit) not in hand:
                 for i in [SEVEN, EIGHT, NINE, KING, TEN]:
                     if (i, suit) in hand:
-                        possible_modes.add((1, suit))
+                        possible_modes.add((PARTNER_MODE, suit))
                         break
         return possible_modes
 
     def determine_possible_game_modes(self, hand, mode_to_beat=(NO_GAME, None)):
         possible_modes = {(NO_GAME, None)}
         if mode_to_beat[0] == NO_GAME:
-            possible_modes |= self.determine_possible_partnermodes(hand) | {(WENZ, None), (SOLO, BELLS), (SOLO, HEARTS),
-                                                                       (SOLO, LEAVES), (SOLO, ACORNS)}
+            possible_modes |= self.determine_possible_partner_modes(hand) | {(WENZ, None), (SOLO, BELLS),(SOLO, HEARTS),
+                                                                             (SOLO, LEAVES), (SOLO, ACORNS)}
         elif mode_to_beat[0] == PARTNER_MODE:
             possible_modes |= {(WENZ, None), (SOLO, BELLS), (SOLO, HEARTS), (SOLO, LEAVES), (SOLO, ACORNS)}
         elif mode_to_beat[0] == WENZ:
