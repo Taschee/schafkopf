@@ -1,4 +1,4 @@
-
+from schafkopf.game_modes import NO_GAME
 import random
 
 class Player:
@@ -31,13 +31,37 @@ class Player:
         self._hand = sorted_hand
 
 class RandomPlayer(Player):
-
+    """Random Player"""
     def choose_game_mode(self, options):
         return random.choice(tuple(options))
 
     def play_card(self, public_info, options=None):
         if options is None:
             card = random.choice(self._hand)
+        else:
+            card = random.choice(options)
+        self._hand.remove(card)
+        return card
+
+
+class DummyPlayer(Player):
+    """Always chooses specified game_mode if possible. Otherwise he passes.
+       Always plays specified card if possible. Otherwise random card. For testing purpose only."""
+    def __init__(self, name="Dummy", game_mode=None, card=None):
+        Player.__init__(self, name=name)
+        self.favorite_mode = game_mode
+        self.favorite_card = card
+
+    def choose_game_mode(self, options):
+        if self.favorite_mode in options:
+            return self.favorite_mode
+        else:
+            chosen_mode = (NO_GAME, None)
+            return chosen_mode
+
+    def play_card(self, public_info, options=None):
+        if self.favorite_card in options:
+            card = self.favorite_card
         else:
             card = random.choice(options)
         self._hand.remove(card)
