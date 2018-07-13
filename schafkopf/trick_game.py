@@ -10,13 +10,16 @@ class TrickGame:
         self.playerlist = playerlist
         self.max_num_tricks = len(playerlist[0].get_hand())
         self.leading_player_index = game_state["leading_player_index"]
-        self.current_player_index = game_state["leading_player_index"]
         self.game_mode = game_state["game_mode"]
         self.mode_proposals = game_state["mode_proposals"]
         self.offensive_players = game_state["offensive_players"]
         self.trumpcards = define_trumpcards(self.game_mode)
         self.tricks = game_state["tricks"]
-        self.current_trick = game_state["current_trick"]
+        if game_state["current_trick"] is not None:
+            self.current_trick = game_state["current_trick"]
+        else:
+            self.current_trick = Trick(leading_player_index=self.leading_player_index)
+        self.current_player_index = self.current_trick.current_player
         self.scores = [0 for player in playerlist]
 
     def next_player(self):
@@ -32,8 +35,7 @@ class TrickGame:
                          "game_mode": self.game_mode,
                          "trumpcards": self.trumpcards,
                          "tricks": self.tricks,
-                         "current_trick": self.current_trick,
-                         "current_player_index": self.current_player_index})
+                         "current_trick": self.current_trick})
 
     def suit_in_hand(self, suit, hand):
         suit_cards = [card for card in hand if card[1] == suit and card not in self.trumpcards]
@@ -85,7 +87,7 @@ class TrickGame:
         self.current_trick.num_cards += 1
 
     def trick_finished(self):
-        if self.current_trick.num_cards == 4:
+        if self.current_trick.finished():
             self.current_trick.calculate_points()
             self.current_trick.determine_trickwinner(self.trumpcards)
             self.current_player_index = self.current_trick.winner
