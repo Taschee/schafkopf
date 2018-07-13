@@ -7,7 +7,7 @@ from schafkopf.players import DummyPlayer
 
 
 @pytest.fixture
-def random_player_list():
+def dummy_player_list():
     return [DummyPlayer(name="A", game_mode=(NO_GAME, None)),
             DummyPlayer(name="B", game_mode=(PARTNER_MODE, BELLS)),
             DummyPlayer(name="C", game_mode=(NO_GAME, None)),
@@ -78,18 +78,18 @@ def game_state_after_bidding(player_hands):
 
 
 @pytest.fixture
-def game_before(game_state_before_bidding, random_player_list):
-    return BiddingGame(game_state=game_state_before_bidding, playerlist=random_player_list)
+def game_before(game_state_before_bidding, dummy_player_list):
+    return BiddingGame(game_state=game_state_before_bidding, playerlist=dummy_player_list)
 
 
 @pytest.fixture
-def game_during(game_state_during_bidding, random_player_list):
-    return BiddingGame(game_state=game_state_during_bidding, playerlist=random_player_list)
+def game_during(game_state_during_bidding, dummy_player_list):
+    return BiddingGame(game_state=game_state_during_bidding, playerlist=dummy_player_list)
 
 
 @pytest.fixture
-def game_after(game_state_after_bidding, random_player_list):
-    return BiddingGame(game_state=game_state_after_bidding, playerlist=random_player_list)
+def game_after(game_state_after_bidding, dummy_player_list):
+    return BiddingGame(game_state=game_state_after_bidding, playerlist=dummy_player_list)
 
 
 def test_possible_partner_modes(game_before, player_hands):
