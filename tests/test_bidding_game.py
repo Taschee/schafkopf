@@ -79,16 +79,22 @@ def game_state_after_bidding(player_hands):
 
 @pytest.fixture
 def game_before(game_state_before_bidding, dummy_player_list):
+    for player, hand in zip(dummy_player_list, game_state_before_bidding["player_hands"]):
+        player.pick_up_cards(hand)
     return BiddingGame(game_state=game_state_before_bidding, playerlist=dummy_player_list)
 
 
 @pytest.fixture
 def game_during(game_state_during_bidding, dummy_player_list):
+    for player, hand in zip(dummy_player_list, game_state_during_bidding["player_hands"]):
+        player.pick_up_cards(hand)
     return BiddingGame(game_state=game_state_during_bidding, playerlist=dummy_player_list)
 
 
 @pytest.fixture
 def game_after(game_state_after_bidding, dummy_player_list):
+    for player, hand in zip(dummy_player_list, game_state_after_bidding["player_hands"]):
+        player.pick_up_cards(hand)
     return BiddingGame(game_state=game_state_after_bidding, playerlist=dummy_player_list)
 
 

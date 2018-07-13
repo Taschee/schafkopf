@@ -6,8 +6,6 @@ from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 class BiddingGame:
     def __init__(self, playerlist, game_state):
         self.playerlist = playerlist
-        for player, hand in zip(self.playerlist, game_state["player_hands"]):
-            player.pick_up_cards(hand)
         self.deciding_players = set(playerlist)
         self.offensive_players = game_state["offensive_players"]
         self.current_player_index = game_state["leading_player_index"]
