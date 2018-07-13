@@ -2,16 +2,26 @@ from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 
 
 class Trick:
-    def __init__(self, leading_player_index):
-        self.cards = [None for player in range(4)]
-        self.score = 0
-        self.winner = None
-        self.num_cards = 0
+    def __init__(self, leading_player_index, score=0, winner=None, cards=None):
+        self.score = score
+        self.winner = winner
         self.leading_player_index = leading_player_index
         self.current_player = leading_player_index
+        self.num_cards = 0
+        if cards is None:
+            self.cards = [None for player in range(4)]
+        else:
+            self.cards = cards
+            for card in cards:
+                if card is not None:
+                    self.current_player += 1
+                    self.num_cards += 1
 
     def __str__(self):
         return str(self.cards)
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
     def calculate_points(self):
         points = 0
