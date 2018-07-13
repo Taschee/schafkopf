@@ -47,10 +47,10 @@ class RandomPlayer(Player):
 class DummyPlayer(Player):
     """Always chooses specified game_mode if possible. Otherwise he passes.
        Always plays specified card if possible. Otherwise random card. For testing purpose only."""
-    def __init__(self, name="Dummy", game_mode=None, card=None):
+    def __init__(self, name="Dummy", game_mode=None, favorite_cards=None):
         Player.__init__(self, name=name)
         self.favorite_mode = game_mode
-        self.favorite_card = card
+        self.favorite_cards = favorite_cards
 
     def choose_game_mode(self, options):
         if self.favorite_mode in options:
@@ -60,8 +60,10 @@ class DummyPlayer(Player):
             return chosen_mode
 
     def play_card(self, public_info, options=None):
-        if self.favorite_card in options:
-            card = self.favorite_card
+        for fav_card in self.favorite_cards:
+            if fav_card in options:
+                card = fav_card
+                break
         else:
             card = random.choice(options)
         self._hand.remove(card)
