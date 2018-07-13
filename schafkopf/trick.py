@@ -16,21 +16,22 @@ class Trick:
     def calculate_points(self):
         points = 0
         for card in self.cards:
-            if card[0] == TEN:
-                points += 10
-            elif card[0] == UNTER:
-                points += 2
-            elif card[0] == OBER:
-                points += 3
-            elif card[0] == KING:
-                points += 4
-            elif card[0] == ACE:
-                points += 11
+            if card is not None:
+                if card[0] == TEN:
+                    points += 10
+                elif card[0] == UNTER:
+                    points += 2
+                elif card[0] == OBER:
+                    points += 3
+                elif card[0] == KING:
+                    points += 4
+                elif card[0] == ACE:
+                    points += 11
         self.score = points
         return points
 
     def determine_trickwinner(self, trumpcards):
-        # returns index of winning card / player
+        # determines index of winning card / player
         trumps_in_trick = [card for card in self.cards if card in trumpcards]
         if len(trumps_in_trick) > 0:
             best_trump = min([trumpcards.index(trump) for trump in trumps_in_trick])
