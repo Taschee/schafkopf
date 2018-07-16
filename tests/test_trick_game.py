@@ -9,10 +9,14 @@ from schafkopf.trick import Trick
 
 @pytest.fixture
 def dummy_player_list():
-    return [DummyPlayer(name="A", favorite_cards=[]),
-            DummyPlayer(name="B", favorite_cards=[]),
-            DummyPlayer(name="C", favorite_cards=[]),
-            DummyPlayer(name="D", favorite_cards=[])]
+    return [DummyPlayer(name="A", favorite_cards=[(OBER, ACORNS), (SEVEN, ACORNS), (ACE, BELLS), (OBER, BELLS),
+                                                  (UNTER, BELLS), (KING, LEAVES), (TEN, ACORNS), (NINE, ACORNS)]),
+            DummyPlayer(name="B", favorite_cards=[(ACE, HEARTS), (ACE, ACORNS), (KING, BELLS), (OBER, HEARTS),
+                                                  (SEVEN, HEARTS), (OBER, LEAVES), (UNTER, ACORNS), (SEVEN, BELLS)]),
+            DummyPlayer(name="C", favorite_cards=[(KING, HEARTS), (EIGHT, ACORNS), (NINE, BELLS), (TEN, HEARTS),
+                                                  (UNTER, LEAVES), (TEN, LEAVES), (SEVEN, LEAVES), (KING, ACORNS)]),
+            DummyPlayer(name="D", favorite_cards=[(EIGHT, HEARTS), (NINE, HEARTS), (EIGHT, BELLS), (UNTER, HEARTS),
+                                                  (EIGHT, LEAVES), (NINE, LEAVES), (ACE, LEAVES), (TEN, BELLS)])]
 
 
 @pytest.fixture
@@ -152,5 +156,60 @@ def test_suit_in_hand(trick_game_before):
                                                                         (ACE, HEARTS), (SEVEN, HEARTS), (ACE, ACORNS),
                                                                         (KING, BELLS), (SEVEN, BELLS)]
 
+
 def test_possible_cards(trick_game_during):
-    pass
+    curr_trick = trick_game_during.current_trick
+    hand = trick_game_during.playerlist[3].get_hand()
+    assert trick_game_during.possible_cards(current_trick=curr_trick,
+                                            hand=hand) == [(UNTER, HEARTS), (ACE, LEAVES), (TEN, BELLS),
+                                                           (EIGHT, LEAVES), (EIGHT, BELLS), (NINE, LEAVES)]
+    hand = trick_game_during.playerlist[0].get_hand()
+    assert trick_game_during.possible_cards(current_trick=curr_trick,
+                                            hand=hand) == [(TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)]
+    curr_trick = Trick(leading_player_index=0,
+                          cards=[(SEVEN, HEARTS), None, None, None])
+    hand = trick_game_during.playerlist[3].get_hand()
+    assert trick_game_during.possible_cards(current_trick=curr_trick,
+                                            hand=hand) == [(UNTER, HEARTS)]
+    hand = trick_game_during.playerlist[1].get_hand()
+    assert trick_game_during.possible_cards(current_trick=curr_trick,
+                                            hand=hand) == [(OBER, HEARTS), (UNTER, ACORNS), (SEVEN, HEARTS)]
+
+
+def test_next_card(trick_game_before):
+    game = trick_game_before
+    assert game.current_trick.num_cards == 0
+    game.play_next_card()
+    assert game.current_trick.num_cards == 1
+    assert game.current_trick.cards[0] == (OBER, ACORNS)
+    assert not game.current_trick.finished()
+    assert game.current_player_index == 0
+    game.trick_finished()
+    assert game.current_player_index == 1
+    game.play_next_card()
+    game.trick_finished()
+    assert game.current_trick.num_cards == 2
+    assert game.current_trick.cards[1] == (ACE, HEARTS)
+    game.play_next_card()
+    game.trick_finished()
+    game.play_next_card()
+    assert game.current_trick.finished()
+    assert len(game.tricks) == 0
+    game.trick_finished()
+    assert len(game.tricks) == 1
+    assert game.scores == [18, 0, 0, 0]
+    assert game.current_player_index == 0
+    for i in range(4):
+        game.play_next_card()
+        game.trick_finished()
+    assert game.scores == [18, 0, 0, 11]
+    assert game.current_player_index == 3
+    assert game.tricks[1].cards[3] == (NINE, HEARTS)
+    assert game.current_trick.num_cards == 0
+
+
+def test_play(trick_game_before):
+    trick_game_before.play()
+    assert trick_game_before.finished()
+    assert trick_game_before.scores == [33, 58, 4, 25]
+    assert [trick.winner for trick in trick_game_before.tricks] == [0, 3, 0, 1, 2, 1, 1, 3]

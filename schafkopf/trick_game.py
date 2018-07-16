@@ -67,7 +67,7 @@ class TrickGame:
                     return hand
             elif self.game_mode[0] == PARTNER_MODE and first_card[1] == self.game_mode[1] \
                     and (7, self.game_mode[1]) in hand:
-                return (7, self.game_mode[1])
+                return [(7, self.game_mode[1])]
             else:
                 suit = first_card[1]
                 return self.suit_in_hand(suit, hand)
