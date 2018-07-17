@@ -14,7 +14,7 @@ class Trick:
             self.cards = cards
             for card in cards:
                 if card is not None:
-                    self.current_player += 1
+                    self.current_player = (self.current_player + 1) % 4
                     self.num_cards += 1
 
     def __str__(self):
