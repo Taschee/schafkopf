@@ -20,14 +20,14 @@ def player_hands_during():
 
 
 @pytest.fixture
-def game_state_before_play(player_hands_before):
+def game_state_before_play(player_hands_partner):
     leading_player = 0
     mode_proposals = [(NO_GAME, None), (PARTNER_MODE, BELLS), (NO_GAME, None), (NO_GAME, None)]
     game_mode = (PARTNER_MODE, BELLS)
     offensive_players = [1, 0]
     tricks = []
     current_trick = None
-    return {"player_hands": player_hands_before,
+    return {"player_hands": player_hands_partner,
             "leading_player_index": leading_player,
             "mode_proposals": mode_proposals,
             "game_mode": game_mode,
@@ -72,17 +72,17 @@ def game_state_during_play(player_hands_during, prev_tricks, current_trick):
 
 
 @pytest.fixture
-def trick_game_before(dummy_player_list, game_state_before_play):
-    for player, hand in zip(dummy_player_list, game_state_before_play["player_hands"]):
+def trick_game_before(partner_player_list, game_state_before_play):
+    for player, hand in zip(partner_player_list, game_state_before_play["player_hands"]):
         player.pick_up_cards(hand)
-    return TrickGame(game_state=game_state_before_play, playerlist=dummy_player_list)
+    return TrickGame(game_state=game_state_before_play, playerlist=partner_player_list)
 
 
 @pytest.fixture
-def trick_game_during(dummy_player_list, game_state_during_play):
-    for player, hand in zip(dummy_player_list, game_state_during_play["player_hands"]):
+def trick_game_during(partner_player_list, game_state_during_play):
+    for player, hand in zip(partner_player_list, game_state_during_play["player_hands"]):
         player.pick_up_cards(hand)
-    return TrickGame(game_state=game_state_during_play, playerlist=dummy_player_list)
+    return TrickGame(game_state=game_state_during_play, playerlist=partner_player_list)
 
 
 def test_trick_game_init_before(trick_game_before):

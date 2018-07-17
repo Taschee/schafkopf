@@ -1,5 +1,5 @@
 from copy import deepcopy
-from  schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
+from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
 from schafkopf.helpers import define_trumpcards
 from schafkopf.payouts import BASIC_PAYOUT_SOLO, BASIC_PAYOUT_PARTNER_MODE, EXTRA_PAYOUT
 from schafkopf.bidding_game import BiddingGame
@@ -9,35 +9,23 @@ from schafkopf.trick_game import TrickGame
 class Game:
     def __init__(self, players, game_state):
         self.playerlist = players
-        self.leading_player_index = game_state[1]
-        self.bidding_game = BiddingGame(playerlist=players, game_state=game_state)
-        self.trick_game = TrickGame(playerlist=players, game_state=game_state)
-        self.game_mode = (NO_GAME, None)
-        self.winners = None
-
         for player, hand in zip(self.playerlist, game_state["player_hands"]):
             player.pick_up_cards(hand)
+        self.leading_player_index = game_state["leading_player_index"]
+        self.bidding_game = BiddingGame(playerlist=players, game_state=game_state)
+        self.trick_game = TrickGame(playerlist=players, game_state=game_state)
+        self.winners = None
 
-    def initialize_game_state(self, game_state):
-        # a game state should be given by a dictionary:
-        # {player_hands, leading_player_index, mode_proposals, game_mode, offensive_players, tricks, current_trick}
-        pass
-
-    def initialize_game_mode(self, leading_player_index, mode_proposals):
-        pass
-
-    def find_offensive_partner(self, game_state):
-        pass
-
-    def initialize_scores(self, tricks):
-        pass
 
     def play(self):
         if not self.bidding_game.finished():
-            self.bidding_game.decide_game_mode()
+            self.bidding_game.play()
             self.prepare_trick_game()
         if not self.trick_game.finished():
             self.trick_game.play()
+
+    def finished(self):
+        return self.trick_game.finished()
 
     def prepare_trick_game(self):
         self.trick_game.offensive_players = self.bidding_game.offensive_players
@@ -57,11 +45,11 @@ class Game:
 
     def get_payout(self, player):
         if self.trick_game.finished():
-            if self.game_mode is NO_GAME:
+            if self.trick_game.game_mode is NO_GAME:
                 return 0
             else:
-                if self.game_mode[0] == PARTNER_MODE:
-                    return self.get_payout_partnermode(player)
+                if self.trick_game.game_mode[0] == PARTNER_MODE:
+                    return self.get_payout_partner_mode(player)
                 else:
                     return self.get_payout_solo(player)
 
@@ -84,7 +72,7 @@ class Game:
         else:
             return False
 
-    def get_payout_partnermode(self, playerindex):
+    def get_payout_partner_mode(self, playerindex):
         payout = BASIC_PAYOUT_PARTNER_MODE
         if self.schneider():
             payout += EXTRA_PAYOUT
@@ -111,7 +99,7 @@ class Game:
             if self.schwarz():
                 payout += EXTRA_PAYOUT
         num_laufende = self.num_laufende()
-        if self.game_mode[0] == WENZ:
+        if self.trick_game.game_mode[0] == WENZ:
             if num_laufende >= 2:
                 payout += num_laufende * EXTRA_PAYOUT
         else:
