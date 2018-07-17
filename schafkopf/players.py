@@ -47,9 +47,9 @@ class RandomPlayer(Player):
 class DummyPlayer(Player):
     """Always chooses specified game_mode if possible. Otherwise he passes.
        Always plays specified card if possible. Otherwise random card. For testing purpose only."""
-    def __init__(self, name="Dummy", game_mode=None, favorite_cards=None):
+    def __init__(self, name="Dummy", favorite_mode=None, favorite_cards=None):
         Player.__init__(self, name=name)
-        self.favorite_mode = game_mode
+        self.favorite_mode = favorite_mode
         self.favorite_cards = favorite_cards
 
     def choose_game_mode(self, options):
