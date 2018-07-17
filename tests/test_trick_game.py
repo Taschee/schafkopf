@@ -8,30 +8,6 @@ from schafkopf.trick import Trick
 
 
 @pytest.fixture
-def dummy_player_list():
-    return [DummyPlayer(name="A", favorite_cards=[(OBER, ACORNS), (SEVEN, ACORNS), (ACE, BELLS), (OBER, BELLS),
-                                                  (UNTER, BELLS), (KING, LEAVES), (TEN, ACORNS), (NINE, ACORNS)]),
-            DummyPlayer(name="B", favorite_cards=[(ACE, HEARTS), (ACE, ACORNS), (KING, BELLS), (OBER, HEARTS),
-                                                  (SEVEN, HEARTS), (OBER, LEAVES), (UNTER, ACORNS), (SEVEN, BELLS)]),
-            DummyPlayer(name="C", favorite_cards=[(KING, HEARTS), (EIGHT, ACORNS), (NINE, BELLS), (TEN, HEARTS),
-                                                  (UNTER, LEAVES), (TEN, LEAVES), (SEVEN, LEAVES), (KING, ACORNS)]),
-            DummyPlayer(name="D", favorite_cards=[(EIGHT, HEARTS), (NINE, HEARTS), (EIGHT, BELLS), (UNTER, HEARTS),
-                                                  (EIGHT, LEAVES), (NINE, LEAVES), (ACE, LEAVES), (TEN, BELLS)])]
-
-
-@pytest.fixture
-def player_hands_before():
-    return [[(OBER, ACORNS), (OBER, BELLS), (UNTER, BELLS), (ACE, BELLS),
-             (KING, LEAVES), (TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)],
-            [(OBER, LEAVES), (OBER, HEARTS), (UNTER, ACORNS), (ACE, HEARTS),
-             (SEVEN, HEARTS), (ACE, ACORNS), (KING, BELLS), (SEVEN, BELLS)],
-            [(UNTER, LEAVES), (TEN, LEAVES), (KING, HEARTS), (KING, ACORNS),
-             (TEN, HEARTS), (SEVEN, LEAVES), (EIGHT, ACORNS), (NINE, BELLS)],
-            [(UNTER, HEARTS), (ACE, LEAVES), (TEN, BELLS), (EIGHT, HEARTS),
-             (EIGHT, LEAVES), (EIGHT, BELLS), (NINE, HEARTS), (NINE, LEAVES)]]
-
-
-@pytest.fixture
 def player_hands_during():
     return [[(OBER, BELLS), (ACE, BELLS),
              (KING, LEAVES), (TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)],
@@ -212,4 +188,6 @@ def test_play(trick_game_before):
     trick_game_before.play()
     assert trick_game_before.finished()
     assert trick_game_before.scores == [33, 58, 4, 25]
+    assert len(trick_game_before.tricks) == 8
     assert [trick.winner for trick in trick_game_before.tricks] == [0, 3, 0, 1, 2, 1, 1, 3]
+    assert trick_game_before.tricks[0].cards == [(OBER, ACORNS), (ACE, HEARTS), (KING, HEARTS), (EIGHT, HEARTS)]
