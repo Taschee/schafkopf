@@ -77,6 +77,6 @@ class BiddingGame:
         else:
             return False
 
-    def decide_game_mode(self):
+    def play(self):
         while not self.finished():
             self.next_proposal()
