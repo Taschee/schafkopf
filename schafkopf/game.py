@@ -17,6 +17,12 @@ class Game:
         self.winners = None
 
 
+    def get_public_info(self):
+        if not self.bidding_game.finished():
+            return self.bidding_game.get_public_info()
+        else:
+            return self.trick_game.get_public_info()
+
     def play(self):
         if not self.bidding_game.finished():
             self.bidding_game.play()

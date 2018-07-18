@@ -53,6 +53,7 @@ class BiddingGame:
 
     def get_public_info(self):
         return deepcopy({"leading_player_index": self.leading_player_index,
+                         "current_player_index": self.current_player_index,
                          "mode_proposals": self.mode_proposals,
                          "declaring_player": None,
                          "game_mode": None,

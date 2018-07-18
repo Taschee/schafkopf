@@ -30,6 +30,7 @@ class TrickGame:
 
     def get_public_info(self):
         return deepcopy({"leading_player_index": self.leading_player_index,
+                         "current_player_index": self.current_player_index,
                          "mode_proposals": self.mode_proposals,
                          "declaring_player": self.offensive_players[0],
                          "game_mode": self.game_mode,
