@@ -9,8 +9,8 @@ from schafkopf.card_deck import CardDeck
 
 
 @pytest.fixture
-def partner_game(dummy_player_list, game_state_before_bidding):
-    return Game(players=dummy_player_list, game_state=game_state_before_bidding)
+def partner_game(partner_player_list, game_state_partner):
+    return Game(players=partner_player_list, game_state=game_state_partner)
 
 
 @pytest.fixture
