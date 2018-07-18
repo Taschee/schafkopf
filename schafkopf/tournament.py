@@ -7,6 +7,7 @@ class Tournament:
     def __init__(self, playerlist, number_of_games=32, record_games=True):
         self.playerlist = playerlist
         self.number_of_games = number_of_games
+        self.game_number = 1
         self.leading_player_index = 0
         self.record_games = record_games
         self.cumulative_rewards = [0 for player in self.playerlist]
@@ -41,7 +42,14 @@ class Tournament:
             reward = game.get_payout(playerindex)
             self.cumulative_rewards[playerindex] += reward
         self.update_leading_player_index()
+        self.game_number += 1
 
-    def play_tournament(self):
-        for game_num in range(self.number_of_games):
+    def play(self):
+        while not self.finished():
             self.play_next_game()
+
+    def finished(self):
+        if self.game_number <= self.number_of_games:
+            return False
+        else:
+            return True

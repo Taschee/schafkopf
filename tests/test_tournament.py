@@ -14,3 +14,10 @@ def test_play_next_game(rand_tournament):
     assert rand_tournament.leading_player_index == 1
     assert len(rand_tournament.games) == 1
     assert sum(rand_tournament.cumulative_rewards) == 0
+
+
+def test_play(rand_tournament):
+    rand_tournament.play()
+    assert rand_tournament.finished()
+    assert len(rand_tournament.games) == 32
+    assert sum(rand_tournament.cumulative_rewards) == 0
