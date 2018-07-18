@@ -125,7 +125,7 @@ class Game:
                                   if player not in self.trick_game.offensive_players]
         team_cards = self.get_teamcards(team_with_laufende)
         next_highest_trump_in_team = True
-        while next_highest_trump_in_team:
+        while next_highest_trump_in_team and num <= len(self.trick_game.trumpcards):
             next_trump = self.trick_game.trumpcards[num]
             if next_trump in team_cards:
                 num += 1

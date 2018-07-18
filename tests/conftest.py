@@ -1,8 +1,13 @@
 import pytest
-from schafkopf.players import DummyPlayer
+from schafkopf.players import DummyPlayer, RandomPlayer
 from schafkopf.suits import LEAVES, ACORNS, BELLS, HEARTS
 from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 from schafkopf.game_modes import NO_GAME, WENZ, PARTNER_MODE, SOLO
+
+
+@pytest.fixture
+def random_player_list():
+    return [RandomPlayer(name="A"), RandomPlayer(name="B"), RandomPlayer(name="C"), RandomPlayer(name="D")]
 
 
 @pytest.fixture
