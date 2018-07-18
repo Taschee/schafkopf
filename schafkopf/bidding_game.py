@@ -1,10 +1,12 @@
 from schafkopf.game_modes import PARTNER_MODE, NO_GAME, WENZ, SOLO
 from schafkopf.suits import BELLS, ACORNS, HEARTS, LEAVES
 from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
+from copy import deepcopy
 
 
 class BiddingGame:
     def __init__(self, playerlist, game_state):
+        self.leading_player_index = game_state["leading_player_index"]
         self.playerlist = playerlist
         self.deciding_players = set(playerlist)
         self.offensive_players = game_state["offensive_players"]
@@ -38,25 +40,36 @@ class BiddingGame:
                         break
         return possible_modes
 
-    def determine_possible_game_modes(self, hand, mode_to_beat=(NO_GAME, None)):
+    def determine_possible_game_modes(self, hand, mode_to_beat=NO_GAME):
         possible_modes = {(NO_GAME, None)}
-        if mode_to_beat[0] == NO_GAME:
+        if mode_to_beat == NO_GAME:
             possible_modes |= self.determine_possible_partner_modes(hand) | {(WENZ, None), (SOLO, BELLS),(SOLO, HEARTS),
                                                                              (SOLO, LEAVES), (SOLO, ACORNS)}
-        elif mode_to_beat[0] == PARTNER_MODE:
+        elif mode_to_beat == PARTNER_MODE:
             possible_modes |= {(WENZ, None), (SOLO, BELLS), (SOLO, HEARTS), (SOLO, LEAVES), (SOLO, ACORNS)}
-        elif mode_to_beat[0] == WENZ:
+        elif mode_to_beat == WENZ:
             possible_modes |= {(SOLO, BELLS), (SOLO, HEARTS), (SOLO, LEAVES), (SOLO, ACORNS)}
         return possible_modes
+
+    def get_public_info(self):
+        return deepcopy({"leading_player_index": self.leading_player_index,
+                         "mode_proposals": self.mode_proposals,
+                         "declaring_player": None,
+                         "game_mode": None,
+                         "trumpcards": [],
+                         "tricks": [],
+                         "current_trick": None})
 
     def next_proposal(self):
         player = self.get_current_player()
         while player not in self.deciding_players:
             self.next_player()
             player = self.get_current_player()
-        options = self.determine_possible_game_modes(player.get_hand(), mode_to_beat=self.game_mode)
-        chosen_mode = player.choose_game_mode(options=options)
-        if chosen_mode == (NO_GAME, None):
+        mode_to_beat = sum([1 for proposal in self.mode_proposals if proposal[0] != NO_GAME])
+        options = self.determine_possible_game_modes(player.get_hand(), mode_to_beat=mode_to_beat)
+        public_info = self.get_public_info()
+        chosen_mode = player.choose_game_mode(options=options, public_info=public_info)
+        if chosen_mode[0] <= self.game_mode[0]:
             self.deciding_players.remove(player)
         else:
             self.game_mode = chosen_mode

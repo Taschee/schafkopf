@@ -32,7 +32,7 @@ class Player:
 
 class RandomPlayer(Player):
     """Random Player"""
-    def choose_game_mode(self, options):
+    def choose_game_mode(self, options, public_info):
         return random.choice(tuple(options))
 
     def play_card(self, public_info, options=None):
@@ -52,7 +52,7 @@ class DummyPlayer(Player):
         self.favorite_mode = favorite_mode
         self.favorite_cards = favorite_cards
 
-    def choose_game_mode(self, options):
+    def choose_game_mode(self, options, public_info):
         if self.favorite_mode in options:
             return self.favorite_mode
         else:

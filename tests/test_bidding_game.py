@@ -83,13 +83,13 @@ def test_possible_partner_modes(game_before, player_hands_partner):
 
 
 def test_possible_game_modes(game_before, player_hands_partner):
-    possible_modes = game_before.determine_possible_game_modes(player_hands_partner[0], mode_to_beat=(NO_GAME, None))
+    possible_modes = game_before.determine_possible_game_modes(player_hands_partner[0], mode_to_beat=NO_GAME)
     assert possible_modes == {(PARTNER_MODE, ACORNS), (PARTNER_MODE, LEAVES), (NO_GAME, None), (WENZ, None),
                               (SOLO, HEARTS), (SOLO, ACORNS), (SOLO, BELLS), (SOLO, LEAVES)}
-    possible_modes = game_before.determine_possible_game_modes(player_hands_partner[1], mode_to_beat=(NO_GAME, None))
+    possible_modes = game_before.determine_possible_game_modes(player_hands_partner[1], mode_to_beat=NO_GAME)
     assert possible_modes == {(PARTNER_MODE, BELLS), (NO_GAME, None), (WENZ, None),
                               (SOLO, HEARTS), (SOLO, ACORNS), (SOLO, BELLS), (SOLO, LEAVES)}
-    possible_modes = game_before.determine_possible_game_modes(player_hands_partner[0], mode_to_beat=(WENZ, None))
+    possible_modes = game_before.determine_possible_game_modes(player_hands_partner[0], mode_to_beat=WENZ)
     assert possible_modes == {(SOLO, HEARTS), (SOLO, ACORNS), (SOLO, BELLS), (SOLO, LEAVES), (NO_GAME, None)}
 
 
