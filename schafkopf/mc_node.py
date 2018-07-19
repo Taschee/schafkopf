@@ -1,19 +1,12 @@
-from copy import deepcopy
-from schafkopf.game import Game
-from schafkopf.players import Player
-from schafkopf.helpers import sample_opponent_cards
 import numpy as np
 
 
-UCB_CONSTANT = 2
-
-
 class MCNode:
-    def __init__(self, state, current_player, parent=None, previous_action=None):
+    def __init__(self, game_state, parent=None, previous_action=None):
         self.children = []
         self.parent = parent
-        self.state = state
-        self.current_player = current_player
+        self.game_state = game_state
+        self.current_player = game_state["current_player"]
         self.previous_action = previous_action
         self.visits = 0
         self.cumulative_rewards = [0 for i in range(4)]
@@ -27,16 +20,28 @@ class MCNode:
         else:
             return False
 
-    def best_child(self):
+    def is_terminal(self):
+        if len(self.game_state["tricks"]) == 8:
+            return True
+        else:
+            return False
+
+    def fully_expanded(self):
+        if len(self.children) == len(self.game_state["possible_actions"]):
+            return True
+        else:
+            return False
+
+    def best_child(self, ucb_const):
         if not self.is_leaf():
-            values = [self.ucb_value(child) for child in self.children]
+            values = [self.ucb_value(child, ucb_const) for child in self.children]
             best_child = self.children[np.argmax(values)]
             return best_child
 
-    def ucb_value(self, child_node):
+    def ucb_value(self, child_node, ucb_const):
         if child_node.visits != 0:
             average_reward = self.get_average_reward(player=self.current_player)
-            return average_reward + UCB_CONSTANT * np.sqrt(2 * np.log(self.visits) / child_node.visits)
+            return average_reward + ucb_const * np.sqrt(2 * np.log(self.visits) / child_node.visits)
         else:
             return np.infty
 
@@ -52,19 +57,3 @@ class MCNode:
             return self.cumulative_rewards[player] / self.visits
         else:
             return 0
-
-class MCTree:
-    def __init__(self, root_node):
-        self.root_node = root_node
-        self.nodes = {root_node}
-
-    def add_node(self, node, parent_node):
-        self.nodes.add(node)
-        parent_node.add_child(node)
-
-    def backpropagate(self, leaf_node, rewards):
-        current_node = leaf_node
-        while current_node != self.root_node:
-            current_node.update_rewards(rewards)
-            current_node.update_visits()
-            current_node = current_node.parent
