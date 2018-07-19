@@ -16,12 +16,36 @@ class Game:
         self.trick_game = TrickGame(playerlist=players, game_state=game_state)
         self.winners = None
 
-
     def get_public_info(self):
         if not self.bidding_game.finished():
             return self.bidding_game.get_public_info()
         else:
             return self.trick_game.get_public_info()
+
+    def get_game_state(self):
+        game_state = self.get_public_info()
+        player_hands = [player.get_hand() for player in self.playerlist]
+        game_state["player_hands"] = player_hands
+        game_state["possible_actions"] = self.get_possible_actions()
+        return deepcopy(game_state)
+
+    def get_possible_actions(self):
+        if self.bidding_game.finished():
+            return self.trick_game.possible_cards(current_trick=self.trick_game.current_trick,
+                                                  hand=self.trick_game.get_current_player().get_hand())
+        else:
+            hand = self.bidding_game.get_current_player().get_hand()
+            mode_to_beat = sum([1 for proposal in self.bidding_game.mode_proposals if proposal[0] != NO_GAME])
+            return self.bidding_game.determine_possible_game_modes(hand=hand,
+                                                                   mode_to_beat=mode_to_beat)
+
+    def next_action(self):
+        if not self.bidding_game.finished():
+            self.bidding_game.next_proposal()
+            if self.bidding_game.finished():
+                self.prepare_trick_game()
+        elif not self.trick_game.finished():
+            self.trick_game.play_next_card()
 
     def play(self):
         if not self.bidding_game.finished():
@@ -49,15 +73,18 @@ class Game:
             self.winners = [pl for pl in range(len(self.playerlist)) if pl not in self.trick_game.offensive_players]
         return self.winners
 
-    def get_payout(self, player):
+    def get_payouts(self):
         if self.trick_game.finished():
-            if self.trick_game.game_mode is NO_GAME:
-                return 0
+            return [self.get_payout(player) for player in self.playerlist]
+
+    def get_payout(self, player):
+        if self.trick_game.game_mode is NO_GAME:
+            return 0
+        else:
+            if self.trick_game.game_mode[0] == PARTNER_MODE:
+                return self.get_payout_partner_mode(player)
             else:
-                if self.trick_game.game_mode[0] == PARTNER_MODE:
-                    return self.get_payout_partner_mode(player)
-                else:
-                    return self.get_payout_solo(player)
+                return self.get_payout_solo(player)
 
     def schneider(self):
         offensive_score = self.score_offensive_players()
