@@ -98,7 +98,7 @@ class TrickGame:
             self.next_player()
 
     def finished(self):
-        if len(self.tricks) == self.max_num_tricks or self.game_mode == (NO_GAME, None):
+        if len(self.tricks) == self.max_num_tricks:
             return True
         else:
             return False

@@ -55,7 +55,13 @@ class Game:
             self.trick_game.play()
 
     def finished(self):
-        return self.trick_game.finished()
+        if self.bidding_game.finished():
+            if self.bidding_game.game_mode == (NO_GAME, None):
+                return True
+            else:
+                return self.trick_game.finished()
+        else:
+            return False
 
     def prepare_trick_game(self):
         self.trick_game.offensive_players = self.bidding_game.offensive_players
