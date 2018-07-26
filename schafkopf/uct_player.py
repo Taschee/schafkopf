@@ -4,6 +4,7 @@ from schafkopf.helpers import sample_opponent_hands
 from schafkopf.players import Player, DummyPlayer, RandomPlayer
 from schafkopf.game import Game
 from copy import deepcopy
+import multiprocessing as mp
 import random
 
 class UCTPlayer(Player):
@@ -64,13 +65,7 @@ class UCTPlayer(Player):
         rewards = game.get_payouts()
         return rewards
 
-    def choose_game_mode(self, public_info, options):
-        return random.choice(tuple(options))
-
-    def play_card(self, public_info, options=None):
-        # choose card by sampling opponent cards N times, in each sample perform MonteCarloSimulation, return best card
-        # ! parallelizing possile !
-
+    def sample_and_search(self, public_info):
         leading_player_index = public_info["leading_player_index"]
         playerindex = public_info["current_player_index"]
         mode_proposals = public_info["mode_proposals"]
@@ -80,7 +75,11 @@ class UCTPlayer(Player):
         current_trick = public_info["current_trick"]
 
         # sample opponent hands
-        player_hands = sample_opponent_hands(tricks, current_trick, trumpcards, playerindex, player_hand=self._hand)
+        player_hands = sample_opponent_hands(tricks=tricks,
+                                             current_trick=current_trick,
+                                             trumpcards=trumpcards,
+                                             playerindex=playerindex,
+                                             player_hand=self._hand)
 
         # game state
         game_state = public_info
@@ -88,4 +87,14 @@ class UCTPlayer(Player):
 
         best_action = self.uct_search(game_state=deepcopy(game_state), num_simulations=100)
 
-        return best_action # still needs the parallelizing
+        return best_action
+
+    def choose_game_mode(self, public_info, options):
+        return random.choice(tuple(options))
+
+    def play_card(self, public_info, options=None):
+        # choose card by sampling opponent cards N times, in each sample perform MonteCarloSimulation, return best card
+
+
+
+        return best_action
