@@ -45,12 +45,14 @@ def partner_player_list():
 @pytest.fixture
 def game_state_partner(player_hands_partner):
     leading_player = 0
+    current_player = 0
     mode_proposals = []
     game_mode = (NO_GAME, None)
     offensive_players = []
     tricks = []
     current_trick = None
     return {"player_hands": player_hands_partner,
+            "current_player_index": current_player,
             "leading_player_index": leading_player,
             "mode_proposals": mode_proposals,
             "game_mode": game_mode,
@@ -94,6 +96,7 @@ def wenz_player_list():
 @pytest.fixture
 def game_state_wenz(player_hands_wenz):
     leading_player = 1
+    current_player = 1
     mode_proposals = []
     game_mode = (NO_GAME, None)
     offensive_players = []
@@ -102,6 +105,7 @@ def game_state_wenz(player_hands_wenz):
     return {"player_hands": player_hands_wenz,
             "leading_player_index": leading_player,
             "mode_proposals": mode_proposals,
+            "current_player_index": current_player,
             "game_mode": game_mode,
             "offensive_players": offensive_players,
             "tricks": tricks,
@@ -144,6 +148,7 @@ def solo_player_list():
 def game_state_solo(player_hands_solo):
     leading_player = 0
     mode_proposals = []
+    current_player = 0
     game_mode = (NO_GAME, None)
     offensive_players = []
     tricks = []
@@ -151,6 +156,7 @@ def game_state_solo(player_hands_solo):
     return {"player_hands": player_hands_solo,
             "leading_player_index": leading_player,
             "mode_proposals": mode_proposals,
+            "current_player_index": current_player,
             "game_mode": game_mode,
             "offensive_players": offensive_players,
             "tricks": tricks,
