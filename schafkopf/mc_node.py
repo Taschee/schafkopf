@@ -6,7 +6,7 @@ class MCNode:
         self.children = []
         self.parent = parent
         self.game_state = game_state
-        self.current_player = game_state["current_player"]
+        self.current_player = game_state["current_player_index"]
         self.previous_action = previous_action
         self.visits = 0
         self.cumulative_rewards = [0 for i in range(4)]
@@ -44,6 +44,9 @@ class MCNode:
             return average_reward + ucb_const * np.sqrt(2 * np.log(self.visits) / child_node.visits)
         else:
             return np.infty
+
+    def ucb_values(self, ucb_const):
+        return [self.ucb_value(child, ucb_const) for child in self.children]
 
     def update_visits(self):
         self.visits += 1

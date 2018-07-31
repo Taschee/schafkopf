@@ -1,6 +1,6 @@
 import pytest
 from schafkopf.players import DummyPlayer, RandomPlayer
-from schafkopf.suits import LEAVES, ACORNS, BELLS, HEARTS
+from schafkopf.suits import LEAVES, ACORNS, BELLS, HEARTS, SUITS
 from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 from schafkopf.game_modes import NO_GAME, WENZ, PARTNER_MODE, SOLO
 
@@ -51,6 +51,8 @@ def game_state_partner(player_hands_partner):
     offensive_players = []
     tricks = []
     current_trick = None
+    possible_actions = [(NO_GAME, None), (WENZ, None)] + [(PARTNER_MODE, suit) for suit in SUITS]\
+                                                       + [(SOLO, suit) for suit in SUITS]
     return {"player_hands": player_hands_partner,
             "current_player_index": current_player,
             "leading_player_index": leading_player,
@@ -58,7 +60,8 @@ def game_state_partner(player_hands_partner):
             "game_mode": game_mode,
             "offensive_players": offensive_players,
             "tricks": tricks,
-            "current_trick": current_trick}
+            "current_trick": current_trick,
+            "possible_actions": possible_actions}
 
 
 @pytest.fixture
@@ -102,6 +105,8 @@ def game_state_wenz(player_hands_wenz):
     offensive_players = []
     tricks = []
     current_trick = None
+    possible_actions = [(NO_GAME, None), (WENZ, None)] + [(PARTNER_MODE, suit) for suit in SUITS]\
+                                                       + [(SOLO, suit) for suit in SUITS]
     return {"player_hands": player_hands_wenz,
             "leading_player_index": leading_player,
             "mode_proposals": mode_proposals,
@@ -109,7 +114,8 @@ def game_state_wenz(player_hands_wenz):
             "game_mode": game_mode,
             "offensive_players": offensive_players,
             "tricks": tricks,
-            "current_trick": current_trick}
+            "current_trick": current_trick,
+            "possible_actions": possible_actions}
 
 
 @pytest.fixture
@@ -153,6 +159,8 @@ def game_state_solo(player_hands_solo):
     offensive_players = []
     tricks = []
     current_trick = None
+    possible_actions = [(NO_GAME, None), (WENZ, None)] + [(PARTNER_MODE, suit) for suit in SUITS]\
+                                                       + [(SOLO, suit) for suit in SUITS]
     return {"player_hands": player_hands_solo,
             "leading_player_index": leading_player,
             "mode_proposals": mode_proposals,
@@ -160,4 +168,5 @@ def game_state_solo(player_hands_solo):
             "game_mode": game_mode,
             "offensive_players": offensive_players,
             "tricks": tricks,
-            "current_trick": current_trick}
+            "current_trick": current_trick,
+            "possible_actions": possible_actions}

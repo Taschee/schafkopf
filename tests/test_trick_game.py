@@ -27,13 +27,16 @@ def game_state_before_play(player_hands_partner):
     offensive_players = [1, 0]
     tricks = []
     current_trick = None
+    possible_actions = [(OBER, ACORNS), (OBER, BELLS), (UNTER, BELLS), (ACE, BELLS),
+                        (KING, LEAVES), (TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)]
     return {"player_hands": player_hands_partner,
             "leading_player_index": leading_player,
             "mode_proposals": mode_proposals,
             "game_mode": game_mode,
             "offensive_players": offensive_players,
             "tricks": tricks,
-            "current_trick": current_trick}
+            "current_trick": current_trick,
+            "possible_actions": possible_actions}
 
 
 @pytest.fixture
@@ -62,13 +65,16 @@ def game_state_during_play(player_hands_during, prev_tricks, current_trick):
     mode_proposals = [(NO_GAME, None), (PARTNER_MODE, BELLS), (NO_GAME, None), (NO_GAME, None)]
     game_mode = (PARTNER_MODE, BELLS)
     offensive_players = [1, 0]
+    possible_actions = [(UNTER, HEARTS), (ACE, LEAVES), (TEN, BELLS),
+                        (EIGHT, LEAVES), (EIGHT, BELLS), (NINE, LEAVES)]
     return {"player_hands": player_hands_during,
             "leading_player_index": leading_player,
             "mode_proposals": mode_proposals,
             "game_mode": game_mode,
             "offensive_players": offensive_players,
             "tricks": prev_tricks,
-            "current_trick": current_trick}
+            "current_trick": current_trick,
+            "possible_actions": possible_actions}
 
 
 @pytest.fixture
