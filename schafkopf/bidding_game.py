@@ -8,10 +8,15 @@ class BiddingGame:
     def __init__(self, playerlist, game_state):
         self.leading_player_index = game_state["leading_player_index"]
         self.playerlist = playerlist
-        self.deciding_players = set(playerlist)
-        self.offensive_players = game_state["offensive_players"]
-        self.current_player_index = game_state["leading_player_index"]
         self.game_mode = game_state["game_mode"]
+        self.deciding_players = set(playerlist)
+        self.offensive_players = [game_state["declaring_player"]]
+        if self.game_mode[0] == PARTNER_MODE:
+            for player in self.playerlist:
+                if (7, self.game_mode[1]) in player.get_hand():
+                    self.offensive_players.append(self.playerlist.index(player))
+        self.current_player_index = game_state["leading_player_index"]
+
         self.mode_proposals = game_state["mode_proposals"]
         # initializing deciding players
         for proposal in self.mode_proposals:

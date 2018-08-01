@@ -12,7 +12,11 @@ class TrickGame:
         self.leading_player_index = game_state["leading_player_index"]
         self.game_mode = game_state["game_mode"]
         self.mode_proposals = game_state["mode_proposals"]
-        self.offensive_players = game_state["offensive_players"]
+        self.offensive_players = [game_state["declaring_player"]]
+        if self.game_mode[0] == PARTNER_MODE:
+            for player in self.playerlist:
+                if (7, self.game_mode[1]) in player.get_hand():
+                    self.offensive_players.append(self.playerlist.index(player))
         self.trumpcards = define_trumpcards(self.game_mode)
         self.tricks = game_state["tricks"]
         if game_state["current_trick"] is not None:

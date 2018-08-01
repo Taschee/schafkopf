@@ -24,8 +24,8 @@ class Game:
 
     def get_game_state(self):
         game_state = self.get_public_info()
-        player_hands = [player.get_hand() for player in self.playerlist]
-        game_state["player_hands"] = player_hands
+        game_state["offensive_players"] = self.bidding_game.offensive_players
+        game_state["player_hands"] = [player.get_hand() for player in self.playerlist]
         game_state["possible_actions"] = self.get_possible_actions()
         return deepcopy(game_state)
 

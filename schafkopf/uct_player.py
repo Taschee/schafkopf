@@ -66,28 +66,33 @@ class UCTPlayer(Player):
         return rewards
 
     def sample_game_state(self, public_info):
-        leading_player_index = public_info["leading_player_index"]
-        playerindex = public_info["current_player_index"]
-        mode_proposals = public_info["mode_proposals"]
-        game_mode = public_info["game_mode"]
-        trumpcards = public_info["trumpcards"]
-        tricks = public_info["tricks"]
-        current_trick = public_info["current_trick"]
 
         # sample opponent hands
-        player_hands = sample_opponent_hands(tricks=tricks,
-                                             current_trick=current_trick,
-                                             trumpcards=trumpcards,
-                                             playerindex=playerindex,
+        player_hands = sample_opponent_hands(tricks=public_info["tricks"],
+                                             current_trick=public_info["current_trick"],
+                                             trumpcards=public_info["trumpcards"],
+                                             playerindex=public_info["current_player_index"],
                                              player_hand=self._hand)
 
-        # add player_hands to game state
+        # add player_hands and possible actions to game state
         game_state = public_info
         game_state["player_hands"] = player_hands
+        game = Game(game_state=game_state, players=[RandomPlayer(), RandomPlayer(), RandomPlayer(), RandomPlayer()])
+        game_state["possible_actions"] = game.get_possible_actions()
         return game_state
 
     def choose_game_mode(self, public_info, options):
-        return random.choice(tuple(options))
+        sampled_states = [self.sample_game_state(public_info) for num in range(self.num_samples)]
+
+        num_workers = mp.cpu_count()
+        pool = mp.Pool(num_workers)
+
+        # maybe change this to choosing highest average payout/ucb_value? Now: most frequent best action is chosen
+        results = pool.map(func=self.uct_search, iterable=sampled_states)
+
+        best_action = max(results, key=results.count)
+
+        return best_action
 
     def play_card(self, public_info, options=None):
         # choose card by sampling opponent cards N times, in each sample perform MonteCarloSimulation, return best card
