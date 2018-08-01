@@ -1,6 +1,7 @@
 from schafkopf.game import Game
 from schafkopf.card_deck import CardDeck
-from schafkopf.game_modes import NO_GAME
+from schafkopf.game_modes import NO_GAME, WENZ, PARTNER_MODE, SOLO
+from schafkopf.suits import SUITS
 
 
 class Tournament:
@@ -28,9 +29,12 @@ class Tournament:
                       "leading_player_index": self.leading_player_index,
                       "mode_proposals": [],
                       "game_mode": (NO_GAME, None),
-                      "offensive_players": [],
+                      "declaring_player": None,
                       "tricks": [],
-                      "current_trick": None}
+                      "current_trick": None,
+                      "possible_actions": [(NO_GAME, None), (WENZ, None)] +
+                                          [(PARTNER_MODE, suit) for suit in SUITS] +
+                                          [(SOLO, suit) for suit in SUITS]}
         return Game(players=self.playerlist, game_state=game_state)
 
     def play_next_game(self):
