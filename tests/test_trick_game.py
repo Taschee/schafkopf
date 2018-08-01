@@ -24,7 +24,7 @@ def game_state_before_play(player_hands_partner):
     leading_player = 0
     mode_proposals = [(NO_GAME, None), (PARTNER_MODE, BELLS), (NO_GAME, None), (NO_GAME, None)]
     game_mode = (PARTNER_MODE, BELLS)
-    offensive_players = [1, 0]
+    declaring_player = 1
     tricks = []
     current_trick = None
     possible_actions = [(OBER, ACORNS), (OBER, BELLS), (UNTER, BELLS), (ACE, BELLS),
@@ -33,7 +33,7 @@ def game_state_before_play(player_hands_partner):
             "leading_player_index": leading_player,
             "mode_proposals": mode_proposals,
             "game_mode": game_mode,
-            "offensive_players": offensive_players,
+            "declaring_player": declaring_player,
             "tricks": tricks,
             "current_trick": current_trick,
             "possible_actions": possible_actions}
@@ -64,14 +64,14 @@ def game_state_during_play(player_hands_during, prev_tricks, current_trick):
     leading_player = 0
     mode_proposals = [(NO_GAME, None), (PARTNER_MODE, BELLS), (NO_GAME, None), (NO_GAME, None)]
     game_mode = (PARTNER_MODE, BELLS)
-    offensive_players = [1, 0]
+    declaring_player = 1
     possible_actions = [(UNTER, HEARTS), (ACE, LEAVES), (TEN, BELLS),
                         (EIGHT, LEAVES), (EIGHT, BELLS), (NINE, LEAVES)]
     return {"player_hands": player_hands_during,
             "leading_player_index": leading_player,
             "mode_proposals": mode_proposals,
             "game_mode": game_mode,
-            "offensive_players": offensive_players,
+            "declaring_player": declaring_player,
             "tricks": prev_tricks,
             "current_trick": current_trick,
             "possible_actions": possible_actions}

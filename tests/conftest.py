@@ -48,7 +48,7 @@ def game_state_partner(player_hands_partner):
     current_player = 0
     mode_proposals = []
     game_mode = (NO_GAME, None)
-    offensive_players = []
+    declaring_player = None
     tricks = []
     current_trick = None
     possible_actions = [(NO_GAME, None), (WENZ, None)] + [(PARTNER_MODE, suit) for suit in SUITS]\
@@ -58,7 +58,7 @@ def game_state_partner(player_hands_partner):
             "leading_player_index": leading_player,
             "mode_proposals": mode_proposals,
             "game_mode": game_mode,
-            "offensive_players": offensive_players,
+            "declaring_player": declaring_player,
             "tricks": tricks,
             "current_trick": current_trick,
             "possible_actions": possible_actions}
@@ -102,7 +102,7 @@ def game_state_wenz(player_hands_wenz):
     current_player = 1
     mode_proposals = []
     game_mode = (NO_GAME, None)
-    offensive_players = []
+    declaring_player = None
     tricks = []
     current_trick = None
     possible_actions = [(NO_GAME, None), (WENZ, None)] + [(PARTNER_MODE, suit) for suit in SUITS]\
@@ -112,7 +112,7 @@ def game_state_wenz(player_hands_wenz):
             "mode_proposals": mode_proposals,
             "current_player_index": current_player,
             "game_mode": game_mode,
-            "offensive_players": offensive_players,
+            "declaring_player": declaring_player,
             "tricks": tricks,
             "current_trick": current_trick,
             "possible_actions": possible_actions}
@@ -156,7 +156,7 @@ def game_state_solo(player_hands_solo):
     mode_proposals = []
     current_player = 0
     game_mode = (NO_GAME, None)
-    offensive_players = []
+    declaring_player = None
     tricks = []
     current_trick = None
     possible_actions = [(NO_GAME, None), (WENZ, None)] + [(PARTNER_MODE, suit) for suit in SUITS]\
@@ -166,7 +166,7 @@ def game_state_solo(player_hands_solo):
             "mode_proposals": mode_proposals,
             "current_player_index": current_player,
             "game_mode": game_mode,
-            "offensive_players": offensive_players,
+            "declaring_player": declaring_player,
             "tricks": tricks,
             "current_trick": current_trick,
             "possible_actions": possible_actions}
