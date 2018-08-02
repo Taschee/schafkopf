@@ -24,11 +24,12 @@ class TrickGame:
             self.current_trick = game_state["current_trick"]
         else:
             self.current_trick = Trick(leading_player_index=self.leading_player_index)
-        self.current_player_index = self.current_trick.current_player
+        self.current_player_index = self.current_trick.current_player_index
         self.scores = [0 for player in playerlist]
 
     def next_player(self):
         self.current_player_index = (self.current_player_index + 1) % 4
+        self.current_trick.current_player_index = self.current_player_index
 
     def get_current_player(self):
         return self.playerlist[self.current_player_index]

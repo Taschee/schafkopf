@@ -15,3 +15,4 @@ class MCTree:
             current_node.update_rewards(rewards)
             current_node.update_visits()
             current_node = current_node.parent
+        self.root_node.update_visits()

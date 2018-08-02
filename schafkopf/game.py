@@ -24,7 +24,7 @@ class Game:
 
     def get_game_state(self):
         game_state = self.get_public_info()
-        game_state["offensive_players"] = self.bidding_game.offensive_players
+        game_state["declaring_player"] = self.bidding_game.offensive_players[0]
         game_state["player_hands"] = [player.get_hand() for player in self.playerlist]
         game_state["possible_actions"] = self.get_possible_actions()
         return deepcopy(game_state)
@@ -85,7 +85,7 @@ class Game:
             return [self.get_payout(player) for player in self.playerlist]
 
     def get_payout(self, player):
-        if self.trick_game.game_mode is NO_GAME:
+        if self.trick_game.game_mode[0] is NO_GAME:
             return 0
         else:
             if self.trick_game.game_mode[0] == PARTNER_MODE:

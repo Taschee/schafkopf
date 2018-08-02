@@ -6,7 +6,7 @@ class Trick:
         self.score = score
         self.winner = winner
         self.leading_player_index = leading_player_index
-        self.current_player = leading_player_index
+        self.current_player_index = leading_player_index
         self.num_cards = 0
         if cards is None:
             self.cards = [None for player in range(4)]
@@ -14,7 +14,7 @@ class Trick:
             self.cards = cards
             for card in cards:
                 if card is not None:
-                    self.current_player = (self.current_player + 1) % 4
+                    self.current_player_index = (self.current_player_index + 1) % 4
                     self.num_cards += 1
 
     def __str__(self):

@@ -38,10 +38,12 @@ def test_play_partner_mode(partner_game):
     assert partner_game.trick_game.offensive_players == [1, 0]
     assert partner_game.trick_game.finished()
     assert len(partner_game.trick_game.tricks) == 8
-    assert partner_game.trick_game.tricks[-1] == Trick(leading_player_index=1,
-                                                       cards=[(NINE, ACORNS), (SEVEN, BELLS), (KING, ACORNS), (TEN, BELLS)],
-                                                       winner=3,
-                                                       score=14)
+    trick = Trick(leading_player_index=1,
+                  cards=[(NINE, ACORNS), (SEVEN, BELLS), (KING, ACORNS), (TEN, BELLS)],
+                  winner=3,
+                  score=14)
+    trick.current_player_index = 0
+    assert partner_game.trick_game.tricks[-1] == trick
 
 
 def test_score_offensive_players_partner_mode(partner_game):
@@ -74,10 +76,12 @@ def test_play_wenz(wenz_game):
     assert wenz_game.bidding_game.game_mode == (WENZ, None)
     assert wenz_game.trick_game.finished()
     assert len(wenz_game.trick_game.tricks) == 8
-    assert wenz_game.trick_game.tricks[-1] == Trick(leading_player_index=3,
-                                                    cards=[(KING, LEAVES), (KING, BELLS), (TEN, HEARTS), (NINE, HEARTS)],
-                                                    winner=2,
-                                                    score=18)
+    trick = Trick(leading_player_index=3,
+                  cards=[(KING, LEAVES), (KING, BELLS), (TEN, HEARTS), (NINE, HEARTS)],
+                  winner=2,
+                  score=18)
+    trick.current_player_index = 2
+    assert wenz_game.trick_game.tricks[-1] == trick
 
 
 def test_score_offensive_players_wenz(wenz_game):
@@ -103,10 +107,12 @@ def test_play_solo(solo_game):
     assert solo_game.bidding_game.game_mode == (SOLO, ACORNS)
     assert solo_game.trick_game.finished()
     assert len(solo_game.trick_game.tricks) == 8
-    assert solo_game.trick_game.tricks[2] == Trick(leading_player_index=1,
-                                                   cards=[(SEVEN, BELLS), (TEN, BELLS), (NINE, BELLS), (ACE, BELLS)],
-                                                   winner=3,
-                                                   score=21)
+    trick = Trick(leading_player_index=1,
+                  cards=[(SEVEN, BELLS), (TEN, BELLS), (NINE, BELLS), (ACE, BELLS)],
+                  winner=3,
+                  score=21)
+    trick.current_player_index = 0
+    assert solo_game.trick_game.tricks[2] == trick
 
 
 def test_score_offensive_players_solo(solo_game):
