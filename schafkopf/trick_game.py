@@ -8,7 +8,7 @@ from schafkopf.trick import Trick
 class TrickGame:
     def __init__(self, playerlist, game_state):
         self.playerlist = playerlist
-        self.max_num_tricks = len(playerlist[0].get_hand())
+        self.max_num_tricks = 8
         self.leading_player_index = game_state["leading_player_index"]
         self.game_mode = game_state["game_mode"]
         self.mode_proposals = game_state["mode_proposals"]

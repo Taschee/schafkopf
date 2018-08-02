@@ -46,6 +46,7 @@ class Game:
                 self.prepare_trick_game()
         elif not self.trick_game.finished():
             self.trick_game.play_next_card()
+            self.trick_game.trick_finished()
 
     def play(self):
         if not self.bidding_game.finished():
