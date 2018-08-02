@@ -15,6 +15,7 @@ class BiddingGame:
             for player in self.playerlist:
                 if (7, self.game_mode[1]) in player.get_hand():
                     self.offensive_players.append(self.playerlist.index(player))
+                    break
         self.current_player_index = game_state["leading_player_index"]
 
         self.mode_proposals = game_state["mode_proposals"]
