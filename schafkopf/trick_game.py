@@ -17,6 +17,7 @@ class TrickGame:
             for player in self.playerlist:
                 if (7, self.game_mode[1]) in player.get_hand():
                     self.offensive_players.append(self.playerlist.index(player))
+                    break
         self.trumpcards = define_trumpcards(self.game_mode)
         self.tricks = game_state["tricks"]
         if game_state["current_trick"] is not None:
