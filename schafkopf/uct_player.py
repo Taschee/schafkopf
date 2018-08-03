@@ -14,7 +14,7 @@ class UCTPlayer(Player):
         self.ucb_const = ucb_const
         self.num_samples = num_samples
 
-    def uct_search(self, game_state, num_simulations=100):
+    def uct_search(self, game_state, num_simulations=1000):
         root_node = MCNode(game_state=game_state)
         mc_tree = MCTree(root_node=root_node)
 
@@ -41,10 +41,10 @@ class UCTPlayer(Player):
         not_visited_actions = set(node.game_state["possible_actions"])
         for child in node.children:
             not_visited_actions.remove(child.previous_action)
-        chosen_action = random.choice(not_visited_actions)
+        chosen_action = random.choice(tuple(not_visited_actions))
         new_state = self.get_new_state(game_state=node.game_state,
                                        action=chosen_action)
-        new_node = MCNode(parent=node, game_state=new_state)
+        new_node = MCNode(parent=node, game_state=new_state, previous_action=chosen_action)
         mc_tree.add_node(node=new_node,
                          parent_node=node)
         return new_node
@@ -54,15 +54,15 @@ class UCTPlayer(Player):
                       DummyPlayer(favorite_mode=action, favorite_cards=[action]),
                       DummyPlayer(favorite_mode=action, favorite_cards=[action]),
                       DummyPlayer(favorite_mode=action, favorite_cards=[action])]
-        game = Game(game_state=game_state, players=playerlist)
+        game = Game(game_state=deepcopy(game_state), players=playerlist)
         game.next_action()
         return game.get_game_state()
 
     def simulation(self, selected_node):
         playerlist = [RandomPlayer(), RandomPlayer(), RandomPlayer(), RandomPlayer()]
-        game = Game(players=playerlist, game_state=selected_node.game_state)
-        game.play()
-        rewards = game.get_payouts()
+        game_simulation = Game(players=playerlist, game_state=deepcopy(selected_node.game_state))
+        game_simulation.play()
+        rewards = game_simulation.get_payouts()
         return rewards
 
     def sample_game_state(self, public_info):
@@ -75,7 +75,7 @@ class UCTPlayer(Player):
                                              player_hand=self._hand)
 
         # add player_hands and possible actions to game state
-        game_state = public_info
+        game_state = deepcopy(public_info)
         game_state["player_hands"] = player_hands
         game = Game(game_state=game_state, players=[RandomPlayer(), RandomPlayer(), RandomPlayer(), RandomPlayer()])
         game_state["possible_actions"] = game.get_possible_actions()

@@ -82,7 +82,7 @@ class Game:
 
     def get_payouts(self):
         if self.trick_game.finished():
-            return [self.get_payout(player) for player in self.playerlist]
+            return [self.get_payout(playerindex) for playerindex in range(len(self.playerlist))]
 
     def get_payout(self, player):
         if self.trick_game.game_mode[0] is NO_GAME:
