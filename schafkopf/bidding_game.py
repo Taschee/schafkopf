@@ -9,7 +9,7 @@ class BiddingGame:
         self.leading_player_index = game_state["leading_player_index"]
         self.playerlist = playerlist
         self.game_mode = game_state["game_mode"]
-        self.deciding_players = set(playerlist)
+        self.deciding_players = set(range(len(playerlist)))
         self.offensive_players = [game_state["declaring_player"]]
         if self.game_mode[0] == PARTNER_MODE:
             for player in self.playerlist:
@@ -21,12 +21,10 @@ class BiddingGame:
         self.mode_proposals = game_state["mode_proposals"]
         # initializing deciding players
         for proposal in self.mode_proposals:
-            player = self.playerlist[self.current_player_index]
-            while player not in self.deciding_players:
+            while self.current_player_index not in self.deciding_players:
                 self.next_player()
-                player = self.playerlist[self.current_player_index]
             if proposal == (NO_GAME, None):
-                self.deciding_players.remove(player)
+                self.deciding_players.remove(self.current_player_index)
             self.next_player()
 
 
@@ -68,16 +66,16 @@ class BiddingGame:
                          "current_trick": None})
 
     def next_proposal(self):
-        player = self.get_current_player()
-        while player not in self.deciding_players or self.playerlist.index(player) in self.offensive_players:
+        while self.current_player_index not in self.deciding_players \
+                or self.current_player_index == self.offensive_players[0]:
             self.next_player()
-            player = self.get_current_player()
+        player = self.get_current_player()
         mode_to_beat = sum([1 for proposal in self.mode_proposals if proposal[0] != NO_GAME])
         options = self.determine_possible_game_modes(hand=player.get_hand(), mode_to_beat=mode_to_beat)
         public_info = self.get_public_info()
         chosen_mode = player.choose_game_mode(options=options, public_info=public_info)
         if chosen_mode[0] == NO_GAME:
-            self.deciding_players.remove(player)
+            self.deciding_players.remove(self.current_player_index)
         elif chosen_mode[0] > self.game_mode[0]:
             self.game_mode = chosen_mode
             self.set_offensive_players(player)

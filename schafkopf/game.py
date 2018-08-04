@@ -24,7 +24,7 @@ class Game:
 
     def get_game_state(self):
         game_state = self.get_public_info()
-        game_state["declaring_player"] = self.bidding_game.offensive_players[0]
+        #game_state["declaring_player"] = self.bidding_game.offensive_players[0]
         game_state["player_hands"] = [player.get_hand() for player in self.playerlist]
         game_state["possible_actions"] = self.get_possible_actions()
         return deepcopy(game_state)
@@ -165,7 +165,7 @@ class Game:
                                   if player not in self.trick_game.offensive_players]
         team_cards = self.get_teamcards(team_with_laufende)
         next_highest_trump_in_team = True
-        while next_highest_trump_in_team and num <= len(self.trick_game.trumpcards):
+        while next_highest_trump_in_team and num < len(self.trick_game.trumpcards):
             next_trump = self.trick_game.trumpcards[num]
             if next_trump in team_cards:
                 num += 1

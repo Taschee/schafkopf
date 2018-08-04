@@ -100,14 +100,14 @@ def test_possible_game_modes(game_before, player_hands_partner):
 
 def test_bidding_game_init_before(game_before):
     assert game_before.current_player_index == 0
-    assert game_before.deciding_players == set(game_before.playerlist)
+    assert game_before.deciding_players == {0, 1, 2, 3}
     assert game_before.mode_proposals == []
     assert not game_before.finished()
 
 
 def test_bidding_game_init_during(game_during):
     assert game_during.current_player_index == 3
-    assert set([player._name for player in game_during.deciding_players]) == {"B", "D"}
+    assert game_during.deciding_players == {1, 3}
     assert not game_during.finished()
     assert game_during.game_mode == (PARTNER_MODE, BELLS)
     assert game_during.offensive_players == [1, 0]
@@ -115,26 +115,26 @@ def test_bidding_game_init_during(game_during):
 
 def test_bidding_game_init_after(game_after):
     assert game_after.game_mode == (WENZ, None)
-    assert set([player._name for player in game_after.deciding_players]) == {"D"}
+    assert game_after.deciding_players == {3}
     assert game_after.offensive_players == [3]
     assert game_after.finished()
 
 
 def test_bidding_game_next_proposal(game_before):
     bidding_game = game_before
-    assert set([player._name for player in bidding_game.deciding_players]) == {"A", "B", "C", "D"}
+    assert bidding_game.deciding_players == {0, 1, 2, 3}
     assert bidding_game.current_player_index == 0
     bidding_game.next_proposal()
     assert bidding_game.game_mode == (NO_GAME, None)
     assert bidding_game.current_player_index == 1
-    assert set([player._name for player in bidding_game.deciding_players]) == {"B", "C", "D"}
+    assert bidding_game.deciding_players == {1, 2, 3}
     assert not bidding_game.finished()
     bidding_game.next_proposal()
     assert bidding_game.game_mode == (PARTNER_MODE, BELLS)
-    assert set([player._name for player in bidding_game.deciding_players]) == {"B", "C", "D"}
+    assert bidding_game.deciding_players == {1, 2, 3}
     assert not bidding_game.finished()
     bidding_game.next_proposal()
-    assert set([player._name for player in bidding_game.deciding_players]) == {"B", "D"}
+    assert bidding_game.deciding_players == {1, 3}
     assert bidding_game.current_player_index == 3
     assert not bidding_game.finished()
     bidding_game.next_proposal()
