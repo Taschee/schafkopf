@@ -61,24 +61,24 @@ class BiddingGame:
         return deepcopy({"leading_player_index": self.leading_player_index,
                          "current_player_index": self.current_player_index,
                          "mode_proposals": self.mode_proposals,
-                         "declaring_player": None,
-                         "game_mode": None,
+                         "declaring_player": self.offensive_players[0],
+                         "game_mode": self.game_mode,
                          "trumpcards": [],
                          "tricks": [],
                          "current_trick": None})
 
     def next_proposal(self):
         player = self.get_current_player()
-        while player not in self.deciding_players:
+        while player not in self.deciding_players or self.playerlist.index(player) in self.offensive_players:
             self.next_player()
             player = self.get_current_player()
         mode_to_beat = sum([1 for proposal in self.mode_proposals if proposal[0] != NO_GAME])
         options = self.determine_possible_game_modes(hand=player.get_hand(), mode_to_beat=mode_to_beat)
         public_info = self.get_public_info()
         chosen_mode = player.choose_game_mode(options=options, public_info=public_info)
-        if chosen_mode[0] <= self.game_mode[0]:
+        if chosen_mode[0] == NO_GAME:
             self.deciding_players.remove(player)
-        else:
+        elif chosen_mode[0] > self.game_mode[0]:
             self.game_mode = chosen_mode
             self.set_offensive_players(player)
         self.mode_proposals.append(chosen_mode)
