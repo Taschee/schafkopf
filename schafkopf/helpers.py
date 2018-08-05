@@ -64,8 +64,9 @@ def suits_not_followed(tricks, current_trick, trumpcards, playerindex):
         if first_card not in trumpcards and first_card is not None:
             suit = first_card[1]
             played_card = trick.cards[playerindex]
-            if played_card[1] != suit and played_card is not None:
-                missing_suits.append(suit)
+            if played_card is not None:
+                if played_card[1] != suit:
+                    missing_suits.append(suit)
     return missing_suits
 
 

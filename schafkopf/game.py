@@ -8,12 +8,13 @@ from schafkopf.trick_game import TrickGame
 
 class Game:
     def __init__(self, players, game_state):
+        state = deepcopy(game_state)
         self.playerlist = players
-        for player, hand in zip(self.playerlist, game_state["player_hands"]):
+        for player, hand in zip(self.playerlist, state["player_hands"]):
             player.pick_up_cards(hand)
-        self.leading_player_index = game_state["leading_player_index"]
-        self.bidding_game = BiddingGame(playerlist=players, game_state=game_state)
-        self.trick_game = TrickGame(playerlist=players, game_state=game_state)
+        self.leading_player_index = state["leading_player_index"]
+        self.bidding_game = BiddingGame(playerlist=players, game_state=state)
+        self.trick_game = TrickGame(playerlist=players, game_state=state)
         self.winners = None
 
     def get_public_info(self):
@@ -24,7 +25,6 @@ class Game:
 
     def get_game_state(self):
         game_state = self.get_public_info()
-        #game_state["declaring_player"] = self.bidding_game.offensive_players[0]
         game_state["player_hands"] = [player.get_hand() for player in self.playerlist]
         game_state["possible_actions"] = self.get_possible_actions()
         return deepcopy(game_state)
