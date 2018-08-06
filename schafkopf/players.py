@@ -33,7 +33,7 @@ class Player:
 class RandomPlayer(Player):
     """Random Player"""
     def choose_game_mode(self, options, public_info):
-        return random.choice(tuple(options))
+        return (NO_GAME, None)
 
     def play_card(self, public_info, options=None):
         if options is None:
