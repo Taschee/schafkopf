@@ -60,6 +60,8 @@ class TrickGame:
                     forbidden_cards = [card for card in hand if card not in self.trumpcards
                                        and card[1] == self.game_mode[1] and card[0] != 7]
                     return [card for card in hand if card not in forbidden_cards]
+                else:
+                    return hand
             else:
                 return hand
 

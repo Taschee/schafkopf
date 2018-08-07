@@ -57,3 +57,10 @@ class Tournament:
             return False
         else:
             return True
+
+    def get_tournament_results(self):
+        return self.cumulative_rewards
+
+    def get_game_results(self):
+        if self.record_games:
+            return [game.get_payouts() for game in self.games]

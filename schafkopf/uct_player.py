@@ -3,22 +3,24 @@ from schafkopf.mc_node import MCNode
 from schafkopf.helpers import sample_opponent_hands
 from schafkopf.players import Player, DummyPlayer, RandomPlayer
 from schafkopf.game import Game
+from schafkopf.trick import Trick
 from copy import deepcopy
 import multiprocessing as mp
 import random
 
 class UCTPlayer(Player):
 
-    def __init__(self, name="UCT", ucb_const=100, num_samples=10):
+    def __init__(self, name="UCT", ucb_const=100, num_samples=10, num_simulations=100):
         Player.__init__(self, name=name)
         self.ucb_const = ucb_const
         self.num_samples = num_samples
+        self.num_simulations = num_simulations
 
-    def uct_search(self, game_state, num_simulations=1000):
+    def uct_search(self, game_state):
         root_node = MCNode(game_state=game_state)
         mc_tree = MCTree(root_node=root_node)
 
-        for sim_num in range(1, num_simulations + 1):
+        for sim_num in range(1, self.num_simulations + 1):
             selected_node = self.selection(mc_tree)
             rewards = self.simulation(selected_node)
             mc_tree.backup_rewards(leaf_node=selected_node, rewards=rewards)
@@ -68,8 +70,12 @@ class UCTPlayer(Player):
     def sample_game_state(self, public_info):
 
         # sample opponent hands
+        if public_info["current_trick"] is None:
+            current_trick = Trick(leading_player_index=public_info["leading_player_index"])
+        else:
+            current_trick = public_info["current_trick"]
         player_hands = sample_opponent_hands(tricks=public_info["tricks"],
-                                             current_trick=public_info["current_trick"],
+                                             current_trick=current_trick,
                                              trumpcards=public_info["trumpcards"],
                                              playerindex=public_info["current_player_index"],
                                              player_hand=self._hand)
@@ -82,29 +88,35 @@ class UCTPlayer(Player):
         return game_state
 
     def choose_game_mode(self, public_info, options):
-        sampled_states = [self.sample_game_state(public_info) for num in range(self.num_samples)]
+        if len(options) == 1:
+            return list(options)[0]
+        else:
+            sampled_states = [self.sample_game_state(public_info) for num in range(self.num_samples)]
 
-        num_workers = mp.cpu_count()
-        pool = mp.Pool(num_workers)
+            num_workers = mp.cpu_count()
+            pool = mp.Pool(num_workers)
 
-        # maybe change this to choosing highest average payout/ucb_value? Now: most frequent best action is chosen
-        results = pool.map(func=self.uct_search, iterable=sampled_states)
+            # maybe change this to choosing highest average payout/ucb_value? Now: most frequent best action is chosen
+            results = pool.map(func=self.uct_search, iterable=sampled_states)
 
-        best_action = max(results, key=results.count)
+            best_action = max(results, key=results.count)
 
-        return best_action
+            return best_action
 
     def play_card(self, public_info, options=None):
         # choose card by sampling opponent cards N times, in each sample perform MonteCarloSimulation, return best card
+        if len(options) == 1:
+            card = list(options)[0]
+        else:
+            sampled_states = [self.sample_game_state(public_info) for num in range(self.num_samples)]
 
-        sampled_states = [self.sample_game_state(public_info) for num in range(self.num_samples)]
+            num_workers = mp.cpu_count()
+            pool = mp.Pool(num_workers)
 
-        num_workers = mp.cpu_count()
-        pool = mp.Pool(num_workers)
+            # maybe change this to choosing highest average payout/ucb_value? Now: most frequent best action is chosen
+            results = pool.map(func=self.uct_search, iterable=sampled_states)
 
-        # maybe change this to choosing highest average payout/ucb_value? Now: most frequent best action is chosen
-        results = pool.map(func=self.uct_search, iterable=sampled_states)
+            card = max(results, key=results.count)
 
-        best_action = max(results, key=results.count)
-
-        return best_action
+        self._hand.remove(card)
+        return card

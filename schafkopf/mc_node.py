@@ -34,19 +34,19 @@ class MCNode:
 
     def best_child(self, ucb_const):
         if not self.is_leaf():
-            values = [self.ucb_value(child, ucb_const) for child in self.children]
+            values = [child.ucb_value(ucb_const) for child in self.children]
             best_child = self.children[np.argmax(values)]
             return best_child
 
-    def ucb_value(self, child_node, ucb_const):
-        if child_node.visits != 0:
-            average_reward = self.get_average_reward(player=self.current_player)
-            return average_reward + ucb_const * np.sqrt(2 * np.log(self.visits) / child_node.visits)
+    def ucb_value(self, ucb_const):
+        if self.visits != 0:
+            average_reward = self.get_average_reward(player=self.parent.current_player)
+            return average_reward + ucb_const * np.sqrt(2 * np.log(self.parent.visits) / self.visits)
         else:
             return np.infty
 
     def ucb_values(self, ucb_const):
-        return [self.ucb_value(child, ucb_const) for child in self.children]
+        return [child.ucb_value(ucb_const) for child in self.children]
 
     def update_visits(self):
         self.visits += 1
