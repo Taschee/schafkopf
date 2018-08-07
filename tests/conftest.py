@@ -1,5 +1,6 @@
 import pytest
-from schafkopf.players import DummyPlayer, RandomPlayer
+from schafkopf.players.random_player import RandomPlayer
+from schafkopf.players.dummy_player import DummyPlayer
 from schafkopf.suits import LEAVES, ACORNS, BELLS, HEARTS, SUITS
 from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 from schafkopf.game_modes import NO_GAME, WENZ, PARTNER_MODE, SOLO

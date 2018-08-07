@@ -1,9 +1,11 @@
-from schafkopf.uct_player import UCTPlayer
-from schafkopf.game_modes import PARTNER_MODE, NO_GAME, SOLO, WENZ
-from schafkopf.suits import ACORNS, BELLS, HEARTS, LEAVES
-from schafkopf.ranks import OBER, UNTER, KING, ACE, SEVEN, EIGHT, NINE, TEN
-from schafkopf.game import Game
 import pytest
+
+from schafkopf.game import Game
+from schafkopf.game_modes import PARTNER_MODE, NO_GAME
+from schafkopf.players.uct_player import UCTPlayer
+from schafkopf.ranks import OBER, UNTER, KING, ACE, SEVEN, NINE, TEN
+from schafkopf.suits import ACORNS, BELLS, LEAVES
+
 
 @pytest.fixture
 def uct_playerlist():
@@ -36,4 +38,3 @@ def game_state_after_bidding(player_hands_partner):
 
 def test_playing(game_state_after_bidding, uct_playerlist):
     game = Game(game_state=game_state_after_bidding, players=uct_playerlist)
-    game.play()

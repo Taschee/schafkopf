@@ -1,6 +1,6 @@
 import pytest
 from schafkopf.tournament import Tournament
-from schafkopf.players import RandomPlayer
+from schafkopf.players.random_player import RandomPlayer
 
 
 @pytest.fixture

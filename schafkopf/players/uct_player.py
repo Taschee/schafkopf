@@ -1,12 +1,15 @@
 from schafkopf.mc_tree import MCTree
 from schafkopf.mc_node import MCNode
 from schafkopf.helpers import sample_opponent_hands
-from schafkopf.players import Player, DummyPlayer, RandomPlayer
+from schafkopf.players.random_player import RandomPlayer
+from schafkopf.players.dummy_player import DummyPlayer
+from schafkopf.players.player import Player
 from schafkopf.game import Game
 from schafkopf.trick import Trick
 from copy import deepcopy
 import multiprocessing as mp
 import random
+
 
 class UCTPlayer(Player):
 

@@ -1,9 +1,9 @@
-from schafkopf.game import Game
-from schafkopf.players import RandomPlayer
-from schafkopf.uct_player import UCTPlayer
 import time
-from schafkopf.game_states_trick_play import sample_game_states
 
+from schafkopf.game import Game
+from schafkopf.game_states_trick_play import sample_game_states
+from schafkopf.players.random_player import RandomPlayer
+from schafkopf.players.uct_player import UCTPlayer
 
 playerlist = [UCTPlayer(name="A", num_samples=10, num_simulations=100, ucb_const=10),
               RandomPlayer(name="B"),

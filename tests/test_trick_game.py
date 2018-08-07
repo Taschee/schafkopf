@@ -1,6 +1,6 @@
 import pytest
 from schafkopf.trick_game import TrickGame
-from schafkopf.players import DummyPlayer
+from schafkopf.players.dummy_player import DummyPlayer
 from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
 from schafkopf.suits import ACORNS, BELLS, HEARTS, LEAVES
 from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE

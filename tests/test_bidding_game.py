@@ -3,7 +3,7 @@ from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
 from schafkopf.suits import BELLS, ACORNS, LEAVES, HEARTS, SUITS
 from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 from schafkopf.bidding_game import BiddingGame
-from schafkopf.players import DummyPlayer
+from schafkopf.players.dummy_player import DummyPlayer
 
 
 @pytest.fixture

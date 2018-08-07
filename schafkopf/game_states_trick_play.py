@@ -1,9 +1,17 @@
-from schafkopf.uct_player import UCTPlayer
-from schafkopf.players import RandomPlayer
-from schafkopf.game import Game
 from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 from schafkopf.suits import ACORNS, BELLS, HEARTS, LEAVES
 
+
+def define_game_state(player_hands, leading_player_index, mode_proposals):
+    return {"player_hands": player_hands,
+            "leading_player_index": leading_player_index,
+            "current_player_index": leading_player_index,
+            "declaring_player": 0,
+            "game_mode": mode_proposals[0],
+            "mode_proposals": mode_proposals,
+            "tricks": [],
+            "current_trick": None,
+            "possible_actions": player_hands[leading_player_index]}
 
 partner_hands_1 = [[(3, 1), (4, 1), (3, 3), (6, 0), (6, 2), (6, 1), (3, 0), (0, 2)],
                    [(2, 3), (4, 3), (1, 1), (5, 1), (7, 3), (5, 3), (5, 0), (6, 3)],
@@ -139,16 +147,7 @@ list_player_hands = list_player_hands_partner + list_player_hands_wenz + list_pl
 list_proposals = list_proposals_partner + list_proposals_wenz + list_proposals_solo
 
 
-def define_game_state(player_hands, leading_player_index, mode_proposals):
-    return {"player_hands": player_hands,
-            "leading_player_index": leading_player_index,
-            "current_player_index": leading_player_index,
-            "declaring_player": 0,
-            "game_mode": mode_proposals[0],
-            "mode_proposals": mode_proposals,
-            "tricks": [],
-            "current_trick": None,
-            "possible_actions": player_hands[leading_player_index]}
+
 
 sample_game_states_partner = []
 
@@ -167,6 +166,5 @@ sample_game_states_solo = []
 for player_hands, mode_proposals in zip(list_player_hands_solo, list_proposals_solo):
     state = define_game_state(player_hands=player_hands, mode_proposals=mode_proposals, leading_player_index=0)
     sample_game_states_partner.append(state)
-
 
 sample_game_states = sample_game_states_partner + sample_game_states_wenz + sample_game_states_solo
