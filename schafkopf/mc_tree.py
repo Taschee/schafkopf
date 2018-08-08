@@ -1,3 +1,6 @@
+import graphviz
+from schafkopf.suits import SUITS, ACORNS, LEAVES, HEARTS, BELLS
+from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 
 
 class MCTree:
@@ -44,6 +47,47 @@ class MCTree:
         all_depths = [leave.get_depth() for leave in self.get_leaves()]
         return sum(all_depths) / len(all_depths)
 
-    def visualize(self):
-        # create some visualization of the tree?
-        pass
+    def visualize_tree(self, format="png"):
+        """Create a visualization of the tree and save it as .png as well as .gv"""
+        graph = graphviz.Digraph(filename="Tree_{}.gv".format(len(self.nodes)),
+                                 format=format,
+                                 node_attr={"shape": "ellipse", "fixedsize": "True"})
+        self.add_tree(graph=graph,
+                      my_root_node=self.root_node)
+        graph.render()
+
+    def add_tree(self, graph, my_root_node, graph_root_name=None):
+        # recursively add nodes and draw all edges
+        if graph_root_name is None:
+            graph.node(name="ROOT", label="", **{'width':str(0), 'height':str(0)})
+            graph_root_name = "ROOT"
+        for child in my_root_node.children:
+            new_name = str(child.previous_action)
+            img = self.get_image_name(card=child.previous_action)
+            graph.node(name=new_name, image=img, label="", **{'width':str(0.5), 'height':str(0.3)})
+            graph.edge(graph_root_name, new_name)
+            self.add_tree(graph=graph, my_root_node=child, graph_root_name=new_name)
+
+    def get_image_name(self, card):
+        if card[1] == BELLS:
+            img = "Schellen"
+        elif card[1] == HEARTS:
+            img = "Herz"
+        elif card[1] == LEAVES:
+            img = "Gras"
+        else:
+            img = "Eichel"
+        if card[0] in {SEVEN, EIGHT, NINE}:
+            img += str(card[0] + 7)
+        elif card[0] == TEN:
+            img += str(10)
+        elif card[0] == UNTER:
+            img += "U"
+        elif card[0] == OBER:
+            img += "O"
+        elif card[0] == KING:
+            img += "K"
+        else:
+            img += "A"
+        img += ".jpg"
+        return img
