@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
-
 import os
 import pygame
-from schafkopf.game import Game
-from schafkopf.players import RandomPlayer
+
 
 pygame.init()
 pygame.font.init()
@@ -44,11 +41,11 @@ class Card(pygame.sprite.Sprite):
             self.face_down = True
 
 class TableViewer:
-    def __init__(self, screensize, playerlist, current_game):
+    def __init__(self, screensize, game):
         self.screensize = screensize
-        self.current_game = current_game
+        self.current_game = game
         self.cardsize = screensize[0] * 7 // 100, screensize[1] * 14 // 100
-        self.playerlist = playerlist
+        self.playerlist = game.playerlist
 
     def prepare_hand(self, player, angle):
         hand = [Card(card, angle=angle, size=self.cardsize) for card in player.get_hand()]
@@ -75,7 +72,7 @@ class TableViewer:
                           (self.screensize[0] * 55 // 100, self.screensize[1] * 465 // 1000),
                           (self.screensize[0] * 465 // 1000, self.screensize[1] * 31 // 100),
                           (self.screensize[0] * 31 // 100, self.screensize[1] * 465 // 1000)]
-        curr_trick = self.current_game.get_current_trick()
+        curr_trick = self.current_game.trick_game.current_trick
         curr_trick_sprites = []
         for card, i in zip(curr_trick.cards, range(4)):
             if card is not None:
@@ -84,84 +81,49 @@ class TableViewer:
                 curr_trick_sprites.append(sprite)
         return curr_trick_sprites
 
+    def view_table(self):
+        screensize = (700, 700)
+        screen = pygame.display.set_mode(screensize)
+        pygame.display.set_caption(str(self.current_game.trick_game.game_mode))
+        brown = [139, 69, 19]
+        screen.fill(brown)
+        pygame.display.flip()
 
-def main():
-    screensize = (700, 700)
-    screen = pygame.display.set_mode(screensize)
-    pygame.display.set_caption('Schafkopf!')
-    brown = [139, 69, 19]
-    screen.fill(brown)
-    pygame.display.flip()
+        all_cards = self.prepare_current_trick()
+        for player, i in zip(self.playerlist, range(len(self.playerlist))):
+            hand = self.prepare_hand(player=player, angle=i * 90)
+            all_cards.append(hand)
 
+        all_sprites = pygame.sprite.RenderPlain(all_cards)
 
-    Alfons = RandomPlayer(name="Alfons")
-    Bertl = RandomPlayer(name="Bertha")
-    Chrissie = RandomPlayer(name="Chris")
-    Dora = RandomPlayer(name="Dora")
-    playerlist = [Alfons, Bertl, Chrissie, Dora]
+        all_sprites.draw(screen)
+        pygame.display.flip()
 
-    game = Game(players=playerlist, leading_player_index=0)
+        running = True
+        while running:
+            for ev in pygame.event.get():
+                if ev.type == pygame.QUIT:
+                    running = False
+                    pygame.quit()
+                if ev.type == pygame.MOUSEBUTTONUP:
 
-    game.decide_game_mode()
-
-    for player in game.get_players():
-        player.sort_hand(trumpcards=game.get_trump_cards())
-
-    viewer = TableViewer(screensize=(600,600), playerlist=playerlist, current_game=game)
-
-    screen.fill(brown)
-    all_cards = viewer.prepare_current_trick()
-    for player, i in zip(playerlist, range(len(playerlist))):
-        hand = viewer.prepare_hand(player=player, angle=i * 90)
-        all_cards.append(hand)
-
-    all_sprites = pygame.sprite.RenderPlain(all_cards)
-
-    all_sprites.draw(screen)
-    pygame.display.flip()
-
-    running = True
-    while running:
-        for ev in pygame.event.get():
-
-
-            if ev.type == pygame.QUIT:
-                running = False
-                pygame.quit()
-            if ev.type == pygame.MOUSEBUTTONUP:
-
-                if not game.finished():
-                    game_mode = game.get_game_mode()
-
-
-                    game.play_next_card()
+                    self.current_game.next_action()
 
                     screen.fill(brown)
+                    pygame.display.flip()
 
-                    all_cards = viewer.prepare_current_trick()
-
-                    for player, i in zip(playerlist, range(len(playerlist))):
-                        hand = viewer.prepare_hand(player=player, angle=i * 90)
+                    all_cards = self.prepare_current_trick()
+                    for player, i in zip(self.playerlist, range(len(self.playerlist))):
+                        hand = self.prepare_hand(player=player, angle=i * 90)
                         all_cards.append(hand)
+
+                    pygame.display.set_caption("Player " + str(self.current_game.trick_game.offensive_players[0])
+                                               + str(self.current_game.bidding_game.game_mode))
 
                     all_sprites = pygame.sprite.RenderPlain(all_cards)
 
                     all_sprites.draw(screen)
                     pygame.display.flip()
 
-                    game.trick_finished()
-
-                else:
-                    screen.fill(brown)
-                    winner_indices = game.determine_winners()
-                    winner_names = [playerlist[i]._name for i in winner_indices]
-                    text = "Winners : "
-                    for name in winner_names:
-                        text += name + " "
-                    scoretext = myfont.render(text, 1, (255, 255, 255))
-                    screen.blit(scoretext, (5, 5))
-                    pygame.display.flip()
 
 
-if __name__ == "__main__":
-    main()
