@@ -13,12 +13,11 @@ import random
 
 class UCTPlayer(Player):
 
-    def __init__(self, name="UCT", ucb_const=100, num_samples=10, num_simulations=100, visualize=False):
+    def __init__(self, name="UCT", ucb_const=100, num_samples=10, num_simulations=100):
         Player.__init__(self, name=name)
         self.ucb_const = ucb_const
         self.num_samples = num_samples
         self.num_simulations = num_simulations
-        self.visualize = visualize
 
     def uct_search(self, game_state):
         root_node = MCNode(game_state=game_state)
@@ -28,9 +27,6 @@ class UCTPlayer(Player):
             selected_node = self.selection(mc_tree)
             rewards = self.simulation(selected_node)
             mc_tree.backup_rewards(leaf_node=selected_node, rewards=rewards)
-
-        if self.visualize:
-            mc_tree.visualize_tree(ucb=self.ucb_const)
 
         best_child_node = mc_tree.root_node.best_child(ucb_const=0)
         best_action = best_child_node.previous_action

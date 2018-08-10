@@ -49,13 +49,17 @@ class MCTree:
         all_depths = [leave.get_depth() for leave in self.get_leaves()]
         return sum(all_depths) / len(all_depths)
 
-    def visualize_tree(self, format="png", ucb=None):
+    def visualize_tree(self, format="png", ucb=None, filename=None):
         """Create a visualization of the tree and save it as .png as well as .gv"""
-        graph = graphviz.Digraph(filename="Tree_{}nodes{}.gv".format(len(self.nodes) - 1, ucb),
+        if filename is None:
+            filename = "Tree_{}nodes{}.gv".format(len(self.nodes) - 1, ucb)
+
+        graph = graphviz.Digraph(filename=filename,
                                  format=format,
                                  node_attr={"shape": "ellipse", "fixedsize": "True"})
         self.add_tree(graph=graph,
                       my_root_node=self.root_node)
+
         graph.render()
 
     def add_tree(self, graph, my_root_node, graph_root_name=None):
