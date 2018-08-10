@@ -1,6 +1,4 @@
-from schafkopf.tournament import Tournament
 import time
-
 from schafkopf.players.random_player import RandomPlayer
 from schafkopf.players.uct_player import UCTPlayer
 from schafkopf.tournament import Tournament

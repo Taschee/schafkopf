@@ -2,6 +2,8 @@ import graphviz
 from schafkopf.suits import SUITS, ACORNS, LEAVES, HEARTS, BELLS
 from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 
+import random
+
 
 class MCTree:
     def __init__(self, root_node):
@@ -47,9 +49,9 @@ class MCTree:
         all_depths = [leave.get_depth() for leave in self.get_leaves()]
         return sum(all_depths) / len(all_depths)
 
-    def visualize_tree(self, format="png"):
+    def visualize_tree(self, format="png", ucb=None):
         """Create a visualization of the tree and save it as .png as well as .gv"""
-        graph = graphviz.Digraph(filename="Tree_{}.gv".format(len(self.nodes)),
+        graph = graphviz.Digraph(filename="Tree_{}nodes{}.gv".format(len(self.nodes) - 1, ucb),
                                  format=format,
                                  node_attr={"shape": "ellipse", "fixedsize": "True"})
         self.add_tree(graph=graph,
@@ -62,21 +64,22 @@ class MCTree:
             graph.node(name="ROOT", label="", **{'width':str(0), 'height':str(0)})
             graph_root_name = "ROOT"
         for child in my_root_node.children:
-            new_name = str(child.previous_action)
+            new_name = str(random.choice(range(10**10)))
             img = self.get_image_name(card=child.previous_action)
             graph.node(name=new_name, image=img, label="", **{'width':str(0.5), 'height':str(0.3)})
             graph.edge(graph_root_name, new_name)
             self.add_tree(graph=graph, my_root_node=child, graph_root_name=new_name)
 
     def get_image_name(self, card):
+        img = "../images/"
         if card[1] == BELLS:
-            img = "Schellen"
+            img += "Schellen"
         elif card[1] == HEARTS:
-            img = "Herz"
+            img += "Herz"
         elif card[1] == LEAVES:
-            img = "Gras"
+            img += "Gras"
         else:
-            img = "Eichel"
+            img += "Eichel"
         if card[0] in {SEVEN, EIGHT, NINE}:
             img += str(card[0] + 7)
         elif card[0] == TEN:

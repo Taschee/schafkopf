@@ -1,11 +1,11 @@
 import time
-
 from schafkopf.game import Game
 from schafkopf.game_modes import NO_GAME, PARTNER_MODE
 from schafkopf.players.random_player import RandomPlayer
 from schafkopf.players.uct_player import UCTPlayer
 from schafkopf.ranks import *
 from schafkopf.suits import *
+
 
 playerlist = [UCTPlayer(name="A", num_samples=10, num_simulations=1000),
               RandomPlayer(name="B"), RandomPlayer(name="C"), RandomPlayer(name="D")]
