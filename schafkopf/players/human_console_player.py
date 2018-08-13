@@ -7,7 +7,7 @@ class HumanPlayer(Player):
         while True:
             mode = input("Hand : {} \n"
                          "Previous Proposals: {} \n"
-                         "Choose Game Mode : ".format(self._hand, public_info["mode_proposals"]))
+                         "Choose Game Mode : ".format(self.hand, public_info["mode_proposals"]))
             if mode in options:
                 break
         return mode
@@ -16,8 +16,8 @@ class HumanPlayer(Player):
         while True:
             card = input("Hand : {} \n"
                          "Current Trick : {}\n"
-                         "Play card : ".format(self._hand, public_info["current_trick"]))
-            if card in self._hand:
+                         "Play card : ".format(self.hand, public_info["current_trick"]))
+            if card in self.hand:
                 break
-        self._hand.remove(card)
+        self.hand.remove(card)
         return card

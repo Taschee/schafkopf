@@ -81,7 +81,7 @@ class UCTPlayer(Player):
                                              current_trick=current_trick,
                                              trumpcards=public_info["trumpcards"],
                                              playerindex=public_info["current_player_index"],
-                                             player_hand=self._hand)
+                                             player_hand=self.hand)
 
         # add player_hands and possible actions to game state
         game_state = deepcopy(public_info)
@@ -121,5 +121,5 @@ class UCTPlayer(Player):
 
             card = max(results, key=results.count)
 
-        self._hand.remove(card)
+        self.hand.remove(card)
         return card

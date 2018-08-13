@@ -25,6 +25,6 @@ class DummyPlayer(Player):
                 break
         else:
             card = random.choice(options)
-        self._hand.remove(card)
+        self.hand.remove(card)
         return card
 

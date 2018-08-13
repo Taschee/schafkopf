@@ -10,10 +10,10 @@ class RandomPlayer(Player):
 
     def play_card(self, public_info, options=None):
         if options is None:
-            card = random.choice(self._hand)
+            card = random.choice(self.hand)
         else:
             card = random.choice(options)
-        self._hand.remove(card)
+        self.hand.remove(card)
         return card
 
 class FullyRandomPlayer(Player):
@@ -27,8 +27,8 @@ class FullyRandomPlayer(Player):
 
     def play_card(self, public_info, options=None):
         if options is None:
-            card = random.choice(self._hand)
+            card = random.choice(self.hand)
         else:
             card = random.choice(options)
-        self._hand.remove(card)
+        self.hand.remove(card)
         return card
