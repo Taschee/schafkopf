@@ -1,5 +1,5 @@
 from schafkopf.players.player import Player
-from schafkopf.ranks import OBER, UNTER, ACE, SEVEN, EIGHT, NINE, TEN, KING
+from schafkopf.ranks import OBER, UNTER, ACE, SEVEN, EIGHT, NINE, TEN, KING, RANKS
 from schafkopf.suits import HEARTS, LEAVES, ACORNS, BELLS, SUITS
 from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
 import random
@@ -128,16 +128,16 @@ class HeuristicsPlayer(Player):
     def choose_card_wenz(self, public_info, options):
         position_in_list = public_info["current_trick"].current_player_index
         if position_in_list in public_info["declaring_player"]:
-            pass
+            return self.choose_card_wenz_declarer(public_info, options)
         else:
-            pass
+            return self.choose_card_wenz_defensive(public_info, options)
 
     def choose_card_solo(self, public_info, options):
         position_in_list = public_info["current_trick"].current_player_index
         if position_in_list in public_info["declaring_player"]:
-            pass
+            self.choose_card_solo_declarer(public_info, options)
         else:
-            pass
+            self.choose_card_solo_defensive(public_info, options)
 
     def choose_card_partner_mode_declarer(self, public_info, options):
         if public_info["current_trick"].num_cards == 0:
@@ -201,9 +201,9 @@ class HeuristicsPlayer(Player):
                 return random.choice([card for card in self.hand if card not in trumpcards_in_hand])
 
     def follow_suit_partner_mode_partner(self, public_info, options):
-        leading_player = public_info["leading_player_index"]
+        leading_player = public_info["current_trick"].leading_player_index
         first_card = public_info["current_trick"].cards[leading_player]
-        best_trumpcard_in_game = self.best_trumpcard_in_game(public_info)
+        best_trumpcard_in_game = self.best_trumpcard_still_in_game(public_info)
         if first_card in public_info["trumpcars"]:
             if leading_player == public_info["declaring_player"]:
                 if first_card == best_trumpcard_in_game:
@@ -229,12 +229,12 @@ class HeuristicsPlayer(Player):
                 return random.choice(options)
 
     def previously_played_trumpcards(self, public_info):
-        played_trumpcards = []
+        played_trumpcards = [card for card in public_info["current_trick"].cards if card in public_info["trumpcards"]]
         for trick in public_info["tricks"]:
             played_trumpcards += [card for card in trick.cards if card in public_info["trumpcards"]]
         return played_trumpcards
 
-    def best_trumpcard_in_game(self, public_info):
+    def best_trumpcard_still_in_game(self, public_info):
         played_trumpcards = self.previously_played_trumpcards(public_info)
         return [card for card in public_info["trumpcards"] if card not in played_trumpcards][0]
 
@@ -273,7 +273,7 @@ class HeuristicsPlayer(Player):
                 return random.choice(options)
 
     def follow_suit_partner_mode_defensive(self, public_info, options):
-        leading_player = public_info["leading_player_index"]
+        leading_player = public_info["current_trick"].leading_player_index
         first_card = public_info["current_trick"].cards[leading_player]
         first_cards = [trick.cards[trick.leading_player_index] for trick in public_info["tricks"]]
         # if trump was played, play randomly
@@ -317,6 +317,144 @@ class HeuristicsPlayer(Player):
                 return (ACE, first_card[1])
             else:
                 return random.choice(options)
+
+    def choose_card_wenz_declarer(self, public_info, options):
+        if public_info["current_trick"].num_cards == 0:
+            return self.lead_trick_wenz_declarer(public_info, options)
+        else:
+            return self.follow_trick_wenz_declarer(public_info, options)
+
+    def lead_trick_wenz_declarer(self, public_info, options):
+        unter_in_hand = [card for card in public_info["trumpcards"] if card in self.hand]
+        unter_played = self.rank_played(UNTER, public_info)
+        # check if there are still opponent UNTER, if yes, play highest own UNTER
+        if len(unter_in_hand + unter_played) < 4:
+            return unter_in_hand[0]
+        # play sparrow if there are no opponent UNTER left (if possible)
+        else:
+            sparrows = []
+            for card in self.hand:
+                if (ACE, card[1]) not in self.hand:
+                    sparrows.append(card)
+            if len(sparrows) > 0:
+                return random.choice(sparrows)
+            else:
+                return random.choice([card for card in options if card not in public_info["trumpcards"]])
+
+    def rank_played(self, rank, public_info):
+        rank_played = []
+        for trick in public_info["tricks"]:
+            rank_in_trick = [card for card in trick.cards if card[0] == rank]
+            rank_played += rank_in_trick
+        return rank_played
+
+    def follow_trick_wenz_declarer(self, public_info, options):
+        leading_player = public_info["current_trick"].leading_player_index
+        first_card = public_info["current_trick"].cards[leading_player]
+        unter_in_hand = self.rank_in_hand(UNTER)
+        if first_card not in public_info["trumpcards"]:
+            best_card_left = self.best_suitcard_left(first_card[1], public_info)
+            # play highest card of the suit if possible
+            if best_card_left in options:
+                return best_card_left
+            # if suit is not in hand, play lowest unter
+            elif len(self.suit_in_hand(first_card[1], wenz=True)) == 0:
+                return min(unter_in_hand, key=lambda x: x[1])
+            else:
+                return random.choice(options)
+        else:
+            best_trumpcard = self.best_trumpcard_still_in_game(public_info)
+            if best_trumpcard in options:
+                return best_trumpcard
+            else:
+                return random.choice(options)
+
+
+    def card_played_before(self, card, public_info):
+        played_cards = public_info["current_trick"].cards[:]
+        for trick in public_info["tricks"]:
+            played_cards += trick.cards
+        if card in played_cards:
+            return True
+        else:
+            return False
+
+    def best_suitcard_left(self, suit, public_info):
+        played_cards = public_info["current_trick"].cards[:]
+        for trick in public_info["tricks"]:
+            played_cards += trick.cards
+        if public_info["game_mode"] != WENZ:
+            suit_cards_left = [(rank, suit) for rank in [ACE, TEN, KING, NINE, EIGHT, SEVEN]]
+        else:
+            suit_cards_left = [(rank, suit) for rank in [ACE, TEN, KING, OBER, NINE, EIGHT, SEVEN]]
+        for card in played_cards:
+            if card in suit_cards_left:
+                suit_cards_left.remove(card)
+        return suit_cards_left[0]
+
+    def choose_card_wenz_defensive(self, public_info, options):
+        if public_info["current_trick"].num_cards == 0:
+            return self.lead_trick_wenz_defensive(public_info, options)
+        else:
+            return self.follow_trick_wenz_defensive(public_info, options)
+
+    def lead_trick_wenz_defensive(self, public_info, options):
+        max_suit = self.longest_suit(public_info)
+        if (ACE, max_suit) in options:
+            return (ACE, max_suit)
+        else:
+            return random.choice(self.suit_in_hand(max_suit))
+
+    def longest_suit(self, public_info):
+        if public_info["game_mode"][0] != WENZ:
+            suit_nums = [len(self.suit_in_hand(suit, wenz=True)) for suit in SUITS.reverse()]
+            return np.argmax(suit_nums)
+        else:
+            suit_nums = [len(self.suit_in_hand(suit)) for suit in SUITS.reverse()]
+            return np.argmax(suit_nums)
+
+    def follow_trick_wenz_defensive(self, public_info, options):
+        current_trick = public_info["current_trick"]
+        leading_player = current_trick.leading_player_index
+        first_card = current_trick.cards[leading_player]
+        offensive_player = public_info["declaring_player"]
+        trumpcards_in_hand = [card for card in public_info["trumpcards"] if card in self.hand]
+        low_cards_in_hand = self.rank_in_hand(SEVEN) + self.rank_in_hand(EIGHT) + self.rank_in_hand(NINE)
+
+        # if a UNTER was played:
+        if first_card in public_info["trumpcards"]:
+            # if the offensive player played the best trumpcard left, go with lowest trumpcard or card with few points
+            if current_trick.cards[offensive_player] == self.best_trumpcard_still_in_game(public_info):
+                if len(trumpcards_in_hand) > 0:
+                    return trumpcards_in_hand[-1]
+                elif len(low_cards_in_hand) > 0:
+                    return random.choice(low_cards_in_hand)
+                else:
+                    return random.choice(options)
+            # random non-ace otherwise
+            else:
+                aces = self.aces_in_hand(public_info)
+                non_aces = [card for card in self.hand if card not in aces]
+                return random.choice(non_aces)
+        
+        else:
+            # in case of no UNTER as first card: play best suitcard if possible, or if possible, use UNTER to take trick
+            if len(self.suit_in_hand(first_card[1], wenz=True)) > 0:
+                best_suitcard = self.best_suitcard_left(first_card[1], public_info)
+                if best_suitcard in options:
+                    return best_suitcard
+                else:
+                    return random.choice(options)
+            else:
+                unter_in_hand = self.rank_in_hand(UNTER)
+                if len(unter_in_hand) == 0:
+                    return random.choice(options)
+                else:
+                    return unter_in_hand[-1]
+
+
+
+
 
 
 
