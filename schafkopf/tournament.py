@@ -1,7 +1,7 @@
 from schafkopf.game import Game
 from schafkopf.card_deck import CardDeck
 from schafkopf.game_modes import NO_GAME, WENZ, PARTNER_MODE, SOLO
-from schafkopf.suits import SUITS
+from schafkopf.suits import SUITS, ACORNS, LEAVES, BELLS
 
 
 class Tournament:
@@ -33,7 +33,7 @@ class Tournament:
                       "tricks": [],
                       "current_trick": None,
                       "possible_actions": [(NO_GAME, None), (WENZ, None)] +
-                                          [(PARTNER_MODE, suit) for suit in SUITS] +
+                                          [(PARTNER_MODE, suit) for suit in [ACORNS, LEAVES, BELLS]] +
                                           [(SOLO, suit) for suit in SUITS]}
         return Game(players=self.playerlist, game_state=game_state)
 

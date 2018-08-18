@@ -2,6 +2,8 @@ from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 from schafkopf.suits import ACORNS, BELLS, HEARTS, LEAVES
 
 
+#   List of 20 games after the bidding, each game with all possible leading players
+
 def define_game_state(player_hands, leading_player_index, mode_proposals):
     return {"player_hands": player_hands,
             "leading_player_index": leading_player_index,
@@ -12,6 +14,7 @@ def define_game_state(player_hands, leading_player_index, mode_proposals):
             "tricks": [],
             "current_trick": None,
             "possible_actions": player_hands[leading_player_index]}
+
 
 partner_hands_1 = [[(3, 1), (4, 1), (3, 3), (6, 0), (6, 2), (6, 1), (3, 0), (0, 2)],
                    [(2, 3), (4, 3), (1, 1), (5, 1), (7, 3), (5, 3), (5, 0), (6, 3)],
@@ -148,23 +151,32 @@ list_proposals = list_proposals_partner + list_proposals_wenz + list_proposals_s
 
 
 
+sample_game_states = []
 
-sample_game_states_partner = []
+for leading_player_index in range(4):
 
-for player_hands, mode_proposals in zip(list_player_hands_partner, list_proposals_partner):
-    state = define_game_state(player_hands=player_hands, mode_proposals=mode_proposals, leading_player_index=0)
-    sample_game_states_partner.append(state)
+    sample_game_states_partner = []
 
-sample_game_states_wenz = []
+    for player_hands, mode_proposals in zip(list_player_hands_partner, list_proposals_partner):
+        state = define_game_state(player_hands=player_hands,
+                                  mode_proposals=mode_proposals,
+                                  leading_player_index=leading_player_index)
+        sample_game_states_partner.append(state)
 
-for player_hands, mode_proposals in zip(list_player_hands_wenz, list_proposals_wenz):
-    state = define_game_state(player_hands=player_hands, mode_proposals=mode_proposals, leading_player_index=0)
-    sample_game_states_partner.append(state)
+    sample_game_states_wenz = []
 
-sample_game_states_solo = []
+    for player_hands, mode_proposals in zip(list_player_hands_wenz, list_proposals_wenz):
+        state = define_game_state(player_hands=player_hands,
+                                  mode_proposals=mode_proposals,
+                                  leading_player_index=leading_player_index)
+        sample_game_states_partner.append(state)
 
-for player_hands, mode_proposals in zip(list_player_hands_solo, list_proposals_solo):
-    state = define_game_state(player_hands=player_hands, mode_proposals=mode_proposals, leading_player_index=0)
-    sample_game_states_partner.append(state)
+    sample_game_states_solo = []
 
-sample_game_states = sample_game_states_partner + sample_game_states_wenz + sample_game_states_solo
+    for player_hands, mode_proposals in zip(list_player_hands_solo, list_proposals_solo):
+        state = define_game_state(player_hands=player_hands,
+                                  mode_proposals=mode_proposals,
+                                  leading_player_index=leading_player_index)
+        sample_game_states_partner.append(state)
+
+    sample_game_states += sample_game_states_partner + sample_game_states_wenz + sample_game_states_solo

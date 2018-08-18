@@ -19,7 +19,7 @@ class HeuristicsPlayer(Player):
             chosen_mode = chosen_solo
         return chosen_mode
 
-    def play_card(self, public_info, options=None):
+    def play_card(self, public_info, options):
         if len(options) == 1:
             self.hand.remove(options[0])
             return options[0]
@@ -85,7 +85,9 @@ class HeuristicsPlayer(Player):
             return (NO_GAME, None)
 
         else:
-            num_suits = [len(self.suit_in_hand(suit)) for suit in SUITS.reverse()]
+            suits = SUITS[:]
+            suits.reverse()
+            num_suits = [len(self.suit_in_hand(suit)) for suit in suits]
             trump_suit = np.argmax(num_suits)
             non_trumpcards = [card for card in self.hand if card[0] not in {UNTER, OBER} or card[1] == trump_suit]
             num_trump_suit = num_suits[trump_suit]
@@ -138,7 +140,7 @@ class HeuristicsPlayer(Player):
 
     def choose_card_solo(self, public_info, options):
         position_in_list = public_info["current_trick"].current_player_index
-        if position_in_list in public_info["declaring_player"]:
+        if position_in_list == public_info["declaring_player"]:
             return self.choose_card_solo_declarer(public_info, options)
         else:
             return self.choose_card_solo_defensive(public_info, options)
@@ -175,10 +177,11 @@ class HeuristicsPlayer(Player):
                 return random.choice([card for card in self.hand if card not in trumpcards_in_hand])
 
     def follow_suit_partner_mode_declarer(self, public_info, options):
-        leading_player = public_info["leading_player_index"]
-        leading_card = public_info["current_trick"].cards[leading_player]
+        current_trick = public_info["current_trick"]
+        leading_player = current_trick.leading_player_index
+        leading_card = current_trick.cards[leading_player]
         trumpcards_in_hand = self.trumpcards_in_hand(public_info)
-        if leading_card not in public_info["trump_cards"]:
+        if leading_card not in public_info["trumpcards"]:
             suit = leading_card[1]
             # play ACE if possible
             if (ACE, suit) in options:
@@ -387,7 +390,10 @@ class HeuristicsPlayer(Player):
         for card in played_cards:
             if card in suit_cards_left:
                 suit_cards_left.remove(card)
-        return suit_cards_left[0]
+        if len(suit_cards_left) > 0:
+            return suit_cards_left[0]
+        else:
+            return None
 
     def choose_card_wenz_defensive(self, public_info, options):
         if public_info["current_trick"].num_cards == 0:
@@ -403,11 +409,13 @@ class HeuristicsPlayer(Player):
             return random.choice(self.suit_in_hand(max_suit))
 
     def longest_suit(self, public_info):
+        suits = SUITS[:]
+        suits.reverse()
         if public_info["game_mode"][0] != WENZ:
-            suit_nums = [len(self.suit_in_hand(suit, wenz=True)) for suit in SUITS.reverse()]
+            suit_nums = [len(self.suit_in_hand(suit, wenz=True)) for suit in suits]
             return np.argmax(suit_nums)
         else:
-            suit_nums = [len(self.suit_in_hand(suit)) for suit in SUITS.reverse()]
+            suit_nums = [len(self.suit_in_hand(suit)) for suit in suits]
             return np.argmax(suit_nums)
 
     def follow_trick_wenz_defensive(self, public_info, options):
