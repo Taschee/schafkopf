@@ -21,8 +21,9 @@ class HeuristicsPlayer(Player):
 
     def play_card(self, public_info, options):
         if len(options) == 1:
-            self.hand.remove(options[0])
-            return options[0]
+            card = options[0]
+            self.hand.remove(card)
+            return card
         else:
             if public_info["game_mode"][0] == PARTNER_MODE:
                 chosen_card = self.choose_card_partner_mode(public_info, options)
@@ -74,6 +75,8 @@ class HeuristicsPlayer(Player):
                     return (WENZ, None)
                 else:
                     return (NO_GAME, None)
+            else:
+                return (NO_GAME, None)
         else:
             return (NO_GAME, None)
 
@@ -95,10 +98,8 @@ class HeuristicsPlayer(Player):
             if num_trumpcards < 6:
                 return (NO_GAME, None)
 
-            sparrows = set(non_trumpcards)
-            for card in sparrows:
-                if card[0] == ACE:
-                    sparrows.remove(card)
+            sparrows = [card for card in non_trumpcards if card[0] != ACE]
+
             if len(sparrows) >= 2:
                 return (NO_GAME, None)
             elif len(sparrows) == 0:
@@ -133,7 +134,7 @@ class HeuristicsPlayer(Player):
 
     def choose_card_wenz(self, public_info, options):
         position_in_list = public_info["current_trick"].current_player_index
-        if position_in_list in public_info["declaring_player"]:
+        if position_in_list == public_info["declaring_player"]:
             return self.choose_card_wenz_declarer(public_info, options)
         else:
             return self.choose_card_wenz_defensive(public_info, options)
@@ -147,13 +148,13 @@ class HeuristicsPlayer(Player):
 
     def choose_card_partner_mode_declarer(self, public_info, options):
         if public_info["current_trick"].num_cards == 0:
-            return self.lead_trick_partner_mode_declarer(public_info)
+            return self.lead_trick_partner_mode_declarer(public_info, options)
         else:
             return self.follow_suit_partner_mode_declarer(public_info, options)
 
     def choose_card_partner_mode_partner(self, public_info, options):
         if public_info["current_trick"].num_cards == 0:
-            return self.lead_trick_partner_mode_partner(public_info)
+            return self.lead_trick_partner_mode_partner(public_info, options)
         else:
             return self.follow_suit_partner_mode_partner(public_info, options)
 
@@ -163,18 +164,24 @@ class HeuristicsPlayer(Player):
         else:
             return self.follow_suit_partner_mode_defensive(public_info, options)
 
-    def lead_trick_partner_mode_declarer(self, public_info):
+    def lead_trick_partner_mode_declarer(self, public_info, options):
         trumpcards_in_hand = self.trumpcards_in_hand(public_info)
+        non_trumpcards_in_hand = [card for card in self.hand if card not in trumpcards_in_hand]
         played_trumpcards = self.previously_played_trumpcards(public_info)
         # check if other players have still trumpcards. play trumpcard if yes, no trumpcard otherwise
-        if len(trumpcards_in_hand + played_trumpcards) < 14:
-            return random.choice(trumpcards_in_hand)
+        if len(trumpcards_in_hand) + len(played_trumpcards) < 14:
+            if len(trumpcards_in_hand) > 0:
+                return random.choice(trumpcards_in_hand)
+            else:
+                return random.choice(options)
         else:
             aces = self.aces_in_hand(public_info)
             if len(aces) > 0:
                 return random.choice(aces)
+            elif len(non_trumpcards_in_hand) > 0:
+                return random.choice(non_trumpcards_in_hand)
             else:
-                return random.choice([card for card in self.hand if card not in trumpcards_in_hand])
+                return random.choice(options)
 
     def follow_suit_partner_mode_declarer(self, public_info, options):
         current_trick = public_info["current_trick"]
@@ -188,18 +195,27 @@ class HeuristicsPlayer(Player):
                 return (ACE, suit)
             # if played suit is not in hand, play low trump
             elif len([card for card in self.hand if card[1] == suit and card not in public_info["trumpcards"]]) == 0:
-                return trumpcards_in_hand[-1]
+                if len(trumpcards_in_hand) > 0:
+                    return trumpcards_in_hand[-1]
+                else:
+                    return random.choice(options)
             else:
                 return random.choice(options)
         else:
-            return random.choice(trumpcards_in_hand)
+            if len(trumpcards_in_hand) > 0:
+                return random.choice(trumpcards_in_hand)
+            else:
+                return random.choice(options)
 
-    def lead_trick_partner_mode_partner(self, public_info):
+    def lead_trick_partner_mode_partner(self, public_info, options):
         trumpcards_in_hand = self.trumpcards_in_hand(public_info)
         played_trumpcards = self.previously_played_trumpcards(public_info)
         # check if other players have still trumpcards. play highest trumpcard if yes, no trumpcard otherwise
         if len(trumpcards_in_hand + played_trumpcards) < 14:
-            return trumpcards_in_hand[0]
+            if len(trumpcards_in_hand) > 0:
+                return trumpcards_in_hand[0]
+            else:
+                return random.choice(options)
         else:
             aces = self.aces_in_hand(public_info)
             if len(aces) > 0:
@@ -340,7 +356,7 @@ class HeuristicsPlayer(Player):
             if len(sparrows) > 0:
                 return random.choice(sparrows)
             else:
-                return random.choice([card for card in options if card not in public_info["trumpcards"]])
+                return random.choice(options)
 
     def rank_played(self, rank, public_info):
         rank_played = []
@@ -360,7 +376,10 @@ class HeuristicsPlayer(Player):
                 return best_card_left
             # if suit is not in hand, play lowest unter
             elif len(self.suit_in_hand(first_card[1], wenz=True)) == 0:
-                return min(unter_in_hand, key=lambda x: x[1])
+                if len(unter_in_hand) > 0:
+                    return min(unter_in_hand, key=lambda x: x[1])
+                else:
+                    return random.choice(options)
             else:
                 return random.choice(options)
         else:
@@ -458,7 +477,7 @@ class HeuristicsPlayer(Player):
                     return unter_in_hand[-1]
 
     def choose_card_solo_declarer(self, public_info, options):
-        if len(public_info["current_trick"].num_cards) == 0:
+        if public_info["current_trick"].num_cards == 0:
             return self.lead_trick_solo_declarer(public_info, options)
         else:
             return self.follow_trick_solo_declarer(public_info, options)
