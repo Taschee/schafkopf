@@ -76,7 +76,12 @@ class TrickGame:
                     return hand
             elif self.game_mode[0] == PARTNER_MODE and first_card[1] == self.game_mode[1] \
                     and (7, self.game_mode[1]) in hand:
-                return [(7, self.game_mode[1])]
+                previously_ran_away = self.previously_ran_away()
+                if not previously_ran_away:
+                    return [(7, self.game_mode[1])]
+                else:
+                    suit = first_card[1]
+                    return self.suit_in_hand(suit, hand)
             else:
                 suit = first_card[1]
                 return self.suit_in_hand(suit, hand)
@@ -106,7 +111,7 @@ class TrickGame:
             self.next_player()
 
     def finished(self):
-        if len(self.tricks) == self.max_num_tricks:
+        if len(self.tricks) == self.max_num_tricks or self.game_mode[0] == NO_GAME:
             return True
         else:
             return False
@@ -115,3 +120,13 @@ class TrickGame:
         while not self.finished():
             self.play_next_card()
             self.trick_finished()
+
+    def previously_ran_away(self):
+        prev_ran_away = False
+        partnerindex = self.offensive_players[1]
+        searched_suit = self.game_mode[1]
+        for trick in self.tricks:
+            if trick.leading_player_index == partnerindex and trick.cards[partnerindex][0] == searched_suit:
+                prev_ran_away = True
+                break
+        return prev_ran_away

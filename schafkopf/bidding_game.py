@@ -66,8 +66,7 @@ class BiddingGame:
                          "current_trick": None})
 
     def next_proposal(self):
-        while self.current_player_index not in self.deciding_players \
-                or self.current_player_index == self.offensive_players[0]:
+        while self.current_player_index not in self.deciding_players:
             self.next_player()
         player = self.get_current_player()
         mode_to_beat = sum([1 for proposal in self.mode_proposals if proposal[0] != NO_GAME])
@@ -90,7 +89,7 @@ class BiddingGame:
                     self.offensive_players.append(self.playerlist.index(player))
 
     def finished(self):
-        if len(self.deciding_players) == 1 and len(self.offensive_players) in {1,2} or len(self.deciding_players) == 0:
+        if (len(self.deciding_players) == 1 and self.game_mode[0] != NO_GAME) or len(self.deciding_players) == 0:
             return True
         else:
             return False
