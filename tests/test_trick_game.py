@@ -116,8 +116,7 @@ def test_trick_game_init_during(trick_game_during, prev_tricks, current_trick):
                                             (NINE, HEARTS), (EIGHT, HEARTS), (SEVEN, HEARTS)]
     assert trick_game_during.get_public_info() == {"leading_player_index": 0,
                                                    "current_player_index": 3,
-                                                   "mode_proposals": [(NO_GAME, None), (PARTNER_MODE, BELLS),
-                                                                      (NO_GAME, None), (NO_GAME, None)],
+                                                   "mode_proposals": [0, 1, 0, 0],
                                                    "declaring_player": 1,
                                                    "game_mode": (PARTNER_MODE, BELLS),
                                                    "trumpcards": [(OBER, ACORNS), (OBER, LEAVES), (OBER, HEARTS),

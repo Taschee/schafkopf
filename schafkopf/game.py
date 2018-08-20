@@ -25,6 +25,7 @@ class Game:
 
     def get_game_state(self):
         game_state = self.get_public_info()
+        game_state["mode_proposals"] = self.bidding_game.mode_proposals
         game_state["player_hands"] = [player.get_hand() for player in self.playerlist]
         game_state["possible_actions"] = self.get_possible_actions()
         return deepcopy(game_state)

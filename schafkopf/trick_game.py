@@ -35,9 +35,15 @@ class TrickGame:
         return self.playerlist[self.current_player_index]
 
     def get_public_info(self):
+        mode_proposals_public = []
+        for proposal in self.mode_proposals:
+            if proposal[0] == NO_GAME:
+                mode_proposals_public.append(0)
+            else:
+                mode_proposals_public.append(1)
         return deepcopy({"leading_player_index": self.leading_player_index,
                          "current_player_index": self.current_player_index,
-                         "mode_proposals": self.mode_proposals,
+                         "mode_proposals": mode_proposals_public,
                          "declaring_player": self.offensive_players[0],
                          "game_mode": self.game_mode,
                          "trumpcards": self.trumpcards,
