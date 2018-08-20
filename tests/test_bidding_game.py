@@ -21,6 +21,7 @@ def dummy_player_list():
 @pytest.fixture
 def game_state_during_bidding(player_hands_partner):
     leading_player = 0
+    current_player = 3
     mode_proposals = [(NO_GAME, None), (PARTNER_MODE, BELLS), (NO_GAME, None)]
     game_mode = (PARTNER_MODE, BELLS)
     declaring_player = 1
@@ -29,6 +30,7 @@ def game_state_during_bidding(player_hands_partner):
     possible_actions = [(NO_GAME, None), (WENZ, None)] + [(SOLO, suit) for suit in SUITS]
     return {"player_hands": player_hands_partner,
             "leading_player_index": leading_player,
+            "current_player_index": current_player,
             "mode_proposals": mode_proposals,
             "game_mode": game_mode,
             "declaring_player": declaring_player,
@@ -40,6 +42,7 @@ def game_state_during_bidding(player_hands_partner):
 @pytest.fixture
 def game_state_after_bidding(player_hands_partner):
     leading_player = 0
+    current_player = 3
     mode_proposals = [(NO_GAME, None), (PARTNER_MODE, BELLS), (NO_GAME, None), (WENZ, None), (NO_GAME, None)]
     game_mode = (WENZ, None)
     declaring_player = 3
@@ -49,6 +52,7 @@ def game_state_after_bidding(player_hands_partner):
                         (KING, LEAVES), (TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)]
     return {"player_hands": player_hands_partner,
             "leading_player_index": leading_player,
+            "current_player_index": current_player,
             "mode_proposals": mode_proposals,
             "game_mode": game_mode,
             "declaring_player": declaring_player,
@@ -122,15 +126,17 @@ def test_bidding_game_init_after(game_after):
 
 def test_bidding_game_next_proposal(game_before):
     bidding_game = game_before
+    assert bidding_game.mode_to_beat == 0
     assert bidding_game.deciding_players == {0, 1, 2, 3}
     assert bidding_game.current_player_index == 0
     bidding_game.next_proposal()
     assert bidding_game.game_mode == (NO_GAME, None)
+    assert bidding_game.mode_to_beat == NO_GAME
     assert bidding_game.current_player_index == 1
     assert bidding_game.deciding_players == {1, 2, 3}
     assert not bidding_game.finished()
     bidding_game.next_proposal()
-    assert bidding_game.game_mode == (PARTNER_MODE, BELLS)
+    assert bidding_game.mode_to_beat == PARTNER_MODE
     assert bidding_game.deciding_players == {1, 2, 3}
     assert not bidding_game.finished()
     bidding_game.next_proposal()
@@ -138,8 +144,9 @@ def test_bidding_game_next_proposal(game_before):
     assert bidding_game.current_player_index == 3
     assert not bidding_game.finished()
     bidding_game.next_proposal()
-    assert bidding_game.game_mode == (WENZ, None)
+    assert bidding_game.mode_to_beat == PARTNER_MODE
     assert bidding_game.offensive_players == [3]
     assert not bidding_game.finished()
     bidding_game.next_proposal()
+    assert bidding_game.game_mode == (WENZ, None)
     assert bidding_game.finished()

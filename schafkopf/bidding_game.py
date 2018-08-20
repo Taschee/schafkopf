@@ -7,26 +7,30 @@ from copy import deepcopy
 class BiddingGame:
     def __init__(self, playerlist, game_state):
         self.leading_player_index = game_state["leading_player_index"]
+        self.current_player_index = game_state["leading_player_index"]
         self.playerlist = playerlist
+        self.mode_proposals = game_state["mode_proposals"]
         self.game_mode = game_state["game_mode"]
-        self.deciding_players = set(range(len(playerlist)))
+        # set offensive players
         self.offensive_players = [game_state["declaring_player"]]
         if self.game_mode[0] == PARTNER_MODE:
             for player in self.playerlist:
                 if (7, self.game_mode[1]) in player.get_hand():
                     self.offensive_players.append(self.playerlist.index(player))
                     break
-        self.current_player_index = game_state["leading_player_index"]
-
-        self.mode_proposals = game_state["mode_proposals"]
-        # initializing deciding players
+        # initialize mode to beat
+        if len(self.mode_proposals) >= 4:
+            self.mode_to_beat = game_state["game_mode"][0]
+        else:
+            self.mode_to_beat = sum([1 for mode in self.mode_proposals if mode[0] != NO_GAME])
+        # initializing deciding players and current player index
+        self.deciding_players = set(range(len(playerlist)))
         for proposal in self.mode_proposals:
-            while self.current_player_index not in self.deciding_players:
+            while self.current_player_index not in self.deciding_players and len(self.deciding_players) > 0:
                 self.next_player()
             if proposal == (NO_GAME, None):
                 self.deciding_players.remove(self.current_player_index)
             self.next_player()
-
 
     def get_current_player(self):
         return self.playerlist[self.current_player_index]
@@ -56,12 +60,20 @@ class BiddingGame:
         return possible_modes
 
     def get_public_info(self):
+        # public mode proposals only contain game type (no suit). In first 4 proposals, only mininmum possible type
         mode_proposals_public = []
-        for proposal in self.mode_proposals:
+        mode_to_beat = 0
+        for proposal in self.mode_proposals[:4]:
             if proposal[0] == NO_GAME:
                 mode_proposals_public.append(0)
             else:
-                mode_proposals_public.append(1)
+                mode_to_beat += 1
+                mode_proposals_public.append(mode_to_beat)
+        for proposal in self.mode_proposals[4:]:
+            if proposal[0] == NO_GAME:
+                mode_proposals_public.append(0)
+            else:
+                mode_proposals_public.append(proposal[0])
         return deepcopy({"leading_player_index": self.leading_player_index,
                          "current_player_index": self.current_player_index,
                          "mode_proposals": mode_proposals_public,
@@ -75,27 +87,42 @@ class BiddingGame:
         while self.current_player_index not in self.deciding_players:
             self.next_player()
         player = self.get_current_player()
-        mode_to_beat = sum([1 for proposal in self.mode_proposals if proposal[0] != NO_GAME])
-        options = self.determine_possible_game_modes(hand=player.get_hand(), mode_to_beat=mode_to_beat)
+        options = self.determine_possible_game_modes(hand=player.get_hand(), mode_to_beat=self.mode_to_beat)
         public_info = self.get_public_info()
+
         chosen_mode = player.choose_game_mode(options=options, public_info=public_info)
+
+        self.mode_proposals.append(chosen_mode)
         if chosen_mode[0] == NO_GAME:
             self.deciding_players.remove(self.current_player_index)
-        elif chosen_mode[0] > self.game_mode[0]:
+        else:
+            # before all players made at least one proposal, mode to beat is just the number of actual game proposals
+            if len(self.mode_proposals) < 4:
+                self.mode_to_beat += 1
+            # the first player making a public announcement of chosen type, can propose game, that is lower (by one)!
+            elif len(self.mode_proposals) == 4:
+                # if <= 1 actual proposals: game mode and offensive players are already decided
+                if len(self.deciding_players) <= 1:
+                    self.game_mode = max(self.mode_proposals, key=lambda x: x[0])
+                    declaring_player = self.mode_proposals.index(self.game_mode)
+                    self.offensive_players = self.set_offensive_players(declaring_player)
+            # the chosen mode has to be higher then current game mode, if its not NO_GAME
+            else:
+                self.mode_to_beat = chosen_mode[0]
             self.game_mode = chosen_mode
-            self.set_offensive_players(player)
-        self.mode_proposals.append(chosen_mode)
+            self.set_offensive_players(self.current_player_index)
+
         self.next_player()
 
-    def set_offensive_players(self, player):
-        self.offensive_players = [self.playerlist.index(player)]
+    def set_offensive_players(self, playerindex):
+        self.offensive_players = [playerindex]
         if self.game_mode[0] == PARTNER_MODE:
             for player in self.playerlist:
                 if (7, self.game_mode[1]) in player.get_hand():
                     self.offensive_players.append(self.playerlist.index(player))
 
     def finished(self):
-        if (len(self.deciding_players) == 1 and self.game_mode[0] != NO_GAME) or len(self.deciding_players) == 0:
+        if len(self.deciding_players) <= 1 and len(self.mode_proposals) >= 4:
             return True
         else:
             return False
