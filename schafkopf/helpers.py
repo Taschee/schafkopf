@@ -17,6 +17,54 @@ def sample_opponent_hands(tricks, current_trick, trumpcards, playerindex, player
     return sample_hands
 
 
+def sample_mode_proposals(public_info):
+    deciding_players = {0, 1, 2, 3}
+    current_player = public_info["leading_player_index"]
+    mode_proposals = []
+    min_mode = PARTNER_MODE
+    # reconstruct possible mode proposals from public proposals
+    for num in range(len(public_info["mode_proposals"])):
+        public_proposal = public_info["mode_proposals"][num]
+        # find proposing player
+        while current_player not in deciding_players:
+            current_player = (current_player + 1) % 4
+        # if public proposal is NO_GAME
+        if public_proposal == NO_GAME:
+            deciding_players.remove(current_player)
+            mode_proposals.append((NO_GAME, None))
+        # otherwise: for first 4 proposals, only minimum game type is known
+        elif num < 4:
+            if min_mode == PARTNER_MODE:
+                suit = random.choice([ACORNS, BELLS, LEAVES])
+                mode_proposals.append((PARTNER_MODE, suit))
+                min_mode += 1
+            elif min_mode == WENZ:
+                mode_proposals.append(random.choice([(WENZ, None)] + [(SOLO, suit) for suit in SUITS]))
+                min_mode += 1
+            else:
+                mode_proposals.append(random.choice([(SOLO, suit) for suit in SUITS]))
+        # after first proposals, the proposed game type is known, but not the suit
+        else:
+            if public_proposal == PARTNER_MODE:
+                suit = random.choice([ACORNS, BELLS, LEAVES])
+                mode_proposals.append((PARTNER_MODE, suit))
+            elif public_proposal == WENZ:
+                mode_proposals.append((WENZ, None))
+            else:
+                suit = random.choice(SUITS)
+                mode_proposals.append((SOLO, suit))
+
+    # check if bidding game finished, if yes, set last actual proposal to correct game mode
+    if len(deciding_players) == 1 and len(public_info["mode_proposals"]) >= 4:
+        for num in range(len(public_info["mode_proposals"]) - 1, -1, -1):
+            proposal = public_info["mode_proposals"][num]
+            if proposal != NO_GAME:
+                mode_proposals[num] = public_info["game_mode"]
+                break
+
+    return mode_proposals
+
+
 def opponent_cards_still_in_game(tricks, current_trick, player_hand):
     opp_cards = set([(i % 8, i // 8) for i in range(32)])
     not_possible_cards = player_hand + [card for card in current_trick.cards if card is not None]

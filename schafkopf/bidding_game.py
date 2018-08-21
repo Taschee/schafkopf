@@ -61,6 +61,7 @@ class BiddingGame:
 
     def get_public_info(self):
         # public mode proposals only contain game type (no suit). In first 4 proposals, only mininmum possible type
+
         mode_proposals_public = []
         mode_to_beat = 0
         for proposal in self.mode_proposals[:4]:
@@ -74,11 +75,16 @@ class BiddingGame:
                 mode_proposals_public.append(0)
             else:
                 mode_proposals_public.append(proposal[0])
+        # public game mode is minimum possible game type, no suit as well, if bidding game is not finished
+        if self.finished():
+            public_game_mode = self.game_mode
+        else:
+            public_game_mode = (self.mode_to_beat, None)
         return deepcopy({"leading_player_index": self.leading_player_index,
                          "current_player_index": self.current_player_index,
                          "mode_proposals": mode_proposals_public,
                          "declaring_player": self.offensive_players[0],
-                         "game_mode": self.game_mode,
+                         "game_mode": public_game_mode,
                          "trumpcards": [],
                          "tricks": [],
                          "current_trick": None})

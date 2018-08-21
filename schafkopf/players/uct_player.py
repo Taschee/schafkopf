@@ -1,6 +1,6 @@
 from schafkopf.mc_tree import MCTree
 from schafkopf.mc_node import MCNode
-from schafkopf.helpers import sample_opponent_hands
+from schafkopf.helpers import sample_opponent_hands, sample_mode_proposals
 from schafkopf.players.random_player import RandomPlayer
 from schafkopf.players.dummy_player import DummyPlayer
 from schafkopf.players.player import Player
@@ -83,11 +83,16 @@ class UCTPlayer(Player):
                                              playerindex=public_info["current_player_index"],
                                              player_hand=self.hand)
 
+        # recreate possible mode proposals from public info
+        mode_proposals = sample_mode_proposals(public_info)
+
         # add player_hands and possible actions to game state
         game_state = deepcopy(public_info)
+        game_state["mode_proposals"] = mode_proposals
         game_state["player_hands"] = player_hands
         game = Game(game_state=game_state, players=[RandomPlayer(), RandomPlayer(), RandomPlayer(), RandomPlayer()])
         game_state["possible_actions"] = game.get_possible_actions()
+
         return game_state
 
     def choose_game_mode(self, public_info, options):

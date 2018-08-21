@@ -36,7 +36,7 @@ class Game:
                                                   hand=self.trick_game.get_current_player().get_hand())
         else:
             hand = self.bidding_game.get_current_player().get_hand()
-            mode_to_beat = sum([1 for proposal in self.bidding_game.mode_proposals if proposal[0] != NO_GAME])
+            mode_to_beat = self.bidding_game.mode_to_beat
             return self.bidding_game.determine_possible_game_modes(hand=hand,
                                                                    mode_to_beat=mode_to_beat)
 
