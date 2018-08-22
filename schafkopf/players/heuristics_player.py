@@ -570,7 +570,10 @@ class HeuristicsPlayer(Player):
             return random.choice(aces)
         else:
             non_trumpcards = [card for card in self.hand if card not in self.trumpcards_in_hand(public_info)]
-            return random.choice(non_trumpcards)
+            if len(non_trumpcards) > 0:
+                return random.choice(non_trumpcards)
+            else:
+                return random.choice(options)
 
     def follow_trick_solo_defensive(self, public_info, options):
         current_trick = public_info["current_trick"]
