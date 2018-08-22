@@ -259,7 +259,11 @@ class HeuristicsPlayer(Player):
 
     def best_trumpcard_still_in_game(self, public_info):
         played_trumpcards = self.previously_played_trumpcards(public_info)
-        return [card for card in public_info["trumpcards"] if card not in played_trumpcards][0]
+        trumpcards_left = [card for card in public_info["trumpcards"] if card not in played_trumpcards]
+        if len(trumpcards_left) > 0:
+            return trumpcards_left[0]
+        else:
+            return None
 
     def aces_in_hand(self, public_info):
         return [card for card in self.hand if card[0] == ACE and card not in public_info["trumpcards"]]
@@ -505,7 +509,7 @@ class HeuristicsPlayer(Player):
                 return random.choice(options)
 
     def follow_trick_solo_declarer(self, public_info, options):
-        leading_player = public_info["leading_player_index"]
+        leading_player = public_info["current_trick"].leading_player_index
         first_card = public_info["current_trick"].cards[leading_player]
         solo_suit = public_info["game_mode"][1]
         if first_card in public_info["trumpcards"]:
@@ -576,6 +580,7 @@ class HeuristicsPlayer(Player):
         trumpcards_in_hand = self.trumpcards_in_hand(public_info)
         low_cards = self.rank_in_hand(SEVEN) + self.rank_in_hand(EIGHT) + self.rank_in_hand(NINE)
         if leading_player == offensive_player:
+            # play lowest trumpcard or zero points if player played highest trump
             if first_card == self.best_trumpcard_still_in_game(public_info):
                 if len(trumpcards_in_hand) > 0:
                     return trumpcards_in_hand[-1]
