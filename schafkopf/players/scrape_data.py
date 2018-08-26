@@ -92,12 +92,18 @@ def scrape_declaring_player_index(soup):
         if name in n.text:
             return index
 
-def scrape_mode_proposals(soup):
-    pass
-
 def scrape_player_hands(soup):
     dealing_tag = find_dealing_tag(soup)
-    pass
+    hand_tags = dealing_tag.find_all(class_='game-protocol-cards')
+    playerhands = []
+    for tag in hand_tags:
+        card_tags = tag.find_all(class_='card-image')
+        hand = []
+        for card_tag in card_tags:
+            card_encoded = card_tag.text
+            hand.append(card_encodings[card_encoded])
+        playerhands.append(hand)
+    return playerhands
 
 def scrape_tricks(soup):
     pass
@@ -105,4 +111,6 @@ def scrape_tricks(soup):
 def scrape_results(soup):
     pass
 
+def scrape_mode_proposals(soup):
+    pass
 
