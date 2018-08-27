@@ -4,9 +4,14 @@ from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, KING, UNTER, OBER, ACE
 from schafkopf.suits import ACORNS, LEAVES, HEARTS, BELLS
 
 
+with open('login_data.txt') as f:
+    username = f.readline().translate({ord(char): None for char in ' \n'})
+    password = f.readline().translate({ord(char): None for char in ' \n'})
+
+
 def test_scraping_partnermode():
     s = DataScraper()
-    html = s.get_html(game_number=846389616)
+    html = s.get_html(game_number=846389616, username=username, password=password)
     soup_partnermode = s.get_soup(html)
     assert s.game_with_eight_cards(soup_partnermode)
     assert s.scrape_game_mode(soup_partnermode) == (PARTNER_MODE, LEAVES)
@@ -36,7 +41,7 @@ def test_scraping_partnermode():
 
 def test_scraping_solo():
     s = DataScraper()
-    html = s.get_html(game_number=846389389)
+    html = s.get_html(game_number=846389389, username=username, password=password)
     soup_solo = s.get_soup(html)
     assert s.game_with_eight_cards(soup_solo)
     assert s.scrape_game_mode(soup_solo) == (SOLO, LEAVES)
@@ -71,7 +76,7 @@ def test_scraping_solo():
 
 def test_scraping_wenz():
     s = DataScraper()
-    html = s.get_html(game_number=786157276)
+    html = s.get_html(game_number=786157276, username=username, password=password)
     soup_wenz = s.get_soup(html)
     assert s.game_with_eight_cards(soup_wenz)
     assert s.scrape_game_mode(soup_wenz) == (WENZ, None)
@@ -106,6 +111,6 @@ def test_scraping_wenz():
 
 def test_game_with_six_cards():
     s = DataScraper()
-    html = s.get_html(game_number=846388807)
+    html = s.get_html(game_number=846388807, username=username, password=password)
     soup_wenz = s.get_soup(html)
     assert not s.game_with_eight_cards(soup_wenz)
