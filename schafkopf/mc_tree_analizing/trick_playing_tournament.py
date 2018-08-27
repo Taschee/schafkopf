@@ -1,18 +1,23 @@
 import time
-
 from schafkopf.game import Game
-from schafkopf.game_states_trick_play import sample_game_states
+import schafkopf.game_states_trick_play
 from schafkopf.players.random_player import RandomPlayer
 from schafkopf.players.uct_player import UCTPlayer
+from schafkopf.players.heuristics_player import HeuristicsPlayer
+
+
+#####     DONT DO IT WITH MULTIPROCESSING!  :P - not sure why
+
 
 playerlist = [UCTPlayer(name="A", num_samples=10, num_simulations=100, ucb_const=0.1),
-              RandomPlayer(name="B"),
-              RandomPlayer(name="C"),
-              RandomPlayer(name="D")]
+              HeuristicsPlayer(name="B"),
+              HeuristicsPlayer(name="C"),
+              HeuristicsPlayer(name="D")]
 
 def main():
 
-    tournament_game_states = sample_game_states[:20]
+    tournament_game_states = schafkopf.game_states_trick_play.sample_game_states[:20]
+
     total_scores = [0, 0, 0, 0]
 
     for num in range(len(tournament_game_states)):

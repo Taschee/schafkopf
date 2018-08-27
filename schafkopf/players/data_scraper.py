@@ -1,6 +1,7 @@
 from selenium import webdriver
 from schafkopf.game_modes import NO_GAME, PARTNER_MODE, SOLO, WENZ
 from schafkopf.suits import ACORNS, BELLS, LEAVES, HEARTS
+from schafkopf.trick import Trick
 from bs4 import BeautifulSoup
 
 
@@ -84,6 +85,14 @@ class DataScraper():
                 break
         return dealing_tag
 
+    def get_player_names(self, soup):
+        overview_tag = soup.find(class_='row game-overview')
+        playernames = []
+        name_tags = overview_tag.find_all(class_='avatar-username')
+        for tag in name_tags:
+            playername = tag.text.translate({ord(c): None for c in ' \n'})
+            playernames.append(playername)
+        return playernames
 
     # leading player ist immer im Index 0
 
@@ -103,16 +112,27 @@ class DataScraper():
             card_tags = tag.find_all(class_='card-image')
             hand = []
             for card_tag in card_tags:
-                card_encoded = card_tag.text
-                hand.append(self.card_encodings[card_encoded])
+                card_str = card_tag.text
+                hand.append(self.card_encodings[card_str])
             playerhands.append(hand)
         return playerhands
 
-    def scrape_tricks(soup):
+    def scrape_played_cards(self, soup):
+        '''returns list of tuples: (played_card, corresponding playerindex)'''
+        playernames = self.get_player_names(soup)
+        game_prot_items = soup.find_all(class_='card-content game-protocol-trick game-protocol-item')
+        played_cards = []
+        for trick_tag in game_prot_items:
+            card_tags = trick_tag.find_all(class_='game-protocol-trick-card')
+            for tag in card_tags:
+                name = tag.find('a').text
+                card_str = tag.find('span').text
+                card = self.card_encodings[card_str]
+                played_cards.append((card, playernames.index(name)))
+        return played_cards
+
+    def scrape_results(self, soup):
         pass
 
-    def scrape_results(soup):
-        pass
-
-    def scrape_mode_proposals(soup):
+    def scrape_mode_proposals(self, soup):
         pass
