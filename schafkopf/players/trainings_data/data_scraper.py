@@ -148,8 +148,8 @@ class DataScraper():
     def scrape_mode_proposals(self, soup):
         pass
 
-    def scrape(self, game_num):
-        html = self.get_html(game_num)
+    def scrape(self, game_num, username, password):
+        html = self.get_html(game_num, username, password)
         soup = self.get_soup(html)
         player_hands = self.scrape_player_hands(soup)
         game_mode = self.scrape_game_mode(soup)
