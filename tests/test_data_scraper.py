@@ -1,14 +1,14 @@
-import pytest
-from schafkopf.players.data_scraper import DataScraper
-from schafkopf.game_modes import PARTNER_MODE, SOLO, WENZ, NO_GAME
-from schafkopf.suits import ACORNS, LEAVES, HEARTS, BELLS
+from schafkopf.game_modes import PARTNER_MODE, SOLO, WENZ
+from schafkopf.players.trainings_data.data_scraper import DataScraper
 from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, KING, UNTER, OBER, ACE
+from schafkopf.suits import ACORNS, LEAVES, HEARTS, BELLS
 
 
 def test_scraping_partnermode():
     s = DataScraper()
     html = s.get_html(game_number=846389616)
     soup_partnermode = s.get_soup(html)
+    assert s.game_with_eight_cards(soup_partnermode)
     assert s.scrape_game_mode(soup_partnermode) == (PARTNER_MODE, LEAVES)
     assert s.find_declaring_player_name(soup_partnermode) == 'taschee'
     assert s.scrape_declaring_player_index(soup_partnermode) == 2
@@ -38,6 +38,7 @@ def test_scraping_solo():
     s = DataScraper()
     html = s.get_html(game_number=846389389)
     soup_solo = s.get_soup(html)
+    assert s.game_with_eight_cards(soup_solo)
     assert s.scrape_game_mode(soup_solo) == (SOLO, LEAVES)
     assert s.find_declaring_player_name(soup_solo) == 'taschee'
     assert s.scrape_declaring_player_index(soup_solo) == 3
@@ -72,6 +73,7 @@ def test_scraping_wenz():
     s = DataScraper()
     html = s.get_html(game_number=786157276)
     soup_wenz = s.get_soup(html)
+    assert s.game_with_eight_cards(soup_wenz)
     assert s.scrape_game_mode(soup_wenz) == (WENZ, None)
     assert s.find_declaring_player_name(soup_wenz) == 'taschee'
     assert s.scrape_declaring_player_index(soup_wenz) == 3
@@ -102,3 +104,8 @@ def test_scraping_wenz():
                                                 ((KING, BELLS), 1), ((NINE, BELLS), 2)]
 
 
+def test_game_with_six_cards():
+    s = DataScraper()
+    html = s.get_html(game_number=846388807)
+    soup_wenz = s.get_soup(html)
+    assert not s.game_with_eight_cards(soup_wenz)

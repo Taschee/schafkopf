@@ -42,6 +42,17 @@ class DataScraper():
         soup = BeautifulSoup(html, 'html.parser')
         return soup
 
+    def game_with_eight_cards(self, soup):
+        dealing_tag = self.find_dealing_tag(soup)
+        hand_tags = dealing_tag.find_all(class_='game-protocol-cards')
+        tag = hand_tags[0]
+        card_tags = tag.find_all(class_='card-image')
+        num_cards = len(list(card_tags))
+        if num_cards == 8:
+            return True
+        else:
+            return False
+
     def scrape_game_mode(self, soup):
         title_tag = soup.find_all('meta', attrs={'name': 'twitter:title'})[0]
         title_str = title_tag['content']
@@ -136,3 +147,13 @@ class DataScraper():
 
     def scrape_mode_proposals(self, soup):
         pass
+
+    def scrape(self, game_num):
+        html = self.get_html(game_num)
+        soup = self.get_soup(html)
+        player_hands = self.scrape_player_hands(soup)
+        game_mode = self.scrape_game_mode(soup)
+        declaring_player = self.scrape_declaring_player_index(soup)
+        played_cards = self.scrape_played_cards(soup)
+        return (player_hands, game_mode, declaring_player, played_cards)
+

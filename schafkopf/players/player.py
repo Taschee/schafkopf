@@ -1,5 +1,5 @@
 from schafkopf.suits import ACORNS, BELLS, LEAVES, HEARTS, SUITS
-from schafkopf.ranks import RANKS
+from schafkopf.ranks import RANKS, SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 
 class Player:
     def __init__(self, name="Rando Calrissian"):
@@ -10,6 +10,10 @@ class Player:
 
     def pick_up_cards(self, hand):
         self.hand = hand
+        self.sort_hand(trumpcards=[(OBER, ACORNS), (OBER, LEAVES), (OBER, HEARTS), (OBER, BELLS),
+                                   (UNTER, ACORNS), (UNTER, LEAVES), (UNTER, HEARTS), (UNTER, BELLS),
+                                   (ACE, HEARTS), (TEN, HEARTS), (KING, HEARTS),
+                                   (NINE, HEARTS), (EIGHT, HEARTS), (SEVEN, HEARTS)])
         self.starting_hand = hand[:]
 
     def number_of_cards(self):

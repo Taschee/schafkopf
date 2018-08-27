@@ -99,14 +99,21 @@ class UCTPlayer(Player):
         if len(options) == 1:
             return list(options)[0]
         else:
+
             sampled_states = [self.sample_game_state(public_info) for num in range(self.num_samples)]
 
+            results = []
+            for state in sampled_states:
+                best_move = self.uct_search(game_state=state)
+                results.append(best_move)
+
+            """
             num_workers = mp.cpu_count()
             pool = mp.Pool(num_workers)
 
             # maybe change this to choosing highest average payout/ucb_value? Now: most frequent best action is chosen
             results = pool.map(func=self.uct_search, iterable=sampled_states)
-
+            """
             best_action = max(results, key=results.count)
 
             return best_action
@@ -118,12 +125,18 @@ class UCTPlayer(Player):
         else:
             sampled_states = [self.sample_game_state(public_info) for num in range(self.num_samples)]
 
+            results = []
+            for state in sampled_states:
+                best_move = self.uct_search(game_state=state)
+                results.append(best_move)
+
+            """
             num_workers = mp.cpu_count()
             pool = mp.Pool(num_workers)
 
             # maybe change this to choosing highest average payout/ucb_value? Now: most frequent best action is chosen
             results = pool.map(func=self.uct_search, iterable=sampled_states)
-
+            """
             card = max(results, key=results.count)
 
         self.hand.remove(card)
