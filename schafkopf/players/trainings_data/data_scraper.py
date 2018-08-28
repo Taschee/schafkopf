@@ -42,7 +42,8 @@ class DataScraper():
         soup = BeautifulSoup(html, 'html.parser')
         return soup
 
-    def game_with_eight_cards(self, soup):
+    def game_with_eight_cards(self, html):
+        soup = self.get_soup(html)
         dealing_tag = self.find_dealing_tag(soup)
         hand_tags = dealing_tag.find_all(class_='game-protocol-cards')
         tag = hand_tags[0]
@@ -148,8 +149,7 @@ class DataScraper():
     def scrape_mode_proposals(self, soup):
         pass
 
-    def scrape(self, game_num, username, password):
-        html = self.get_html(game_num, username, password)
+    def scrape(self, html):
         soup = self.get_soup(html)
         player_hands = self.scrape_player_hands(soup)
         game_mode = self.scrape_game_mode(soup)
