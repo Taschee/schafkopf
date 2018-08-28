@@ -13,9 +13,11 @@ with open('data_test.p', 'wb') as outfile:
     username = input("Username : ")
     password = input("Password : ")
 
+    driver = scraper.login_to_sauspiel(username, password)
+
     for num in game_numbers:
 
-        html = scraper.get_html(num, username, password)
+        html = scraper.get_html(num, driver)
 
         if scraper.game_with_eight_cards(html):
 
@@ -30,3 +32,4 @@ with open('data_test.p', 'wb') as outfile:
 
                 pickle.dump(data, outfile)
 
+    driver.close()

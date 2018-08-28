@@ -18,23 +18,28 @@ class DataScraper():
                                'Eichel-Unter': (3, 3), 'Der Alte': (4, 3), 'Eichel-König': (5, 3),
                                'Eichel-Zehn': (6, 3), 'Die Alte': (7, 3)}
 
-    def get_html(self, game_number, username, password):
-
+    def login_to_sauspiel(self, username, password):
         chromedriver = 'C:\\Users\\Taschee\\Downloads\\chromedriver_win32\\chromedriver.exe'
         driver = webdriver.Chrome(chromedriver)
         driver.get('http://www.sauspiel.de/spiele')
-
         username_box = driver.find_element_by_name('login')
         username_box.send_keys(username)
         password_box = driver.find_element_by_name('password')
         password_box.send_keys(password)
         password_box.submit()
+        return driver
+
+    def get_html(self, game_number, driver):
 
         game_search_box = driver.find_element_by_name('game_id')
         game_search_box.send_keys(str(game_number))
         game_search_box.submit()
 
         html = driver.page_source
+
+        driver.back()
+        game_search_box = driver.find_element_by_name('game_id')
+        game_search_box.clear()
 
         return html
 
