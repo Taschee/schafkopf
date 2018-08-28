@@ -132,7 +132,7 @@ def test_trick_game_init_during(trick_game_during, prev_tricks, current_trick):
 def test_suit_in_hand(trick_game_before):
     hand_0 = trick_game_before.playerlist[0].get_hand()
     assert trick_game_before.suit_in_hand(suit=BELLS, hand=hand_0) == [(ACE, BELLS)]
-    assert trick_game_before.suit_in_hand(suit=ACORNS, hand=hand_0) == [(TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)]
+    assert trick_game_before.suit_in_hand(suit=ACORNS, hand=hand_0) == [(TEN, ACORNS), (NINE, ACORNS), (SEVEN, ACORNS)]
     hand_1 = trick_game_before.playerlist[1].get_hand()
     assert trick_game_before.suit_in_hand(suit=LEAVES, hand=hand_1) == [(OBER, LEAVES), (OBER, HEARTS), (UNTER, ACORNS),
                                                                         (ACE, HEARTS), (SEVEN, HEARTS), (ACE, ACORNS),
@@ -143,8 +143,8 @@ def test_possible_cards(trick_game_during):
     curr_trick = trick_game_during.current_trick
     hand = trick_game_during.playerlist[3].get_hand()
     assert trick_game_during.possible_cards(current_trick=curr_trick,
-                                            hand=hand) == [(UNTER, HEARTS), (ACE, LEAVES), (TEN, BELLS),
-                                                           (EIGHT, LEAVES), (EIGHT, BELLS), (NINE, LEAVES)]
+                                            hand=hand) == [(UNTER, HEARTS), (ACE, LEAVES), (NINE, LEAVES),
+                                                           (EIGHT, LEAVES), (TEN, BELLS), (EIGHT, BELLS)]
     hand = trick_game_during.playerlist[0].get_hand()
     assert trick_game_during.possible_cards(current_trick=curr_trick,
                                             hand=hand) == [(TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)]

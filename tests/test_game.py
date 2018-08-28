@@ -27,8 +27,8 @@ def test_init_partner_mode(partner_game):
     assert partner_game.leading_player_index == 0
     assert len(partner_game.bidding_game.mode_proposals) == 0
     assert partner_game.trick_game.playerlist[0].get_hand() == [(OBER, ACORNS), (OBER, BELLS), (UNTER, BELLS),
-                                                                (ACE, BELLS), (KING, LEAVES), (TEN, ACORNS),
-                                                                (SEVEN, ACORNS), (NINE, ACORNS)]
+                                                                (TEN, ACORNS), (NINE, ACORNS), (SEVEN, ACORNS),
+                                                                (KING, LEAVES), (ACE, BELLS)]
 
 
 def test_play_partner_mode(partner_game):
@@ -64,9 +64,9 @@ def test_payout_partner_mode(partner_game):
 def test_init_wenz(wenz_game):
     assert wenz_game.leading_player_index == 1
     assert len(wenz_game.bidding_game.mode_proposals) == 0
-    assert wenz_game.trick_game.playerlist[0].get_hand() == [(TEN, LEAVES), (OBER, BELLS), (UNTER, BELLS),
-                                                             (NINE, LEAVES), (KING, LEAVES), (TEN, ACORNS),
-                                                             (EIGHT, ACORNS) , (KING, HEARTS)]
+    assert wenz_game.trick_game.playerlist[0].get_hand() == [(OBER, BELLS), (UNTER, BELLS), (KING, HEARTS),
+                                                             (TEN, ACORNS), (EIGHT, ACORNS), (TEN, LEAVES),
+                                                             (KING, LEAVES), (NINE, LEAVES)]
 
 
 def test_play_wenz(wenz_game):
