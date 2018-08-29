@@ -6,14 +6,15 @@ import pickle
 
 scraper = DataScraper()
 
-game_numbers = [846389616, 846389972, 846389815, 846389389, 846389142]
+game_numbers = range(846000000, 846010000)
 
-with open('data_test.p', 'wb') as outfile:
+with open('train_data.p', 'wb') as outfile:
 
     username = input("Username : ")
     password = input("Password : ")
 
     driver = scraper.login_to_sauspiel(username, password)
+    num_collected = 0
 
     for num in game_numbers:
 
@@ -32,4 +33,8 @@ with open('data_test.p', 'wb') as outfile:
 
                 pickle.dump(data, outfile)
 
+                num_collected += 1
+
     driver.close()
+
+print("Collected data from {} games".format(num_collected))

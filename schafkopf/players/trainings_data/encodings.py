@@ -16,7 +16,7 @@ def decode_one_hot_card(encoded_card):
 
 
 def encode_one_hot_player_position(position):
-    position_encoded = np.zeros(8)
+    position_encoded = np.zeros(32)
     position_encoded[position] = 1
     return position_encoded
 
