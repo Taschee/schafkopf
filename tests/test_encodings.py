@@ -37,3 +37,11 @@ def test_one_hot_game_mode_encoding():
     assert enc.encode_one_hot_game_mode((PARTNER_MODE, LEAVES)).all() == partner_leaves_encoded.all()
     for mode in possible_modes:
         assert enc.decode_one_hot_game_mode(enc.encode_one_hot_game_mode(mode)) == mode
+
+
+def test_one_hot_player_position():
+    enc_pos = np.zeros(8)
+    enc_pos[2] = 1
+    assert enc.encode_one_hot_player_position(2).all() == enc_pos.all()
+    for pos in range(4):
+        assert enc.decode_one_hot_player_position(enc.encode_one_hot_player_position(pos)) == pos
