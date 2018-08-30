@@ -15,7 +15,7 @@ class TrickGame:
         self.offensive_players = [game_state["declaring_player"]]
         if self.game_mode[0] == PARTNER_MODE:
             for player in self.playerlist:
-                if (7, self.game_mode[1]) in player.get_hand():
+                if (7, self.game_mode[1]) in player.starting_hand:
                     self.offensive_players.append(self.playerlist.index(player))
                     break
         self.trumpcards = define_trumpcards(self.game_mode)
