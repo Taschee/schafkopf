@@ -6,9 +6,11 @@ import pickle
 
 scraper = DataScraper()
 
-game_numbers = range(846000000, 846010000)
 
-with open('train_data.p', 'wb') as outfile:
+# scraped data from #846000000 - 846060000
+game_numbers = range(846050000, 846060000)
+
+with open('train_data.p', 'ab') as outfile:
 
     username = input("Username : ")
     password = input("Password : ")
@@ -17,23 +19,25 @@ with open('train_data.p', 'wb') as outfile:
     num_collected = 0
 
     for num in game_numbers:
+        try:
+            html = scraper.get_html(num, driver)
 
-        html = scraper.get_html(num, driver)
+            if scraper.game_with_eight_cards(html):
 
-        if scraper.game_with_eight_cards(html):
+                player_hands, game_mode, declaring_player, played_cards = scraper.scrape(html)
 
-            player_hands, game_mode, declaring_player, played_cards = scraper.scrape(html)
+                if game_mode is not None:
 
-            if game_mode is not None:
+                    data = {'player_hands': player_hands,
+                            'game_mode': game_mode,
+                            'declaring_player': declaring_player,
+                            'played_cards': played_cards}
 
-                data = {'player_hands': player_hands,
-                        'game_mode': game_mode,
-                        'declaring_player': declaring_player,
-                        'played_cards': played_cards}
+                    pickle.dump(data, outfile)
+                    num_collected += 1
 
-                pickle.dump(data, outfile)
-
-                num_collected += 1
+        except:
+            continue
 
     driver.close()
 
