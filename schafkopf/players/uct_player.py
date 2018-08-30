@@ -78,6 +78,7 @@ class UCTPlayer(Player):
             current_trick = Trick(leading_player_index=public_info["leading_player_index"])
         else:
             current_trick = public_info["current_trick"]
+
         player_hands = sample_opponent_hands(tricks=public_info["tricks"],
                                              current_trick=current_trick,
                                              trumpcards=public_info["trumpcards"],
@@ -103,10 +104,14 @@ class UCTPlayer(Player):
 
             sampled_states = [self.sample_game_state(public_info) for num in range(self.num_samples)]
 
-            results = []
+            move_counts = {move: 0 for move in options}
+            move_av_rewards = {move: 0 for move in options}
+
             for state in sampled_states:
-                best_move = self.uct_search(game_state=state)
-                results.append(best_move)
+                mc_results = self.uct_search(game_state=state)
+                for move, move_count, average_reward in mc_results:
+                    move_counts[move] += move_count
+                    move_av_rewards[move] += average_reward
 
             """
             num_workers = mp.cpu_count()
@@ -115,7 +120,7 @@ class UCTPlayer(Player):
             # maybe change this to choosing highest average payout/ucb_value? Now: most frequent best action is chosen
             results = pool.map(func=self.uct_search, iterable=sampled_states)
             """
-            best_action = max(results, key=results.count)
+            best_action = max(move_counts, key=move_counts.get)
 
             return best_action
 
