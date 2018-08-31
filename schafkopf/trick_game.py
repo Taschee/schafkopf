@@ -26,6 +26,8 @@ class TrickGame:
             self.current_trick = Trick(leading_player_index=self.leading_player_index)
         self.current_player_index = self.current_trick.current_player_index
         self.scores = [0 for player in playerlist]
+        for trick in game_state["tricks"]:
+            self.scores[trick.winner] += trick.calculate_points()
 
     def next_player(self):
         self.current_player_index = (self.current_player_index + 1) % 4

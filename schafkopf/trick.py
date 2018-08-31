@@ -53,7 +53,6 @@ class Trick:
             best_card = (max([i for (i, j) in self.cards if j == played_suit]), played_suit)
             self.winner = self.cards.index(best_card)
 
-
     def finished(self):
         if self.num_cards == 4:
             return True

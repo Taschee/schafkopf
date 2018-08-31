@@ -12,7 +12,7 @@ class Game:
         self.playerlist = players
         for player, hand in zip(self.playerlist, state["player_hands"]):
             player.pick_up_cards(hand)
-            previous_tricks = state["tricks"]
+            previous_tricks = deepcopy(state["tricks"])
             if state["current_trick"] is not None:
                 previous_tricks += [state["current_trick"]]
             player.set_starting_hand(hand, previous_tricks, self.playerlist.index(player))
