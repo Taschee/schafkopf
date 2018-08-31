@@ -65,6 +65,7 @@ def game_state_after_bidding(player_hands_partner):
 def game_before(game_state_partner, dummy_player_list):
     for player, hand in zip(dummy_player_list, game_state_partner["player_hands"]):
         player.pick_up_cards(hand)
+        player.set_starting_hand(hand)
     return BiddingGame(game_state=game_state_partner, playerlist=dummy_player_list)
 
 
@@ -72,6 +73,7 @@ def game_before(game_state_partner, dummy_player_list):
 def game_during(game_state_during_bidding, dummy_player_list):
     for player, hand in zip(dummy_player_list, game_state_during_bidding["player_hands"]):
         player.pick_up_cards(hand)
+        player.set_starting_hand(hand)
     return BiddingGame(game_state=game_state_during_bidding, playerlist=dummy_player_list)
 
 
@@ -79,6 +81,7 @@ def game_during(game_state_during_bidding, dummy_player_list):
 def game_after(game_state_after_bidding, dummy_player_list):
     for player, hand in zip(dummy_player_list, game_state_after_bidding["player_hands"]):
         player.pick_up_cards(hand)
+        player.set_starting_hand(hand)
     return BiddingGame(game_state=game_state_after_bidding, playerlist=dummy_player_list)
 
 

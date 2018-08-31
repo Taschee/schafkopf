@@ -64,5 +64,12 @@ def load_data_bidding(file):
     return x_data, y_data
 
 
+def prepare_data_trickplay(game_data_dic):
+
+    player_hands = game_data_dic['player_hands']
+    game_mode = game_data_dic['game_mode']
+    declaring_player = game_data_dic['declaring_player']
+    played_cards = game_data_dic['played_cards']
 
 
+print(num_games_in_file('train_data.p'))

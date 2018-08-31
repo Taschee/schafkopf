@@ -81,6 +81,7 @@ def game_state_during_play(player_hands_during, prev_tricks, current_trick):
 def trick_game_before(partner_player_list, game_state_before_play):
     for player, hand in zip(partner_player_list, game_state_before_play["player_hands"]):
         player.pick_up_cards(hand)
+        player.set_starting_hand(hand)
     return TrickGame(game_state=game_state_before_play, playerlist=partner_player_list)
 
 
@@ -88,6 +89,8 @@ def trick_game_before(partner_player_list, game_state_before_play):
 def trick_game_during(partner_player_list, game_state_during_play):
     for player, hand in zip(partner_player_list, game_state_during_play["player_hands"]):
         player.pick_up_cards(hand)
+        previous_tricks = game_state_during_play["tricks"] + [game_state_during_play["current_trick"]]
+        player.set_starting_hand(hand, previous_tricks, partner_player_list.index(player))
     return TrickGame(game_state=game_state_during_play, playerlist=partner_player_list)
 
 
@@ -147,7 +150,7 @@ def test_possible_cards(trick_game_during):
                                                            (EIGHT, LEAVES), (TEN, BELLS), (EIGHT, BELLS)]
     hand = trick_game_during.playerlist[0].get_hand()
     assert trick_game_during.possible_cards(current_trick=curr_trick,
-                                            hand=hand) == [(TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)]
+                                            hand=hand) == [(TEN, ACORNS), (NINE, ACORNS), (SEVEN, ACORNS)]
     curr_trick = Trick(leading_player_index=0,
                           cards=[(SEVEN, HEARTS), None, None, None])
     hand = trick_game_during.playerlist[3].get_hand()

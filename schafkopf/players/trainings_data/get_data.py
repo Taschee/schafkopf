@@ -7,8 +7,8 @@ import pickle
 scraper = DataScraper()
 
 
-# scraped data from #846000000 - 846060000
-game_numbers = range(846050000, 846060000)
+# scraped data from #846000000 - 846070000
+game_numbers = range(846060000, 846070000)
 
 with open('train_data.p', 'ab') as outfile:
 

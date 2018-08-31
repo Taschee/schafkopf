@@ -5,8 +5,6 @@ from schafkopf.players.heuristics_player import HeuristicsPlayer
 from schafkopf.tournament import Tournament
 
 
-
-
 def main():
     playerlist = [UCTPlayer(name="A", num_samples=10, num_simulations=100, ucb_const=0.1),
                   HeuristicsPlayer(name="B"), HeuristicsPlayer(name="C"), HeuristicsPlayer(name="D")]

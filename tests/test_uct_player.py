@@ -3,6 +3,7 @@ import pytest
 from schafkopf.game import Game
 from schafkopf.game_modes import PARTNER_MODE, NO_GAME
 from schafkopf.players.uct_player import UCTPlayer
+from schafkopf.players.random_player import RandomPlayer
 from schafkopf.ranks import OBER, UNTER, KING, ACE, SEVEN, NINE, TEN
 from schafkopf.suits import ACORNS, BELLS, LEAVES
 

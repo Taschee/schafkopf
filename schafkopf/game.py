@@ -10,14 +10,17 @@ class Game:
     def __init__(self, players, game_state):
         state = deepcopy(game_state)
         self.playerlist = players
+        for player, hand in zip(self.playerlist, state["player_hands"]):
+            player.pick_up_cards(hand)
+            previous_tricks = state["tricks"]
+            if state["current_trick"] is not None:
+                previous_tricks += [state["current_trick"]]
+            player.set_starting_hand(hand, previous_tricks, self.playerlist.index(player))
         self.leading_player_index = state["leading_player_index"]
         self.bidding_game = BiddingGame(playerlist=players, game_state=state)
         self.trick_game = TrickGame(playerlist=players, game_state=state)
         self.winners = None
-        for player, hand in zip(self.playerlist, state["player_hands"]):
-            player.pick_up_cards(hand)
-            previous_tricks = state["tricks"] + [state["current_trick"]]
-            player.set_starting_hand(hand, previous_tricks, state["trumpcards"])
+
 
     def get_public_info(self):
         if not self.bidding_game.finished():
