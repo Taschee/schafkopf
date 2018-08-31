@@ -13,7 +13,7 @@ import random
 
 class UCTPlayer(Player):
 
-    def __init__(self, name="UCT", ucb_const=100, num_samples=10, num_simulations=100):
+    def __init__(self, name="UCT", ucb_const=0.1, num_samples=10, num_simulations=100):
         Player.__init__(self, name=name)
         self.ucb_const = ucb_const
         self.num_samples = num_samples
