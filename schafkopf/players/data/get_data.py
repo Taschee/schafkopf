@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 
-from schafkopf.players.trainings_data.data_scraper import DataScraper
+from schafkopf.players.data.data_scraper import DataScraper
 import pickle
 
 
 scraper = DataScraper()
 
 
-# scraped data from #846000000 - 846070000
-game_numbers = range(846060000, 846070000)
+# scraped data from #846000000 - 846200000
+# test data from #700000000 - 700010000
+# validation data from #700010000 - 700020000
 
-with open('train_data.p', 'ab') as outfile:
+game_numbers = range(700010000, 700020000)
+
+with open('valid_data.p', 'ab') as outfile:
 
     username = input("Username : ")
     password = input("Password : ")

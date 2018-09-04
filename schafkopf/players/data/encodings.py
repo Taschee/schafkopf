@@ -16,7 +16,7 @@ def decode_one_hot_card(encoded_card):
 
 
 def encode_one_hot_player_position(position):
-    position_encoded = np.zeros(32)
+    position_encoded = np.zeros(4)
     position_encoded[position] = 1
     return position_encoded
 
@@ -25,8 +25,8 @@ def decode_one_hot_player_position(position_encoded):
     return np.where(position_encoded == 1)[0][0]
 
 
-def encode_one_hot_game_mode(game_mode):
-    encoded_mode = np.zeros(9)
+def encode_one_hot_game_mode(game_mode, length=9):
+    encoded_mode = np.zeros(length)
     if game_mode[0] == NO_GAME:
         encoded_mode[0] = 1
     elif game_mode[0] == PARTNER_MODE:
