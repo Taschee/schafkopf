@@ -1,4 +1,5 @@
 import pickle
+import random
 import numpy as np
 from schafkopf.game_modes import NO_GAME
 import schafkopf.players.data.encodings as enc
@@ -61,27 +62,54 @@ def load_data_bidding(file):
     return x_data, y_data
 
 
-def prepare_data_trickplay(game_data_dic):
+def prepare_data_trickplay(game_data_dic, num_samples=1):
 
-    game_mode = game_data_dic['game_mode']
-    declaring_player = game_data_dic['declaring_player']
     played_cards = game_data_dic['played_cards']
 
     card_sequences = []
+    cards_to_predict = []
 
-    # want to predict the next card up to the 28th card.
-    # first column in a sequence is no card, only the declaring player and whose turn it is !!!!!!!!????!!!!
-    for seq_len in range(28):
-        new_seq = np.zeros((29, 40))
-        new_seq[0][32:] = enc.encode_one_hot_player_position(declaring_player)
+    # create num_samples different sequences from one game
+    seq_lenghts = random.sample(range(27), num_samples)
+
+    for seq_len in seq_lenghts:
+        new_seq = np.zeros((28, 36))
+        # first entry contains only the relative player position of the player playing at the moment
+        rel_pos = played_cards[0][1]
+        new_seq[0][32:] = enc.encode_one_hot_player_position(rel_pos)
+        # after this, the next card and the relative player position of the next player are added to sequence
         for card_index in range(seq_len):
             card = played_cards[card_index][0]
-            train_example = np.zeros(36) ## whose turn it is / leading player as well?
-            train_example[32:] = enc.encode_one_hot_player_position(declaring_player)
+            rel_pos_next_player = played_cards[card_index + 1][1]
+            train_example = np.zeros(36)
+            train_example[32:] = enc.encode_one_hot_player_position(rel_pos_next_player)
             train_example[:32] = enc.encode_one_hot_card(card)
             new_seq[card_index + 1] = train_example
         card_sequences.append(new_seq)
 
-    return card_sequences
+        next_card = played_cards[seq_len][0]
+        cards_to_predict.append(enc.encode_one_hot_card(next_card))
 
+    return card_sequences, cards_to_predict
+
+
+def load_data_trickplay(file, num_samples=1):
+
+    num_games = num_games_in_file(file)
+
+    with open(file, 'rb') as infile:
+
+        x_data = np.zeros(shape=(num_games * num_samples, 28, 36))
+        y_data = np.zeros(shape=(num_games * num_samples, 32))
+
+        for game_num in range(num_games):
+            game_data_dic = pickle.load(infile)
+            card_sequences, cards_to_predict = prepare_data_trickplay(game_data_dic, num_samples)
+            for num in range(num_samples):
+                x = card_sequences[num]
+                y = cards_to_predict[num]
+                x_data[game_num * num_samples + num] = x
+                y_data[game_num * num_samples + num] = y
+
+    return x_data, y_data
 
