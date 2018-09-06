@@ -1,5 +1,5 @@
 from schafkopf.game_modes import PARTNER_MODE, SOLO, WENZ
-from schafkopf.players.trainings_data.data_scraper import DataScraper
+from schafkopf.players.data.data_scraper import DataScraper
 from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, KING, UNTER, OBER, ACE
 from schafkopf.suits import ACORNS, LEAVES, HEARTS, BELLS
 import pytest

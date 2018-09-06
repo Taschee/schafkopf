@@ -7,13 +7,13 @@ import pickle
 scraper = DataScraper()
 
 
-# scraped data from #846000000 - 846200000
+# scraped data from #846000000 - 846320000
 # test data from #700000000 - 700010000
 # validation data from #700010000 - 700020000
 
-game_numbers = range(700010000, 700020000)
+game_numbers = range(846300000, 846320000)
 
-with open('valid_data.p', 'ab') as outfile:
+with open('train_data.p', 'ab') as outfile:
 
     username = input("Username : ")
     password = input("Password : ")

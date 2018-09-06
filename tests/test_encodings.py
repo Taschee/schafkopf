@@ -1,4 +1,4 @@
-import schafkopf.players.trainings_data.encodings as enc
+import schafkopf.players.data.encodings as enc
 from schafkopf.game_modes import SOLO, WENZ, PARTNER_MODE, NO_GAME
 from schafkopf.ranks import SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE, RANKS
 from schafkopf.suits import HEARTS, LEAVES, ACORNS, BELLS, SUITS
