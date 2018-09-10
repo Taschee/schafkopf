@@ -15,6 +15,13 @@ def decode_one_hot_card(encoded_card):
     return (index // 4, index % 4)
 
 
+def encode_one_hot_hand(hand):
+    enc_hand = np.zeros((8, 32))
+    for card, i in zip(hand, range(len(hand))):
+        enc_hand[i] = encode_one_hot_card(card)
+    return enc_hand
+
+
 def encode_one_hot_player_position(position):
     position_encoded = np.zeros(4)
     position_encoded[position] = 1
