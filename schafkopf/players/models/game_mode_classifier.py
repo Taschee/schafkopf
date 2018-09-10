@@ -36,7 +36,7 @@ def baseline_model():
     model.add(Dense(units=9,
                     activation='softmax',
                     kernel_initializer='he_uniform'))
-    adam = Adam(lr=0.001)
+    adam = Adam(lr=0.001, decay=0.9)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
     return model
 
@@ -56,8 +56,3 @@ model.fit(x_train, y_train,
           batch_size=100,
           verbose=1,
           callbacks=callback_list)
-
-
-
-
-

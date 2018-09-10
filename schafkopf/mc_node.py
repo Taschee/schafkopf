@@ -34,9 +34,7 @@ class MCNode:
 
     def best_child(self, ucb_const):
         if not self.is_leaf():
-            values = [child.ucb_value(ucb_const) for child in self.children]
-            best_child = self.children[np.argmax(values)]
-            return best_child
+            return max(self.children, key=lambda child: child.ucb_value(ucb_const))
 
     def ucb_value(self, ucb_const):
         if self.visits != 0:

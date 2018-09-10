@@ -113,3 +113,7 @@ def load_data_trickplay(file, num_samples=1):
 
     return x_data, y_data
 
+print(num_games_in_file('train_data.p'))
+print(num_games_in_file('train_data_partner.p'))
+print(num_games_in_file('train_data_solo.p'))
+print(num_games_in_file('train_data_wenz.p'))

@@ -5,7 +5,7 @@ from schafkopf.suits import SUITS, ACORNS, LEAVES, BELLS
 
 
 class Tournament:
-    def __init__(self, playerlist, number_of_games=32, record_games=True):
+    def __init__(self, playerlist, number_of_games=32, record_games=False):
         self.playerlist = playerlist
         self.number_of_games = number_of_games
         self.game_number = 1
