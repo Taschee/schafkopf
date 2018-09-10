@@ -1,6 +1,7 @@
 import numpy as np
 from schafkopf.game_modes import SOLO, WENZ, PARTNER_MODE, NO_GAME
 from schafkopf.suits import ACORNS, BELLS, LEAVES, HEARTS
+from schafkopf.helpers import sort_hand
 
 
 def encode_one_hot_card(card):
@@ -16,6 +17,7 @@ def decode_one_hot_card(encoded_card):
 
 
 def encode_one_hot_hand(hand):
+    hand = sort_hand(hand)
     enc_hand = np.zeros((8, 32))
     for card, i in zip(hand, range(len(hand))):
         enc_hand[i] = encode_one_hot_card(card)

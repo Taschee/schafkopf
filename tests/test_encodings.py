@@ -18,10 +18,10 @@ def test_one_hot_card_encoding():
     card4 = (NINE, LEAVES)
     encoded4 = np.zeros(32)
     encoded4[10] = 1
-    assert enc.encode_one_hot_card(card).all() == encoded.all()
-    assert enc.encode_one_hot_card(card2).all() == encoded2.all()
-    assert enc.encode_one_hot_card(card3).all() == encoded3.all()
-    assert enc.encode_one_hot_card(card4).all() == encoded4.all()
+    assert np.array_equal(enc.encode_one_hot_card(card), encoded)
+    assert np.array_equal(enc.encode_one_hot_card(card2), encoded2)
+    assert np.array_equal(enc.encode_one_hot_card(card3), encoded3)
+    assert np.array_equal(enc.encode_one_hot_card(card4), encoded4)
     for suit in SUITS:
         for rank in RANKS:
             card = (rank, suit)
@@ -34,14 +34,27 @@ def test_one_hot_game_mode_encoding():
                       + [(SOLO, suit) for suit in SUITS]
     partner_leaves_encoded = np.zeros(9)
     partner_leaves_encoded[2] = 1
-    assert enc.encode_one_hot_game_mode((PARTNER_MODE, LEAVES)).all() == partner_leaves_encoded.all()
+    assert np.array_equal(enc.encode_one_hot_game_mode((PARTNER_MODE, LEAVES)), partner_leaves_encoded)
     for mode in possible_modes:
         assert enc.decode_one_hot_game_mode(enc.encode_one_hot_game_mode(mode)) == mode
 
 
 def test_one_hot_player_position():
-    enc_pos = np.zeros(8)
+    enc_pos = np.zeros(4)
     enc_pos[2] = 1
-    assert enc.encode_one_hot_player_position(2).all() == enc_pos.all()
+    assert np.array_equal(enc.encode_one_hot_player_position(2), enc_pos)
     for pos in range(4):
         assert enc.decode_one_hot_player_position(enc.encode_one_hot_player_position(pos)) == pos
+
+
+def test_one_hot_encoding_hand():
+    hand = [(NINE, HEARTS), (SEVEN, ACORNS), (OBER, BELLS), (UNTER, HEARTS),
+            (EIGHT, LEAVES), (TEN, LEAVES), (ACE, HEARTS), (KING, BELLS)]
+    first_card_enc = np.zeros(32)
+    first_card_enc[16] = 1
+    assert np.array_equal(enc.encode_one_hot_hand(hand)[0], first_card_enc)
+    sec_card_enc = np.zeros(32)
+    sec_card_enc[13] = 1
+    assert np.array_equal(enc.encode_one_hot_hand(hand)[1], sec_card_enc)
+
+
