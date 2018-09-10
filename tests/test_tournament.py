@@ -5,7 +5,7 @@ from schafkopf.players.random_player import RandomPlayer
 
 @pytest.fixture
 def rand_tournament(random_player_list):
-    return Tournament(playerlist=random_player_list, number_of_games=32)
+    return Tournament(playerlist=random_player_list, number_of_games=32, record_games=True)
 
 
 def test_play_next_game(rand_tournament):
