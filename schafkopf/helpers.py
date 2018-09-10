@@ -4,6 +4,16 @@ from schafkopf.ranks import SEVEN, EIGHT, NINE, UNTER, OBER, KING, TEN, ACE, RAN
 from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
 
 
+def sort_hand(hand, trumpcards):
+    trumps_in_hand = [trump for trump in trumpcards if trump in hand]
+    bells = [(i, BELLS) for i in RANKS if (i, BELLS) in hand and (i, BELLS) not in trumpcards]
+    hearts = [(i, HEARTS) for i in RANKS if (i, HEARTS) in hand and (i, HEARTS) not in trumpcards]
+    leaves = [(i, LEAVES) for i in RANKS if (i, LEAVES) in hand and (i, LEAVES) not in trumpcards]
+    acorns = [(i, ACORNS) for i in RANKS if (i, ACORNS) in hand and (i, ACORNS) not in trumpcards]
+    sorted_hand = trumps_in_hand + acorns + leaves + hearts + bells
+    return sorted_hand
+
+
 def sample_opponent_hands(tricks, current_trick, trumpcards, playerindex, player_hand):
     opp_cards = opponent_cards_still_in_game(tricks, current_trick, player_hand)
 
