@@ -4,7 +4,10 @@ from schafkopf.ranks import SEVEN, EIGHT, NINE, UNTER, OBER, KING, TEN, ACE, RAN
 from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
 
 
-def sort_hand(hand, trumpcards):
+def sort_hand(hand, trumpcards=None):
+    if trumpcards is None:
+        trumpcards = [(OBER, suit) for suit in SUITS] + [(UNTER, suit) for suit in SUITS] + \
+                     [(ACE, HEARTS), (TEN, HEARTS), (KING, HEARTS), (NINE, HEARTS), (EIGHT, HEARTS), (SEVEN, HEARTS)]
     trumps_in_hand = [trump for trump in trumpcards if trump in hand]
     bells = [(i, BELLS) for i in RANKS if (i, BELLS) in hand and (i, BELLS) not in trumpcards]
     hearts = [(i, HEARTS) for i in RANKS if (i, HEARTS) in hand and (i, HEARTS) not in trumpcards]

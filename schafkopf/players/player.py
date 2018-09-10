@@ -10,14 +10,7 @@ class Player:
         return
 
     def pick_up_cards(self, hand, trumpcards=None):
-        if trumpcards is None:
-            self.hand = sort_hand(hand=hand, trumpcards=[(OBER, ACORNS), (OBER, LEAVES), (OBER, HEARTS),
-                                                              (OBER, BELLS), (UNTER, ACORNS), (UNTER, LEAVES),
-                                                              (UNTER, HEARTS), (UNTER, BELLS), (ACE, HEARTS),
-                                                              (TEN, HEARTS), (KING, HEARTS), (NINE, HEARTS),
-                                                              (EIGHT, HEARTS), (SEVEN, HEARTS)])
-        else:
-            self.hand = sort_hand(hand, trumpcards)
+        self.hand = sort_hand(hand, trumpcards)
 
     def set_starting_hand(self, hand, previous_tricks=None, playerindex=None, trumpcards=None):
         starting_hand = hand[:]
