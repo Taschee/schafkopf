@@ -120,18 +120,21 @@ def load_data_bidding(file, augment_data=False):
                     y_data[game_num * 4 + hand_num] = y
     else:
         num_examples_augmented = num_augmented_examples_in_file(file)
+        num_games = num_games_in_file(file)
         with open(file, 'rb') as infile:
 
             x_data = np.zeros(shape=(num_examples_augmented, 8, 32))
             y_data = np.zeros(shape=(num_examples_augmented, 9))
+            next_index = 0
 
             for game_num in range(num_games):
                 game_data_dic = pickle.load(infile)
                 data_list = prepare_data_bidding(game_data_dic)
                 for hand_num in range(len(data_list)):
                     x, y = data_list[hand_num]
-                    x_data[game_num * 4 + hand_num] = x
-                    y_data[game_num * 4 + hand_num] = y
+                    x_data[next_index] = x
+                    y_data[next_index] = y
+                    next_index += 1
 
     return x_data, y_data
 
