@@ -19,7 +19,6 @@ def num_games_in_file(file):
         return num
 
 
-
 def prepare_data_bidding(game_data_dic, augment_data=False):
 
     player_hands = game_data_dic['player_hands']
