@@ -1,8 +1,10 @@
 import pickle
 import random
 import numpy as np
-from schafkopf.game_modes import NO_GAME
+from schafkopf.game_modes import NO_GAME, PARTNER_MODE, SOLO, WENZ
+from schafkopf.players.data.data_processing import switch_suits_player_hands
 import schafkopf.players.data.encodings as enc
+from schafkopf.suits import SUITS, BELLS, LEAVES, ACORNS
 
 
 def num_games_in_file(file):
@@ -17,7 +19,8 @@ def num_games_in_file(file):
         return num
 
 
-def prepare_data_bidding(game_data_dic):
+
+def prepare_data_bidding(game_data_dic, augment_data=False):
 
     player_hands = game_data_dic['player_hands']
     game_mode = game_data_dic['game_mode']
@@ -25,24 +28,68 @@ def prepare_data_bidding(game_data_dic):
 
     data_list = []
 
-    for hand, player_pos in zip(player_hands, range(4)):
-        x = np.zeros(shape=(8, 32))
-
-        for card, index in zip(hand, range(8)):
-            card_encoded = enc.encode_one_hot_card(card)
-            x[index] = card_encoded
-
-        if player_pos == declaring_player:
-            y = enc.encode_one_hot_game_mode(game_mode)
-        else:
-            y = enc.encode_one_hot_game_mode((NO_GAME, None))
-
-        data_list.append((x, y))
-
+    if not augment_data:
+        for hand, player_pos in zip(player_hands, range(len(player_hands))):
+            x, y = create_bidding_example(declaring_player, game_mode, hand, player_pos)
+            data_list.append((x, y))
+    elif game_mode[0] == PARTNER_MODE:
+        data_list += suit_permutations_partner(declaring_player, game_mode, player_hands)
+    else:
+        data_list += suit_permutations_sw(declaring_player, game_mode, player_hands)
     return data_list
 
 
-def load_data_bidding(file):
+def suit_permutations_partner(declaring_player, game_mode, player_hands):
+    data_list = []
+    # augment by getting all suit permutations via two transpositions
+    # first cycle through all possible game_suits
+    for new_game_suit in [BELLS, LEAVES, ACORNS]:
+        new_player_hands = switch_suits_player_hands(player_hands, game_mode[1], new_game_suit)
+        new_game_mode = (PARTNER_MODE, new_game_suit)
+        other_suits = [s for s in [BELLS, LEAVES, ACORNS] if s != new_game_suit]
+        first_suit = other_suits[0]
+        # then both permutations of the remaining two suits
+        for sec_suit in other_suits:
+            new_player_hands = switch_suits_player_hands(new_player_hands, first_suit, sec_suit)
+            # now create trainingsexamples from all switched hands
+            for hand, player_pos in zip(new_player_hands, range(len(player_hands))):
+                x, y = create_bidding_example(declaring_player, new_game_mode, hand, player_pos)
+                data_list.append((x, y))
+    return data_list
+
+
+def suit_permutations_sw(declaring_player, game_mode, player_hands):
+    data_list = []
+    # augment by getting all suit permutations via three transpositions
+    # first cycle through all possible game_suits
+    for new_game_suit in SUITS:
+        new_player_hands = switch_suits_player_hands(player_hands, game_mode[1], new_game_suit)
+        new_game_mode = (PARTNER_MODE, new_game_suit)
+        other_suits = [s for s in SUITS if s != new_game_suit]
+        first_suit = other_suits[0]
+        # then permutations of 3 remaining elements again by two permutations
+        for sec_suit in other_suits:
+            new_player_hands = switch_suits_player_hands(new_player_hands, sec_suit, first_suit)
+            remaining_suits = [s for s in other_suits if s != first_suit]
+            for third_suit in remaining_suits:
+                new_player_hands = switch_suits_player_hands(new_player_hands, sec_suit, third_suit)
+                # now create trainingsexamples from all switched hands
+                for hand, player_pos in zip(new_player_hands, range(len(player_hands))):
+                    x, y = create_bidding_example(declaring_player, new_game_mode, hand, player_pos)
+                    data_list.append((x, y))
+    return data_list
+
+
+def create_bidding_example(declaring_player, game_mode, hand, player_pos):
+    x = enc.encode_one_hot_hand(hand)
+    if player_pos == declaring_player:
+        y = enc.encode_one_hot_game_mode(game_mode)
+    else:
+        y = enc.encode_one_hot_game_mode((NO_GAME, None))
+    return x, y
+
+
+def load_data_bidding(file):  ## augmentation?
 
     num_games = num_games_in_file(file)
 
@@ -53,7 +100,7 @@ def load_data_bidding(file):
 
         for game_num in range(num_games):
             game_data_dic = pickle.load(infile)
-            data_list = prepare_data_bidding(game_data_dic)
+            data_list = prepare_data_bidding(game_data_dic)  ## why here?
             for hand_num in range(4):
                 x, y = data_list[hand_num]
                 x_data[game_num * 4 + hand_num] = x
