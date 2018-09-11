@@ -3,7 +3,6 @@ from schafkopf.game_modes import SOLO, WENZ, PARTNER_MODE
 from schafkopf.suits import HEARTS, ACORNS
 from schafkopf.players.data.data_processing import switch_suits_player_hands, switch_card_suit, \
     switch_suits_played_cards
-from schafkopf.ranks import OBER, UNTER
 
 
 infilename = 'train_data.p'

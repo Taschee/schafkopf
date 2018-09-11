@@ -8,12 +8,27 @@ from schafkopf.suits import SUITS, BELLS, LEAVES, ACORNS
 
 
 def num_games_in_file(file):
-    with (open(file, "rb")) as openfile:
+    with (open(file, "rb")) as file:
         num = 0
         while True:
             try:
-                pickle.load(openfile)
+                pickle.load(file)
                 num += 1
+            except EOFError:
+                break
+        return num
+
+
+def num_augmented_examples_in_file(file):
+    with (open(file, "rb")) as file:
+        num = 0
+        while True:
+            try:
+                data_dic = pickle.load(file)
+                if data_dic['game_mode'][0] == PARTNER_MODE:
+                    num += 6 * 4
+                else:
+                    num += 24 * 4
             except EOFError:
                 break
         return num
@@ -50,7 +65,7 @@ def suit_permutations_partner(declaring_player, game_mode, player_hands):
         # then both permutations of the remaining two suits
         for sec_suit in other_suits:
             new_player_hands = switch_suits_player_hands(new_player_hands, first_suit, sec_suit)
-            # now create trainingsexamples from all switched hands
+            # now create trainingsexamples from switched hands
             for hand, player_pos in zip(new_player_hands, range(len(player_hands))):
                 x, y = create_bidding_example(declaring_player, new_game_mode, hand, player_pos)
                 data_list.append((x, y))
@@ -72,7 +87,7 @@ def suit_permutations_sw(declaring_player, game_mode, player_hands):
             remaining_suits = [s for s in other_suits if s != first_suit]
             for third_suit in remaining_suits:
                 new_player_hands = switch_suits_player_hands(new_player_hands, sec_suit, third_suit)
-                # now create trainingsexamples from all switched hands
+                # now create trainingsexamples from switched hands
                 for hand, player_pos in zip(new_player_hands, range(len(player_hands))):
                     x, y = create_bidding_example(declaring_player, new_game_mode, hand, player_pos)
                     data_list.append((x, y))
@@ -88,22 +103,35 @@ def create_bidding_example(declaring_player, game_mode, hand, player_pos):
     return x, y
 
 
-def load_data_bidding(file):  ## augmentation?
+def load_data_bidding(file, augment_data=False):
+    if not augment_data:
+        num_games = num_games_in_file(file)
+        with open(file, 'rb') as infile:
 
-    num_games = num_games_in_file(file)
+            x_data = np.zeros(shape=(num_games * 4, 8, 32))
+            y_data = np.zeros(shape=(num_games * 4, 9))
 
-    with open(file, 'rb') as infile:
+            for game_num in range(num_games):
+                game_data_dic = pickle.load(infile)
+                data_list = prepare_data_bidding(game_data_dic)
+                for hand_num in range(len(data_list)):
+                    x, y = data_list[hand_num]
+                    x_data[game_num * 4 + hand_num] = x
+                    y_data[game_num * 4 + hand_num] = y
+    else:
+        num_examples_augmented = num_augmented_examples_in_file(file)
+        with open(file, 'rb') as infile:
 
-        x_data = np.zeros(shape=(num_games * 4, 8, 32))
-        y_data = np.zeros(shape=(num_games * 4, 9))
+            x_data = np.zeros(shape=(num_examples_augmented, 8, 32))
+            y_data = np.zeros(shape=(num_examples_augmented, 9))
 
-        for game_num in range(num_games):
-            game_data_dic = pickle.load(infile)
-            data_list = prepare_data_bidding(game_data_dic)  ## why here?
-            for hand_num in range(4):
-                x, y = data_list[hand_num]
-                x_data[game_num * 4 + hand_num] = x
-                y_data[game_num * 4 + hand_num] = y
+            for game_num in range(num_games):
+                game_data_dic = pickle.load(infile)
+                data_list = prepare_data_bidding(game_data_dic)
+                for hand_num in range(len(data_list)):
+                    x, y = data_list[hand_num]
+                    x_data[game_num * 4 + hand_num] = x
+                    y_data[game_num * 4 + hand_num] = y
 
     return x_data, y_data
 
@@ -158,4 +186,3 @@ def load_data_trickplay(file, num_samples=1):
                 y_data[game_num * num_samples + num] = y
 
     return x_data, y_data
-
