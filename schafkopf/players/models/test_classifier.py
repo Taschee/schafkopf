@@ -9,11 +9,11 @@ filepath = "bigger_classifier_sortedhands_lr0.02.hdf5"
 
 model = keras.models.load_model(filepath)
 
-hand_wenz = enc.encode_one_hot_hand([(UNTER, ACORNS), (UNTER, HEARTS), (UNTER, BELLS), (ACE, LEAVES),
+hand_wenz = enc.encode_one_hot_hand([(UNTER, ACORNS), (UNTER, HEARTS), (ACE, BELLS), (ACE, LEAVES),
                                      (EIGHT, LEAVES), (ACE, ACORNS), (EIGHT, BELLS), (SEVEN, BELLS)])
 
-hand_solo_leaves = enc.encode_one_hot_hand([(OBER, ACORNS), (OBER, HEARTS), (OBER, LEAVES), (UNTER, ACORNS),
-                                            (UNTER, BELLS), (TEN, LEAVES), (NINE, LEAVES), (ACE, HEARTS)])
+hand_solo_leaves = enc.encode_one_hot_hand([(OBER, ACORNS), (OBER, HEARTS), (OBER, BELLS), (UNTER, ACORNS),
+                                            (UNTER, BELLS), (TEN, LEAVES), (NINE, LEAVES), (SEVEN, HEARTS)])
 
 hand_partner_leaves = enc.encode_one_hot_hand([(OBER, ACORNS), (OBER, HEARTS), (UNTER, BELLS), (ACE, HEARTS),
                                               (NINE, HEARTS), (EIGHT, BELLS), (TEN, LEAVES), (ACE, ACORNS)])

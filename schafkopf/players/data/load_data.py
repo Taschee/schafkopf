@@ -19,16 +19,16 @@ def num_games_in_file(file):
         return num
 
 
-def num_augmented_examples_in_file(file):
+def num_augmented_games_in_file(file):
     with (open(file, "rb")) as file:
         num = 0
         while True:
             try:
                 data_dic = pickle.load(file)
                 if data_dic['game_mode'][0] == PARTNER_MODE:
-                    num += 6 * 4
+                    num += 6
                 else:
-                    num += 24 * 4
+                    num += 24
             except EOFError:
                 break
         return num
@@ -47,13 +47,13 @@ def prepare_data_bidding(game_data_dic, augment_data=False):
             x, y = create_bidding_example(declaring_player, game_mode, hand, player_pos)
             data_list.append((x, y))
     elif game_mode[0] == PARTNER_MODE:
-        data_list += suit_permutations_partner(declaring_player, game_mode, player_hands)
+        data_list += suit_permutations_hands_partner(declaring_player, game_mode, player_hands)
     else:
-        data_list += suit_permutations_sw(declaring_player, game_mode, player_hands)
+        data_list += suit_permutations_hands_sw(declaring_player, game_mode, player_hands)
     return data_list
 
 
-def suit_permutations_partner(declaring_player, game_mode, player_hands):
+def suit_permutations_hands_partner(declaring_player, game_mode, player_hands):
     data_list = []
     # augment by getting all suit permutations via two transpositions
     # first cycle through all possible game_suits
@@ -72,7 +72,7 @@ def suit_permutations_partner(declaring_player, game_mode, player_hands):
     return data_list
 
 
-def suit_permutations_sw(declaring_player, game_mode, player_hands):
+def suit_permutations_hands_sw(declaring_player, game_mode, player_hands):
     data_list = []
     # augment by getting all suit permutations via three transpositions
     # first cycle through all possible game_suits
@@ -119,7 +119,8 @@ def load_data_bidding(file, augment_data=False):
                     x_data[game_num * 4 + hand_num] = x
                     y_data[game_num * 4 + hand_num] = y
     else:
-        num_examples_augmented = num_augmented_examples_in_file(file)
+
+        num_examples_augmented = num_augmented_games_in_file(file) * 4
         num_games = num_games_in_file(file)
         with open(file, 'rb') as infile:
 
@@ -129,7 +130,7 @@ def load_data_bidding(file, augment_data=False):
 
             for game_num in range(num_games):
                 game_data_dic = pickle.load(infile)
-                data_list = prepare_data_bidding(game_data_dic)
+                data_list = prepare_data_bidding(game_data_dic, augment_data=True)
                 for hand_num in range(len(data_list)):
                     x, y = data_list[hand_num]
                     x_data[next_index] = x
@@ -170,7 +171,7 @@ def prepare_data_trickplay(game_data_dic, num_samples=1):
     return card_sequences, cards_to_predict
 
 
-def load_data_trickplay(file, num_samples=1):
+def load_data_trickplay(file, num_samples=1):    # maybe augment data as well?
 
     num_games = num_games_in_file(file)
 
@@ -187,5 +188,6 @@ def load_data_trickplay(file, num_samples=1):
                 y = cards_to_predict[num]
                 x_data[game_num * num_samples + num] = x
                 y_data[game_num * num_samples + num] = y
+
 
     return x_data, y_data

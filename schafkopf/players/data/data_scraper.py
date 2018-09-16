@@ -19,7 +19,7 @@ class DataScraper():
                                'Eichel-Zehn': (6, 3), 'Die Alte': (7, 3)}
 
     def login_to_sauspiel(self, username, password):
-        chromedriver = 'C:\\Users\\Taschee\\Downloads\\chromedriver_win32\\chromedriver.exe'
+        chromedriver = 'C:\\Program Files\\ChromeDriver\\chromedriver.exe'
         driver = webdriver.Chrome(chromedriver)
         driver.get('http://www.sauspiel.de/spiele')
         username_box = driver.find_element_by_name('login')
