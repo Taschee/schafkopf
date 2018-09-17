@@ -35,14 +35,18 @@ def bigger_lstm_model():
     return model
 
 
-def train(model, x_train, y_train, x_val, y_val, modelname='model.hdf5'):
+def train(model, x_train, y_train, x_val, y_val, epochs, modelname='model.hdf5'):
 
     checkpoint = ModelCheckpoint(modelname, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
     early_stopping = EarlyStopping(patience=3)
     tensorboard = TensorBoard(log_dir='./logs')
     callback_list = [checkpoint, TerminateOnNaN(), early_stopping, tensorboard]
 
-    model.fit(x_train, y_train, epochs=30, validation_data=(x_val, y_val), batch_size=128, callbacks=callback_list)
+    model.fit(x_train, y_train,
+              epochs=epochs,
+              validation_data=(x_val, y_val),
+              batch_size=128,
+              callbacks=callback_list)
 
 
 def main():
@@ -50,11 +54,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('data', help='pickle file with the trainings data')
     parser.add_argument('--modelname', help='name of the model to be trained')
-    parser.add_argument('--epochs', help='number of training epochs')
+    parser.add_argument('--epochs', help='number of training epochs', type='int')
     parser.add_argument('--bigger_lstm', help='use two lstm blocks', action='store_true')
     args = parser.parse_args()
 
     x_train, y_train, x_val, y_val, _, _ = load_data(args.data)
+
+    if args.epochs:
+        num_epochs = args.epochs
+    else:
+        num_epochs = 10
 
     if args.bigger_lstm:
         model = bigger_lstm_model()
