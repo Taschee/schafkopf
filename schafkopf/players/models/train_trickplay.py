@@ -54,7 +54,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('data', help='pickle file with the trainings data')
     parser.add_argument('--modelname', help='name of the model to be trained')
-    parser.add_argument('--epochs', help='number of training epochs', type='int')
+    parser.add_argument('--epochs', help='number of training epochs', type=int)
     parser.add_argument('--bigger_lstm', help='use two lstm blocks', action='store_true')
     args = parser.parse_args()
 
