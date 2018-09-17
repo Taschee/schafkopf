@@ -189,5 +189,4 @@ def load_data_trickplay(file, num_samples=1):    # maybe augment data as well?
                 x_data[game_num * num_samples + num] = x
                 y_data[game_num * num_samples + num] = y
 
-
     return x_data, y_data
