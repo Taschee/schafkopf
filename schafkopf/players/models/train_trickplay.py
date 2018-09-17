@@ -26,7 +26,7 @@ def lstm_model():
 
 def bigger_lstm_model():
     model = Sequential()
-    model.add(LSTM(256, input_shape=(28, 36)))
+    model.add(LSTM(256, input_shape=(28, 36), return_sequences=True))
     model.add(Dropout(0.2))
     model.add(LSTM(256))
     model.add(Dropout(0.2))
@@ -38,7 +38,7 @@ def bigger_lstm_model():
 def train(model, x_train, y_train, x_val, y_val, epochs, modelname='model.hdf5'):
 
     checkpoint = ModelCheckpoint(modelname, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-    early_stopping = EarlyStopping(patience=3)
+    early_stopping = EarlyStopping(patience=7)
     tensorboard = TensorBoard(log_dir='./logs')
     callback_list = [checkpoint, TerminateOnNaN(), early_stopping, tensorboard]
 
@@ -63,7 +63,7 @@ def main():
     if args.epochs:
         num_epochs = args.epochs
     else:
-        num_epochs = 10
+        num_epochs = 20
 
     if args.bigger_lstm:
         model = bigger_lstm_model()
