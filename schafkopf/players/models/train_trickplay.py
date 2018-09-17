@@ -71,9 +71,9 @@ def main():
         model = lstm_model()
 
     if args.modelname:
-        train(model, x_train, y_train, x_val, y_val, modelname=args.modelname)
+        train(model, x_train, y_train, x_val, y_val,  epochs=num_epochs, modelname=args.modelname)
     else:
-        train(model, x_train, y_train, x_val, y_val)
+        train(model, x_train, y_train, x_val, y_val, epochs=num_epochs)
 
 
 if __name__ == '__main__':
