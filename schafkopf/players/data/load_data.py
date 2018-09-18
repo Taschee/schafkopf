@@ -143,7 +143,6 @@ def load_data_bidding(file, augment_data=False):
 def prepare_data_trickplay(game_data_dic, num_samples=1):
 
     played_cards = game_data_dic['played_cards']
-
     card_sequences = []
     cards_to_predict = []
 
@@ -151,20 +150,9 @@ def prepare_data_trickplay(game_data_dic, num_samples=1):
     seq_lenghts = random.sample(range(27), num_samples)
 
     for seq_len in seq_lenghts:
-        new_seq = np.zeros((28, 36))
-        # first entry contains only the relative player position of the player playing at the moment
-        rel_pos = played_cards[0][1]
-        new_seq[0][32:] = enc.encode_one_hot_player_position(rel_pos)
-        # after this, the next card and the relative player position of the next player are added to sequence
-        for card_index in range(seq_len):
-            card = played_cards[card_index][0]
-            rel_pos_next_player = played_cards[card_index + 1][1]
-            train_example = np.zeros(36)
-            train_example[32:] = enc.encode_one_hot_player_position(rel_pos_next_player)
-            train_example[:32] = enc.encode_one_hot_card(card)
-            new_seq[card_index + 1] = train_example
-        card_sequences.append(new_seq)
-
+        seq = played_cards[:seq_len]
+        seq_encoded = enc.encode_played_cards(seq, next_rel_pos=played_cards[seq_len][1])
+        card_sequences.append(seq_encoded)
         next_card = played_cards[seq_len][0]
         cards_to_predict.append(enc.encode_one_hot_card(next_card))
 
