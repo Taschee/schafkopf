@@ -74,3 +74,27 @@ def decode_mode_index(index):
         suit = index - 5
         game_mode = (SOLO, suit)
     return game_mode
+
+
+def encode_played_cards(played_cards, next_rel_pos):
+    """Takes list of tuples of (played_card, player) and next player to act as input.
+    Outputs those encoded as (28, 36) numpy array."""
+    seq = np.zeros((28, 36))
+    # first entry contains only the relative player position of the player playing at the moment
+    rel_pos = played_cards[0][1]
+    seq[0][32:] = encode_one_hot_player_position(rel_pos)
+    # after this, the next card and the relative player position of the next player are added to sequence
+    for card_index in range(len(played_cards) - 1):
+        card = played_cards[card_index][0]
+        rel_pos_next_player = played_cards[card_index + 1][1]
+        next_part_in_seq = np.zeros(36)
+        next_part_in_seq[32:] = encode_one_hot_player_position(rel_pos_next_player)
+        next_part_in_seq[:32] = encode_one_hot_card(card)
+        seq[card_index + 1] = next_part_in_seq
+    last_index = len(played_cards)
+    last_card = played_cards[-1][0]
+    last_part_in_seq = np.zeros(36)
+    last_part_in_seq[32:] = encode_one_hot_player_position(next_rel_pos)
+    last_part_in_seq[:32] = encode_one_hot_card(last_card)
+    seq[last_index] = last_part_in_seq
+    return seq

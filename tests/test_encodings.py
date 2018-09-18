@@ -58,3 +58,19 @@ def test_one_hot_encoding_hand():
     assert np.array_equal(enc.encode_one_hot_hand(hand)[1], sec_card_enc)
 
 
+def test_encode_played_cards():
+    seq = [((OBER, ACORNS), 1), ((UNTER, BELLS), 2), ((TEN, ACORNS), 3), ((EIGHT, HEARTS), 0), ((NINE, HEARTS), 1)]
+    next_rel_pos = 2
+    goal = np.zeros((28, 36))
+    goal[0][33] = 1
+    goal[1][34] = 1
+    goal[1][19] = 1
+    goal[2][35] = 1
+    goal[2][12] = 1
+    goal[3][32] = 1
+    goal[3][27] = 1
+    goal[4][33] = 1
+    goal[4][5] = 1
+    goal[5][34] = 1
+    goal[5][9] = 1
+    assert np.array_equal(enc.encode_played_cards(seq, next_rel_pos), goal)
