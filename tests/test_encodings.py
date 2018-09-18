@@ -74,3 +74,8 @@ def test_encode_played_cards():
     goal[5][34] = 1
     goal[5][9] = 1
     assert np.array_equal(enc.encode_played_cards(seq, next_rel_pos), goal)
+    seq = []
+    next_rel_pos = 3
+    goal = np.zeros((28, 36))
+    goal[0][35] = 1
+    assert np.array_equal(enc.encode_played_cards(seq, next_rel_pos), goal)
