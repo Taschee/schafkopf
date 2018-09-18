@@ -55,6 +55,11 @@ def encode_one_hot_game_mode(game_mode, length=9):
 
 def decode_one_hot_game_mode(game_mode_encoded):
     index = np.where(game_mode_encoded == 1)[0][0]
+    game_mode = decode_mode_index(index)
+    return game_mode
+
+
+def decode_mode_index(index):
     if index == 0:
         game_mode = (NO_GAME, None)
     elif index == 1:
