@@ -33,9 +33,11 @@ class NNPlayer(Player):
         else:
             pred = self.make_card_prediction(public_info)
 
+            options_switched_suits = self.switch_suits_options(options, public_info)
+
             card_deck = [(i // 4, i % 4) for i in range(32)]
             for card in card_deck:
-                if card not in options:
+                if card not in options_switched_suits:
                     pred[card_deck.index(card)] = 0
 
             max_index = np.argmax(pred)
@@ -50,17 +52,27 @@ class NNPlayer(Player):
             self.hand.remove(best_card)
             return best_card
 
+    def switch_suits_options(self, options, public_info):
+        game_suit = public_info['game_mode'][1]
+        if public_info['game_mode'][0] == PARTNER_MODE:
+            options_switched_suits = [switch_card_suit(card, game_suit, ACORNS) for card in options]
+        elif public_info['game_mode'][0] == SOLO:
+            options_switched_suits = [switch_card_suit(card, game_suit, HEARTS) for card in options]
+        else:
+            options_switched_suits = options
+        return options_switched_suits
+
     def make_card_prediction(self, public_info):
         card_sequence = self.create_card_sequence(public_info)
         card_seq_switched_suits = self.switch_suits(card_sequence, public_info)
-        rel_pos = (public_info['current_trick'].current_player_index - public_info['declaring_player_index']) % 4
+        rel_pos = (public_info['current_trick'].current_player_index - public_info['declaring_player']) % 4
         card_seq_encoded = enc.encode_played_cards(card_seq_switched_suits, rel_pos)
         if public_info['game_mode'][0] == PARTNER_MODE:
-            pred = self.partner_nn.predict(np.array(card_seq_encoded))[0]
+            pred = self.partner_nn.predict(np.array([card_seq_encoded]))[0]
         elif public_info['game_mode'][0] == WENZ:
-            pred = self.wenz_nn.predict(np.array(card_seq_encoded))[0]
+            pred = self.wenz_nn.predict(np.array([card_seq_encoded]))[0]
         else:
-            pred = self.solo_nn.predict(np.array(card_seq_encoded))[0]
+            pred = self.solo_nn.predict(np.array([card_seq_encoded]))[0]
         return pred
 
     def create_card_sequence(self, public_info):
