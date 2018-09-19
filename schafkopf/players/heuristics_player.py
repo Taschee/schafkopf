@@ -428,13 +428,15 @@ class HeuristicsPlayer(Player):
         max_suit = self.longest_suit(public_info)
         if (ACE, max_suit) in options:
             return (ACE, max_suit)
-        else:
+        elif len(self.suit_in_hand(max_suit)) > 0:
             return random.choice(self.suit_in_hand(max_suit))
+        else:
+            return random.choice(options)
 
     def longest_suit(self, public_info):
         suits = SUITS[:]
         suits.reverse()
-        if public_info["game_mode"][0] != WENZ:
+        if public_info["game_mode"][0] == WENZ:
             suit_nums = [len(self.suit_in_hand(suit, wenz=True)) for suit in suits]
             return np.argmax(suit_nums)
         else:
