@@ -1,7 +1,8 @@
-from schafkopf.mc_node import MCNode
-from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
-from schafkopf.suits import SUITS, LEAVES
 import pytest
+
+from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
+from schafkopf.players.mc_node import MCNode
+from schafkopf.suits import SUITS, LEAVES
 
 
 @pytest.fixture
