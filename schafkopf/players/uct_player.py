@@ -1,19 +1,20 @@
-from schafkopf.mc_tree import MCTree
-from schafkopf.mc_node import MCNode
-from schafkopf.helpers import sample_opponent_hands, sample_mode_proposals
-from schafkopf.players.random_player import RandomPlayer
-from schafkopf.players.dummy_player import DummyPlayer
-from schafkopf.players.player import Player
-from schafkopf.game import Game
-from schafkopf.trick import Trick
-from copy import deepcopy
-import multiprocessing as mp
 import random
+from copy import deepcopy
+
+from schafkopf.players.mc_tree import MCTree
+
+from schafkopf.game import Game
+from schafkopf.helpers import sample_opponent_hands, sample_mode_proposals
+from schafkopf.players.dummy_player import DummyPlayer
+from schafkopf.players.mc_node import MCNode
+from schafkopf.players.player import Player
+from schafkopf.players.random_player import RandomPlayer
+from schafkopf.trick import Trick
 
 
 class UCTPlayer(Player):
 
-    def __init__(self, name="UCT", ucb_const=0.1, num_samples=10, num_simulations=100):
+    def __init__(self, name="UCT", ucb_const=1, num_samples=10, num_simulations=100):
         Player.__init__(self, name=name)
         self.ucb_const = ucb_const
         self.num_samples = num_samples

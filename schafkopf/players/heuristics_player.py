@@ -218,10 +218,13 @@ class HeuristicsPlayer(Player):
                 return random.choice(options)
         else:
             aces = self.aces_in_hand(public_info)
+            non_trump_cards = [card for card in self.hand if card not in trumpcards_in_hand]
             if len(aces) > 0:
                 return random.choice(aces)
+            elif len(non_trump_cards) > 0:
+                return random.choice(non_trump_cards)
             else:
-                return random.choice([card for card in self.hand if card not in trumpcards_in_hand])
+                return random.choice(options)
 
     def follow_suit_partner_mode_partner(self, public_info, options):
         leading_player = public_info["current_trick"].leading_player_index
