@@ -353,7 +353,10 @@ class HeuristicsPlayer(Player):
         unter_played = self.rank_played(UNTER, public_info)
         # check if there are still opponent UNTER, if yes, play highest own UNTER
         if len(unter_in_hand + unter_played) < 4:
-            return unter_in_hand[0]
+            if len(unter_in_hand) > 0:
+                return unter_in_hand[0]
+            else:
+                return random.choice(options)
         # play sparrow if there are no opponent UNTER left (if possible)
         else:
             sparrows = self.sparrows_in_hand(public_info)
