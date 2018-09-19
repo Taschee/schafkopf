@@ -110,7 +110,7 @@ class HeuristicsPlayer(Player):
                     return (SOLO, trump_suit)
                 elif num_unter + num_ober >= 5:
                     return (SOLO, trump_suit)
-                elif num_ober + num_unter == 4 and len({(ACE, trump_suit), (TEN, trump_suit)} & self.hand) >= 1:
+                elif num_ober + num_unter == 4 and len({(ACE, trump_suit), (TEN, trump_suit)} & set(self.hand)) >= 1:
                     return (SOLO, trump_suit)
                 else:
                     return (NO_GAME, None)
