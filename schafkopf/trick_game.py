@@ -67,11 +67,11 @@ class TrickGame:
                 if len(self.suit_in_hand(suit=self.game_mode[1], hand=hand)) < 4:
                     forbidden_cards = [card for card in hand if card not in self.trumpcards
                                        and card[1] == self.game_mode[1] and card[0] != 7]
-                    return [card for card in hand if card not in forbidden_cards]
+                    poss_cards = [card for card in hand if card not in forbidden_cards]
                 else:
-                    return hand
+                    poss_cards = hand
             else:
-                return hand
+                poss_cards = hand
 
         else:
             first_card = current_trick.cards[current_trick.leading_player_index]
@@ -79,20 +79,22 @@ class TrickGame:
             if first_card in self.trumpcards:
                 players_trumpcards = [trump for trump in self.trumpcards if trump in hand]
                 if len(players_trumpcards) > 0:
-                    return players_trumpcards
+                    poss_cards = players_trumpcards
                 else:
-                    return hand
+                    poss_cards = hand
             elif self.game_mode[0] == PARTNER_MODE and first_card[1] == self.game_mode[1] \
                     and (7, self.game_mode[1]) in hand:
                 previously_ran_away = self.previously_ran_away()
                 if not previously_ran_away:
-                    return [(7, self.game_mode[1])]
+                    poss_cards = [(7, self.game_mode[1])]
                 else:
                     suit = first_card[1]
-                    return self.suit_in_hand(suit, hand)
+                    poss_cards = self.suit_in_hand(suit, hand)
             else:
                 suit = first_card[1]
-                return self.suit_in_hand(suit, hand)
+                poss_cards = self.suit_in_hand(suit, hand)
+
+        return poss_cards[:]
 
     def reset_current_trick(self):
         self.tricks.append(self.current_trick)
@@ -105,6 +107,7 @@ class TrickGame:
         options = self.possible_cards(self.current_trick, current_player.get_hand())
         info = self.get_public_info()
         next_card = current_player.play_card(public_info=info, options=options)
+        assert next_card in options, "Player {} tried to play non legal card".format(current_player)
         self.current_trick.cards[self.current_player_index] = next_card
         self.current_trick.num_cards += 1
 
