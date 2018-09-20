@@ -354,7 +354,7 @@ class HeuristicsPlayer(Player):
     def lead_trick_wenz_declarer(self, public_info, options):
         unter_in_hand = self.trumpcards_in_hand(public_info)
         unter_played = self.rank_played(UNTER, public_info)
-        # check if there are still opponent UNTER, if yes, play highest own UNTER
+        # check if there are still opponent UNTER, if yes, play highest UNTER in own hand
         if len(unter_in_hand + unter_played) < 4:
             if len(unter_in_hand) > 0:
                 return unter_in_hand[0]
@@ -454,19 +454,24 @@ class HeuristicsPlayer(Player):
         leading_player = current_trick.leading_player_index
         first_card = current_trick.cards[leading_player]
         offensive_player = public_info["declaring_player"]
-        trumpcards_in_hand = [card for card in public_info["trumpcards"] if card in self.hand]
+        trumpcards_in_hand = [card for card in self.hand if card[0] == UNTER]
         low_cards_in_hand = self.rank_in_hand(SEVEN) + self.rank_in_hand(EIGHT) + self.rank_in_hand(NINE)
 
         # if a UNTER was played:
         if first_card in public_info["trumpcards"]:
             # if the offensive player played the best trumpcard left, go with lowest trumpcard or card with few points
-            if current_trick.cards[offensive_player] == self.best_trumpcard_still_in_game(public_info):
+            best_trumpcard_left = self.best_trumpcard_still_in_game(public_info)
+            if current_trick.cards[offensive_player] == best_trumpcard_left:
                 if len(trumpcards_in_hand) > 0:
                     return trumpcards_in_hand[-1]
                 elif len(low_cards_in_hand) > 0:
                     return random.choice(low_cards_in_hand)
                 else:
                     return random.choice(options)
+            elif best_trumpcard_left in options:
+                return best_trumpcard_left
+            elif len(trumpcards_in_hand) > 0:
+                return random.choice(trumpcards_in_hand)
             # random non-ace otherwise
             else:
                 aces = self.aces_in_hand(public_info)
