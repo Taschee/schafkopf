@@ -1,0 +1,127 @@
+
+
+<BiddingWidget>:
+    GridLayout:
+        id: modebuttons
+        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+        size_hint: 0.5, 0.5
+        rows: 2
+        cols: 5
+        Button:
+            id: no_game
+            size_hint: None, None
+            text: 'Weiter'
+            on_press: root.print_a('Weiter')
+
+        Button:
+            id: partner_acorns
+            size_hint: None, None
+            text: 'Mit der Alten'
+            on_press: root.print_a('Auf die Alte')
+
+        Button:
+            id: partner_leaves
+            size_hint: None, None
+            text: 'Mit der Blauen'
+            on_press: root.print_a('Auf die Blaue')
+
+        Button:
+            id: partner_bells
+            size_hint: None, None
+            text: 'Mit der Schellen'
+            on_press: root.print_a('Auf die Schellen')
+
+        Button:
+            id: wenz
+            size_hint: None, None
+            text: 'Wenz'
+            on_press: root.print_a('Wenz')
+
+        Button:
+            id: solo_acorns
+            size_hint: None, None
+            text: 'Eichel Solo'
+            on_press: root.print_a('Eichel Solo')
+
+        Button:
+            id: solo_leaves
+            size_hint: None, None
+            text: 'Gras Solo'
+            on_press: root.print_a('Gras Solo')
+
+        Button:
+            id: solo_hearts
+            size_hint: None, None
+            text: 'Herz Solo'
+            on_press: root.print_a('Herz Solo')
+
+
+        Button:
+            id: exit_button
+            size_hint: None, None
+            text: 'Schellen Solo'
+            on_press: root.print_a('Schellen Solo')
+
+    CardWidget:
+        id: cards
+        pos_hint: {'center_x': 0.5, 'center_y': 0.15}
+
+        rows: 1
+        cols: 8
+
+        AnchorLayout:
+            id: A
+            ImageButton:
+                source: '../images/7Eichel.jpg'
+                size_hint: 1, 0.25
+                on_release: root.ids.cards.remove_widget(root.ids.A)
+
+        AnchorLayout:
+            id: B
+            ImageButton:
+                source: '../images/8Eichel.jpg'
+                size_hint: 1, 0.25
+                on_release: root.ids.cards.remove_widget(root.ids.B)
+
+        AnchorLayout:
+            id: C
+            ImageButton:
+                source: '../images/9Eichel.jpg'
+                size_hint: 1, 0.25
+                on_release: root.ids.cards.remove_widget(root.ids.C)
+
+        AnchorLayout:
+            id: D
+            ImageButton:
+                source: '../images/AEichel.jpg'
+                size_hint: 1, 0.25
+                on_release: root.ids.cards.remove_widget(root.ids.D)
+
+        AnchorLayout:
+            id: E
+            ImageButton:
+                source: '../images/7Herz.jpg'
+                size_hint: 1, 0.25
+                on_release: root.ids.cards.remove_widget(root.ids.E)
+
+        AnchorLayout:
+            id: F
+            ImageButton:
+                source: '../images/KHerz.jpg'
+                size_hint: 1, 0.25
+                on_release: root.ids.cards.remove_widget(root.ids.F)
+
+        AnchorLayout:
+            id: G
+            ImageButton:
+                source: '../images/UHerz.jpg'
+                size_hint: 1, 0.25
+                on_release: root.ids.cards.remove_widget(root.ids.G)
+
+        AnchorLayout:
+            id: H
+            ImageButton:
+                source: '../images/OGras.jpg'
+                size_hint: 1, 0.25
+                on_release: root.ids.cards.remove_widget(root.ids.H)
+
