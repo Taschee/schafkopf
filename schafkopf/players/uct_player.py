@@ -5,10 +5,9 @@ from schafkopf.players.mc_tree import MCTree
 
 from schafkopf.game import Game
 from schafkopf.helpers import sample_opponent_hands, sample_mode_proposals
-from schafkopf.players.dummy_player import DummyPlayer
+from schafkopf.players import DummyPlayer, RandomPlayer
 from schafkopf.players.mc_node import MCNode
 from schafkopf.players.player import Player
-from schafkopf.players.random_player import RandomPlayer
 from schafkopf.trick import Trick
 
 
