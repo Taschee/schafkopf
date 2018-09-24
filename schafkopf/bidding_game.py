@@ -6,13 +6,13 @@ from copy import deepcopy
 
 class BiddingGame:
     def __init__(self, playerlist, game_state):
-        self.leading_player_index = game_state["leading_player_index"]
-        self.current_player_index = game_state["leading_player_index"]
+        self.leading_player_index = game_state['leading_player_index']
+        self.current_player_index = game_state['leading_player_index']
         self.playerlist = playerlist
-        self.mode_proposals = game_state["mode_proposals"]
-        self.game_mode = game_state["game_mode"]
+        self.mode_proposals = game_state['mode_proposals']
+        self.game_mode = game_state['game_mode']
         # set offensive players
-        self.offensive_players = [game_state["declaring_player"]]
+        self.offensive_players = [game_state['declaring_player']]
         if self.game_mode[0] == PARTNER_MODE:
             for player in self.playerlist:
                 if (7, self.game_mode[1]) in player.starting_hand:
@@ -20,7 +20,7 @@ class BiddingGame:
                     break
         # initialize mode to beat
         if len(self.mode_proposals) >= 4:
-            self.mode_to_beat = game_state["game_mode"][0]
+            self.mode_to_beat = game_state['game_mode'][0]
         else:
             self.mode_to_beat = sum([1 for mode in self.mode_proposals if mode[0] != NO_GAME])
         # initializing deciding players and current player index
@@ -80,14 +80,14 @@ class BiddingGame:
             public_game_mode = self.game_mode
         else:
             public_game_mode = (self.mode_to_beat, None)
-        return deepcopy({"leading_player_index": self.leading_player_index,
-                         "current_player_index": self.current_player_index,
-                         "mode_proposals": mode_proposals_public,
-                         "declaring_player": self.offensive_players[0],
-                         "game_mode": public_game_mode,
-                         "trumpcards": [],
-                         "tricks": [],
-                         "current_trick": None})
+        return deepcopy({'leading_player_index': self.leading_player_index,
+                         'current_player_index': self.current_player_index,
+                         'mode_proposals': mode_proposals_public,
+                         'declaring_player': self.offensive_players[0],
+                         'game_mode': public_game_mode,
+                         'trumpcards': [],
+                         'tricks': [],
+                         'current_trick': None})
 
     def next_proposal(self):
         while self.current_player_index not in self.deciding_players:

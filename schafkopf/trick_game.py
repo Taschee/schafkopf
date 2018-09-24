@@ -9,19 +9,19 @@ class TrickGame:
     def __init__(self, playerlist, game_state):
         self.playerlist = playerlist
         self.max_num_tricks = 8
-        self.leading_player_index = game_state["leading_player_index"]
-        self.game_mode = game_state["game_mode"]
-        self.mode_proposals = game_state["mode_proposals"]
-        self.offensive_players = [game_state["declaring_player"]]
+        self.leading_player_index = game_state['leading_player_index']
+        self.game_mode = game_state['game_mode']
+        self.mode_proposals = game_state['mode_proposals']
+        self.offensive_players = [game_state['declaring_player']]
         if self.game_mode[0] == PARTNER_MODE:
             for player in self.playerlist:
                 if (7, self.game_mode[1]) in player.starting_hand:
                     self.offensive_players.append(self.playerlist.index(player))
                     break
         self.trumpcards = define_trumpcards(self.game_mode)
-        self.tricks = game_state["tricks"]
-        if game_state["current_trick"] is not None:
-            self.current_trick = game_state["current_trick"]
+        self.tricks = game_state['tricks']
+        if game_state['current_trick'] is not None:
+            self.current_trick = game_state['current_trick']
         else:
             self.current_trick = Trick(leading_player_index=self.leading_player_index)
         self.current_player_index = self.current_trick.current_player_index
@@ -43,14 +43,14 @@ class TrickGame:
                 mode_proposals_public.append(0)
             else:
                 mode_proposals_public.append(1)
-        return deepcopy({"leading_player_index": self.leading_player_index,
-                         "current_player_index": self.current_player_index,
-                         "mode_proposals": mode_proposals_public,
-                         "declaring_player": self.offensive_players[0],
-                         "game_mode": self.game_mode,
-                         "trumpcards": self.trumpcards,
-                         "tricks": self.tricks,
-                         "current_trick": self.current_trick})
+        return deepcopy({'leading_player_index': self.leading_player_index,
+                         'current_player_index': self.current_player_index,
+                         'mode_proposals': mode_proposals_public,
+                         'declaring_player': self.offensive_players[0],
+                         'game_mode': self.game_mode,
+                         'trumpcards': self.trumpcards,
+                         'tricks': self.tricks,
+                         'current_trick': self.current_trick})
 
     def suit_in_hand(self, suit, hand):
         suit_cards = [card for card in hand if card[1] == suit and card not in self.trumpcards]
@@ -107,7 +107,7 @@ class TrickGame:
         options = self.possible_cards(self.current_trick, current_player.get_hand())
         info = self.get_public_info()
         next_card = current_player.play_card(public_info=info, options=options)
-        assert next_card in options, "Player {} tried to play non legal card".format(current_player)
+        assert next_card in options, 'Player {} tried to play non legal card'.format(current_player)
         self.current_trick.cards[self.current_player_index] = next_card
         self.current_trick.num_cards += 1
 

@@ -10,13 +10,13 @@ class Game:
     def __init__(self, players, game_state):
         state = deepcopy(game_state)
         self.playerlist = players
-        for player, hand in zip(self.playerlist, state["player_hands"]):
+        for player, hand in zip(self.playerlist, state['player_hands']):
             player.pick_up_cards(hand)
-            previous_tricks = deepcopy(state["tricks"])
-            if state["current_trick"] is not None:
-                previous_tricks += [state["current_trick"]]
+            previous_tricks = deepcopy(state['tricks'])
+            if state['current_trick'] is not None:
+                previous_tricks += [state['current_trick']]
             player.set_starting_hand(hand, previous_tricks, self.playerlist.index(player))
-        self.leading_player_index = state["leading_player_index"]
+        self.leading_player_index = state['leading_player_index']
         self.bidding_game = BiddingGame(playerlist=players, game_state=state)
         self.trick_game = TrickGame(playerlist=players, game_state=state)
         self.winners = None
@@ -30,9 +30,9 @@ class Game:
 
     def get_game_state(self):
         game_state = self.get_public_info()
-        game_state["mode_proposals"] = self.bidding_game.mode_proposals
-        game_state["player_hands"] = [player.get_hand() for player in self.playerlist]
-        game_state["possible_actions"] = self.get_possible_actions()
+        game_state['mode_proposals'] = self.bidding_game.mode_proposals
+        game_state['player_hands'] = [player.get_hand() for player in self.playerlist]
+        game_state['possible_actions'] = self.get_possible_actions()
         return deepcopy(game_state)
 
     def get_possible_actions(self):
