@@ -18,8 +18,8 @@ class Card(pygame.sprite.Sprite):
         self.size = size
         self.face_down = face_down
         file = SYMBOLS[str(card[0])] + SUITS[str(card[1])] + ".jpg"
-        self.frontside = self.transform(pygame.image.load(os.path.join("images", file)).convert())
-        self.backside = self.transform(pygame.image.load(os.path.join("images", "Rueckseite.jpg")).convert())
+        self.frontside = self.transform(pygame.image.load(os.path.join("../images", file)).convert())
+        self.backside = self.transform(pygame.image.load(os.path.join("../images", "Rueckseite.jpg")).convert())
         if face_down:
             self.image = self.backside
         else:

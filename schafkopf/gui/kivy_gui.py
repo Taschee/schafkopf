@@ -11,11 +11,9 @@ class ImageButton(ButtonBehavior, Image):
 
 class CardWidget(GridLayout):
     def do_layout(self, *args):
-        number_of_children = len(self.children)
         width = self.width
-        width_per_child = width // 10
-
-        positions = range(width // (number_of_children + 2), 9 * width // (number_of_children + 2), width_per_child)
+        width_per_child = int(width // 8)
+        positions = range(0, 8 * width_per_child, width_per_child)
         for position, child in zip(positions, self.children):
             child.height = self.height
             child.x = self.x + position
@@ -38,7 +36,7 @@ class CardWidget(GridLayout):
 
 
 class BiddingWidget(FloatLayout):
-    def print_a(self, string):
+    def print_msg(self, string):
         print(string)
 
 
