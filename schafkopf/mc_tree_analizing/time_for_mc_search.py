@@ -8,7 +8,9 @@ from schafkopf.suits import *
 
 
 playerlist = [UCTPlayer(name="A", num_samples=10, num_simulations=1000),
-              RandomPlayer(name="B"), RandomPlayer(name="C"), RandomPlayer(name="D")]
+              RandomPlayer(name="B"),
+              RandomPlayer(name="C"),
+              RandomPlayer(name="D")]
 
 
 player_hands_partner = [[(OBER, ACORNS), (OBER, BELLS), (UNTER, BELLS), (ACE, BELLS),

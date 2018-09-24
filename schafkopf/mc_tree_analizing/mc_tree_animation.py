@@ -1,9 +1,10 @@
-from schafkopf.players.uct_player import UCTPlayer
-from schafkopf.mc_node import MCNode
-from schafkopf.mc_tree import MCTree
-from schafkopf.game_states_trick_play import sample_game_states
 import imageio
 from PIL import Image, ImageSequence
+from schafkopf.players.mc_tree import MCTree
+
+from schafkopf.players.mc_node import MCNode
+from schafkopf.players.uct_player import UCTPlayer
+from schafkopf.tournaments.game_states_trick_play import sample_game_states
 
 
 def make_gif(filenames, duration, outputname):
