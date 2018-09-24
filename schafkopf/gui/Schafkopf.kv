@@ -1,140 +1,175 @@
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
 
+<MyScreenManager>:
+    transition: FadeTransition()
+    MenuScreen:
+    PlayingScreen:
 
-<BiddingWidget>:
-    canvas:
-        Color:
-            rgba: 0.4, 0.16, 0.1, 1
-        Rectangle:
-            size: self.size
-            pos:self.pos
-
-    GridLayout:
-        id: modebuttons
-        pos_hint: {'center_x': 0.5, 'top': 0.7}
-        size_hint: 0.6, 0.2
-
-        rows: 3
-        cols: 3
-        Button:
-            id: no_game
-            size_hint: 0.2, 0.05
-            text: 'Weiter'
-            on_press: root.print_msg('Weiter')
-
-        Button:
-            id: partner_acorns
-            size_hint: 0.2, 0.05
-            text: 'Mit der Alten'
-            on_press: root.print_msg('Auf die Alte')
-
-        Button:
-            id: partner_leaves
-            size_hint: 0.2, 0.05
-            text: 'Mit der Blauen'
-            on_press: root.print_msg('Auf die Blaue')
-
-        Button:
-            id: partner_bells
-            size_hint: 0.2, 0.05
-            text: 'Mit der Schellen'
-            on_press: root.print_msg('Auf die Schellen')
-
-        Button:
-            id: wenz
-            size_hint: 0.2, 0.05
-            text: 'Wenz'
-            on_press: root.print_msg('Wenz')
-
-        Button:
-            id: solo_acorns
-            size_hint: 0.2, 0.05
-            text: 'Eichel Solo'
-            on_press: root.print_msg('Eichel Solo')
-
-        Button:
-            id: solo_leaves
-            size_hint: 0.2, 0.05
-            text: 'Gras Solo'
-            on_press: root.print_msg('Gras Solo')
-
-        Button:
-            id: solo_hearts
-            size_hint: 0.2, 0.05
-            text: 'Herz Solo'
-            on_press: root.print_msg('Herz Solo')
-
-        Button:
-            id: solo_schellen
-            size_hint: 0.2, 0.05
-            text: 'Schellen Solo'
-            on_press: root.print_msg('Schellen Solo')
-
-    CardWidget:
-        id: cards
-        pos_hint: {'center_x': 0.5, 'top': 0.21}
-        size_hint: 0.75, 0.2
-        rows: 1
-        cols: 8
+<MenuScreen>
+    name: 'menu_screen'
+    FloatLayout:
         canvas:
             Color:
-                rgba: 1, 0, 0, 0.5
+                rgba: 0.4, 0.16, 0.1, 1
             Rectangle:
                 size: self.size
-                pos: self.pos
+                pos:self.pos
 
-        AnchorLayout:
-            id: A
-            ImageButton:
-                source: '../images/7Eichel.jpg'
-                allow_stretch: True
-                on_release: root.ids.cards.remove_widget(root.ids.A)
+        Button:
+            size_hint: 0.4, 0.2
+            pos_hint: {'center_x': 0.5, 'center_y': 0.62}
+            text: 'Schafkopf!'
+            background_normal: ''
+            background_color: 0, 0, 0, 1
+            on_release: app.root.current = 'playing_screen'
 
-        AnchorLayout:
-            id: B
-            ImageButton:
-                source: '../images/8Eichel.jpg'
-                allow_stretch: True
-                on_release: root.ids.cards.remove_widget(root.ids.B)
+        Button:
+            id: exit_btn
+            size_hint: 0.4, 0.2
+            pos_hint: {'center_x': 0.5, 'center_y': 0.38}
+            text: 'Exit'
+            background_normal: ''
+            background_color: 0, 0, 0, 1
+            on_release: app.stop()
 
-        AnchorLayout:
-            id: C
-            ImageButton:
-                source: '../images/9Eichel.jpg'
-                allow_stretch: True
-                on_release: root.ids.cards.remove_widget(root.ids.C)
 
-        AnchorLayout:
-            id: D
-            ImageButton:
-                source: '../images/AEichel.jpg'
-                allow_stretch: True
-                on_release: root.ids.cards.remove_widget(root.ids.D)
+<PlayingScreen>:
+    name: 'playing_screen'
+    FloatLayout:
+        canvas:
+            Color:
+                rgba: 0.4, 0.16, 0.1, 1
+            Rectangle:
+                size: self.size
+                pos:self.pos
 
-        AnchorLayout:
-            id: E
-            ImageButton:
-                source: '../images/7Herz.jpg'
-                allow_stretch: True
-                on_release: root.ids.cards.remove_widget(root.ids.E)
+        GridLayout:
+            id: modebuttons
+            pos_hint: {'center_x': 0.5, 'top': 0.7}
+            size_hint: 0.6, 0.2
 
-        AnchorLayout:
-            id: F
-            ImageButton:
-                source: '../images/KHerz.jpg'
-                allow_stretch: True
-                on_release: root.ids.cards.remove_widget(root.ids.F)
+            rows: 3
+            cols: 3
+            Button:
+                id: no_game
+                size_hint: 0.2, 0.05
+                text: 'Weiter'
+                on_press: root.print_msg('Weiter')
 
-        AnchorLayout:
-            id: G
-            ImageButton:
-                source: '../images/UHerz.jpg'
-                allow_stretch: True
-                on_release: root.ids.cards.remove_widget(root.ids.G)
+            Button:
+                id: partner_acorns
+                size_hint: 0.2, 0.05
+                text: 'Mit der Alten'
+                on_press: root.print_msg('Auf die Alte')
 
-        AnchorLayout:
-            id: H
-            ImageButton:
-                source: '../images/OGras.jpg'
-                allow_stretch: True
-                on_release: root.ids.cards.remove_widget(root.ids.H)
+            Button:
+                id: partner_leaves
+                size_hint: 0.2, 0.05
+                text: 'Mit der Blauen'
+                on_press: root.print_msg('Auf die Blaue')
 
+            Button:
+                id: partner_bells
+                size_hint: 0.2, 0.05
+                text: 'Mit der Schellen'
+                on_press: root.print_msg('Auf die Schellen')
+
+            Button:
+                id: wenz
+                size_hint: 0.2, 0.05
+                text: 'Wenz'
+                on_press: root.print_msg('Wenz')
+
+            Button:
+                id: solo_acorns
+                size_hint: 0.2, 0.05
+                text: 'Eichel Solo'
+                on_press: root.print_msg('Eichel Solo')
+
+            Button:
+                id: solo_leaves
+                size_hint: 0.2, 0.05
+                text: 'Gras Solo'
+                on_press: root.print_msg('Gras Solo')
+
+            Button:
+                id: solo_hearts
+                size_hint: 0.2, 0.05
+                text: 'Herz Solo'
+                on_press: root.print_msg('Herz Solo')
+
+            Button:
+                id: solo_schellen
+                size_hint: 0.2, 0.05
+                text: 'Schellen Solo'
+                on_press: root.print_msg('Schellen Solo')
+
+        CardWidget:
+            id: cards
+            pos_hint: {'center_x': 0.5, 'top': 0.21}
+            size_hint: 0.75, 0.2
+            rows: 1
+            cols: 8
+
+            AnchorLayout:
+                id: A
+                ImageButton:
+                    source: '../images/7Eichel.jpg'
+                    allow_stretch: True
+                    on_release: root.ids.cards.remove_widget(root.ids.A)
+
+            AnchorLayout:
+                id: B
+                ImageButton:
+                    source: '../images/8Eichel.jpg'
+                    allow_stretch: True
+                    on_release: root.ids.cards.remove_widget(root.ids.B)
+
+            AnchorLayout:
+                id: C
+                ImageButton:
+                    source: '../images/9Eichel.jpg'
+                    allow_stretch: True
+                    on_release: root.ids.cards.remove_widget(root.ids.C)
+
+            AnchorLayout:
+                id: D
+                ImageButton:
+                    source: '../images/AEichel.jpg'
+                    allow_stretch: True
+                    on_release: root.ids.cards.remove_widget(root.ids.D)
+
+            AnchorLayout:
+                id: E
+                ImageButton:
+                    source: '../images/7Herz.jpg'
+                    allow_stretch: True
+                    on_release: root.ids.cards.remove_widget(root.ids.E)
+
+            AnchorLayout:
+                id: F
+                ImageButton:
+                    source: '../images/KHerz.jpg'
+                    allow_stretch: True
+                    on_release: root.ids.cards.remove_widget(root.ids.F)
+
+            AnchorLayout:
+                id: G
+                ImageButton:
+                    source: '../images/UHerz.jpg'
+                    allow_stretch: True
+                    on_release: root.ids.cards.remove_widget(root.ids.G)
+
+            AnchorLayout:
+                id: H
+                ImageButton:
+                    source: '../images/OGras.jpg'
+                    allow_stretch: True
+                    on_release: root.ids.cards.remove_widget(root.ids.H)
+
+        Button:
+            id: menu_btn
+            text: 'Menu'
+            pos_hint: {'right': 1, 'y': 0}
+            size_hint: 0.05, 0.05
+            on_release: app.root.current = 'menu_screen'

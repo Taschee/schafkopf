@@ -3,6 +3,24 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.image import Image
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
+
+
+class MenuScreen(Screen):
+    pass
+
+
+class PlayingScreen(Screen):
+    def print_msg(self, string):
+        print(string)
+    pass
+
+
+class MyScreenManager(ScreenManager):
+    def new_game_screen(self):
+        s = PlayingScreen(name='playing_screen')
+        self.add_widget(s)
+        return s
 
 
 class ImageButton(ButtonBehavior, Image):
@@ -36,13 +54,12 @@ class CardWidget(GridLayout):
 
 
 class BiddingWidget(FloatLayout):
-    def print_msg(self, string):
-        print(string)
+    pass
 
 
 class SchafkopfApp(App):
     def build(self):
-        return BiddingWidget()
+        return MyScreenManager()
 
 
 if __name__ == '__main__':
