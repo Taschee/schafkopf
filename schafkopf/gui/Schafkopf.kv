@@ -3,62 +3,62 @@
 <BiddingWidget>:
     GridLayout:
         id: modebuttons
-        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
-        size_hint: 0.5, 0.5
+        pos_hint: {'center_x': 0.5, 'top': 0.7}
+        size_hint: 0.7, 0.2
+
         rows: 2
         cols: 5
         Button:
             id: no_game
-            size_hint: None, None
+            size_hint: 0.2, 0.05
             text: 'Weiter'
             on_press: root.print_a('Weiter')
 
         Button:
             id: partner_acorns
-            size_hint: None, None
+            size_hint: 0.2, 0.05
             text: 'Mit der Alten'
             on_press: root.print_a('Auf die Alte')
 
         Button:
             id: partner_leaves
-            size_hint: None, None
+            size_hint: 0.2, 0.05
             text: 'Mit der Blauen'
             on_press: root.print_a('Auf die Blaue')
 
         Button:
             id: partner_bells
-            size_hint: None, None
+            size_hint: 0.2, 0.05
             text: 'Mit der Schellen'
             on_press: root.print_a('Auf die Schellen')
 
         Button:
             id: wenz
-            size_hint: None, None
+            size_hint: 0.2, 0.05
             text: 'Wenz'
             on_press: root.print_a('Wenz')
 
         Button:
             id: solo_acorns
-            size_hint: None, None
+            size_hint: 0.2, 0.05
             text: 'Eichel Solo'
             on_press: root.print_a('Eichel Solo')
 
         Button:
             id: solo_leaves
-            size_hint: None, None
+            size_hint: 0.2, 0.05
             text: 'Gras Solo'
             on_press: root.print_a('Gras Solo')
 
         Button:
             id: solo_hearts
-            size_hint: None, None
+            size_hint: 0.2, 0.05
             text: 'Herz Solo'
             on_press: root.print_a('Herz Solo')
 
-
         Button:
-            id: exit_button
-            size_hint: None, None
+            id: solo_schellen
+            size_hint: 0.2, 0.05
             text: 'Schellen Solo'
             on_press: root.print_a('Schellen Solo')
 
@@ -73,6 +73,7 @@
             id: A
             ImageButton:
                 source: '../images/7Eichel.jpg'
+                allow_stretch: True
                 size_hint: 1, 0.25
                 on_release: root.ids.cards.remove_widget(root.ids.A)
 
@@ -80,6 +81,7 @@
             id: B
             ImageButton:
                 source: '../images/8Eichel.jpg'
+                allow_stretch: True
                 size_hint: 1, 0.25
                 on_release: root.ids.cards.remove_widget(root.ids.B)
 
@@ -87,6 +89,7 @@
             id: C
             ImageButton:
                 source: '../images/9Eichel.jpg'
+                allow_stretch: True
                 size_hint: 1, 0.25
                 on_release: root.ids.cards.remove_widget(root.ids.C)
 
@@ -94,6 +97,7 @@
             id: D
             ImageButton:
                 source: '../images/AEichel.jpg'
+                allow_stretch: True
                 size_hint: 1, 0.25
                 on_release: root.ids.cards.remove_widget(root.ids.D)
 
@@ -101,6 +105,7 @@
             id: E
             ImageButton:
                 source: '../images/7Herz.jpg'
+                allow_stretch: True
                 size_hint: 1, 0.25
                 on_release: root.ids.cards.remove_widget(root.ids.E)
 
@@ -108,6 +113,7 @@
             id: F
             ImageButton:
                 source: '../images/KHerz.jpg'
+                allow_stretch: True
                 size_hint: 1, 0.25
                 on_release: root.ids.cards.remove_widget(root.ids.F)
 
@@ -115,6 +121,7 @@
             id: G
             ImageButton:
                 source: '../images/UHerz.jpg'
+                allow_stretch: True
                 size_hint: 1, 0.25
                 on_release: root.ids.cards.remove_widget(root.ids.G)
 
@@ -122,6 +129,7 @@
             id: H
             ImageButton:
                 source: '../images/OGras.jpg'
+                allow_stretch: True
                 size_hint: 1, 0.25
                 on_release: root.ids.cards.remove_widget(root.ids.H)
 
