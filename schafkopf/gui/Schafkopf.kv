@@ -45,6 +45,57 @@
                 size: self.size
                 pos:self.pos
 
+        Label:
+            id: player0_proposal
+            pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+            size_hint: 0.15, 0.1
+            text: 'Weiter'
+            color: (0, 0, 0, 1)
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 0.9
+                Ellipse:
+                    pos: self.pos
+                    size: self.size
+
+        Label:
+            id: player1_proposal
+            pos_hint: {'center_x': 0.075, 'center_y': 0.6}
+            size_hint: 0.15, 0.1
+            text: 'Auf die Schellen'
+            color: (0, 0, 0, 1)
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 0.9
+                Ellipse:
+                    pos: self.pos
+                    size: self.size
+
+        Label:
+            id: player2_proposal
+            pos_hint: {'center_x': 0.5, 'center_y': 0.9}
+            size_hint: 0.15, 0.1
+            text: 'Weiter'
+            color: (0, 0, 0, 1)
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 0.9
+                Ellipse:
+                    pos: self.pos
+                    size: self.size
+        Label:
+            id: player3_proposal
+            pos_hint: {'center_x': 0.925, 'center_y': 0.6}
+            size_hint: 0.15, 0.1
+            text: 'Weiter'
+            color: (0, 0, 0, 1)
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 0.9
+                Ellipse:
+                    pos: self.pos
+                    size: self.size
+
         GridLayout:
             id: modebuttons
             pos_hint: {'center_x': 0.5, 'top': 0.7}

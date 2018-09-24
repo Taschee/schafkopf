@@ -1,14 +1,15 @@
 import random
 from pathlib import PurePath
+
 from schafkopf.card_deck import CardDeck
 from schafkopf.game import Game
 from schafkopf.helpers import sort_hand
+from schafkopf.suits import *
+from schafkopf.game_modes import *
 
 from kivy.app import App
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.image import Image
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
 
@@ -19,9 +20,11 @@ SYMBOLS = {"0": "7", "1": "8", "2": "9", "3": "U", "4": "O", "5": "K", "6": "10"
 
 class MyScreenManager(ScreenManager):
 
-    def __init__(self):
+    def __init__(self, playerlist):
         ScreenManager.__init__(self)
         self.leading_player_index = random.choice(range(4))
+        self.playerlist = playerlist
+        self.current_game_state = None
 
     def new_game(self):
         player_hands = CardDeck().shuffle_and_deal_hands()
@@ -33,6 +36,19 @@ class MyScreenManager(ScreenManager):
             filepath = PurePath('..', 'images', im_name)
             widget.source = str(filepath)
         self.current = 'playing_screen'
+        self.current_game_state = self.new_game_state(player_hands)
+
+    def new_game_state(self, player_hands):
+        game_state = {'player_hands': player_hands,
+                      'leading_player_index': self.leading_player_index,
+                      'current_player_index': self.leading_player_index,
+                      'mode_proposals': [],
+                      'game_mode': (NO_GAME, None),
+                      'trumpcards': [],
+                      'declaring_player': None,
+                      'tricks': [],
+                      'current_trick': None}
+        return game_state
 
 
 class MenuScreen(Screen):
@@ -76,7 +92,8 @@ class CardWidget(GridLayout):
 
 class SchafkopfApp(App):
     def build(self):
-        return MyScreenManager()
+        playerlist = []
+        return MyScreenManager(playerlist)
 
 
 if __name__ == '__main__':
