@@ -103,5 +103,3 @@ class NNPlayer(Player):
         else:
             card_seq_switched_suits = card_sequence
         return card_seq_switched_suits
-
-

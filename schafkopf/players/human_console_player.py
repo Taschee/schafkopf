@@ -1,7 +1,7 @@
 from schafkopf.players.player import Player
 
 
-class HumanPlayer(Player):
+class HumanConsolePlayer(Player):
     """Player for playing on console"""
     def choose_game_mode(self, public_info, options):
         while True:
