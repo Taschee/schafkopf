@@ -25,3 +25,7 @@ class CardDeck:
             hand = self.deal_hand()
             player_hands.append(hand)
         return player_hands
+
+    def shuffle_and_deal_hands(self):
+        random.shuffle(self.cards)
+        return self.deal_player_hands()
