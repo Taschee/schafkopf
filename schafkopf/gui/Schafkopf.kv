@@ -1,9 +1,11 @@
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
 
+
 <MyScreenManager>:
     transition: FadeTransition()
     MenuScreen:
     PlayingScreen:
+
 
 <MenuScreen>
     name: 'menu_screen'
@@ -21,7 +23,7 @@
             text: 'Schafkopf!'
             background_normal: ''
             background_color: 0, 0, 0, 1
-            on_release: app.root.current = 'playing_screen'
+            on_release: app.root.new_game()
 
         Button:
             id: exit_btn
@@ -111,61 +113,53 @@
             rows: 1
             cols: 8
 
-            AnchorLayout:
+            ImageButton:
                 id: A
-                ImageButton:
-                    source: '../images/7Eichel.jpg'
-                    allow_stretch: True
-                    on_release: root.ids.cards.remove_widget(root.ids.A)
+                source: '../images/Rueckseite.jpg'
+                allow_stretch: True
+                on_release: root.ids.cards.remove_widget(root.ids.A)
 
-            AnchorLayout:
+            ImageButton:
                 id: B
-                ImageButton:
-                    source: '../images/8Eichel.jpg'
-                    allow_stretch: True
-                    on_release: root.ids.cards.remove_widget(root.ids.B)
+                source: '../images/8Eichel.jpg'
+                allow_stretch: True
+                on_release: root.ids.cards.remove_widget(root.ids.B)
 
-            AnchorLayout:
+            ImageButton:
                 id: C
-                ImageButton:
-                    source: '../images/9Eichel.jpg'
-                    allow_stretch: True
-                    on_release: root.ids.cards.remove_widget(root.ids.C)
+                source: '../images/9Eichel.jpg'
+                allow_stretch: True
+                on_release: root.ids.cards.remove_widget(root.ids.C)
 
-            AnchorLayout:
+            ImageButton:
                 id: D
-                ImageButton:
-                    source: '../images/AEichel.jpg'
-                    allow_stretch: True
-                    on_release: root.ids.cards.remove_widget(root.ids.D)
+                source: '../images/AEichel.jpg'
+                allow_stretch: True
+                on_release: root.ids.cards.remove_widget(root.ids.D)
 
-            AnchorLayout:
+            ImageButton:
                 id: E
-                ImageButton:
-                    source: '../images/7Herz.jpg'
-                    allow_stretch: True
-                    on_release: root.ids.cards.remove_widget(root.ids.E)
+                source: '../images/7Herz.jpg'
+                allow_stretch: True
+                on_release: root.ids.cards.remove_widget(root.ids.E)
 
-            AnchorLayout:
+            ImageButton:
                 id: F
-                ImageButton:
-                    source: '../images/KHerz.jpg'
-                    allow_stretch: True
-                    on_release: root.ids.cards.remove_widget(root.ids.F)
+                source: '../images/KHerz.jpg'
+                allow_stretch: True
+                on_release: root.ids.cards.remove_widget(root.ids.F)
 
-            AnchorLayout:
+            ImageButton:
                 id: G
-                ImageButton:
-                    source: '../images/UHerz.jpg'
-                    allow_stretch: True
-                    on_release: root.ids.cards.remove_widget(root.ids.G)
+                source: '../images/UHerz.jpg'
+                allow_stretch: True
+                on_release: root.ids.cards.remove_widget(root.ids.G)
 
-            AnchorLayout:
+            ImageButton:
                 id: H
-                ImageButton:
-                    source: '../images/OGras.jpg'
-                    allow_stretch: True
-                    on_release: root.ids.cards.remove_widget(root.ids.H)
+                source: '../images/OGras.jpg'
+                allow_stretch: True
+                on_release: root.ids.cards.remove_widget(root.ids.H)
 
         Button:
             id: menu_btn

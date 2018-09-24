@@ -1,9 +1,38 @@
+import random
+from pathlib import PurePath
+from schafkopf.card_deck import CardDeck
+from schafkopf.game import Game
+from schafkopf.helpers import sort_hand
+
 from kivy.app import App
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.image import Image
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
+
+
+SUITS = {"0": "Schellen", "1": "Herz", "2": "Gras", "3": "Eichel"}
+SYMBOLS = {"0": "7", "1": "8", "2": "9", "3": "U", "4": "O", "5": "K", "6": "10", "7": "A"}
+
+
+class MyScreenManager(ScreenManager):
+
+    def __init__(self):
+        ScreenManager.__init__(self)
+        self.leading_player_index = random.choice(range(4))
+
+    def new_game(self):
+        player_hands = CardDeck().shuffle_and_deal_hands()
+        player_index = 0
+        hand = sort_hand(player_hands[player_index])
+        screen = self.get_screen('playing_screen')
+        for card, widget in zip(hand, screen.ids.cards.children):
+            im_name = SYMBOLS[str(card[0])] + SUITS[str(card[1])] + ".jpg"
+            filepath = PurePath('..', 'images', im_name)
+            widget.source = str(filepath)
+        self.current = 'playing_screen'
 
 
 class MenuScreen(Screen):
@@ -13,14 +42,6 @@ class MenuScreen(Screen):
 class PlayingScreen(Screen):
     def print_msg(self, string):
         print(string)
-    pass
-
-
-class MyScreenManager(ScreenManager):
-    def new_game_screen(self):
-        s = PlayingScreen(name='playing_screen')
-        self.add_widget(s)
-        return s
 
 
 class ImageButton(ButtonBehavior, Image):
@@ -51,10 +72,6 @@ class CardWidget(GridLayout):
     def remove_widget(self, widget):
         super(CardWidget, self).remove_widget(widget)
         self.do_layout()
-
-
-class BiddingWidget(FloatLayout):
-    pass
 
 
 class SchafkopfApp(App):
