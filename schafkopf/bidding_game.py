@@ -11,19 +11,11 @@ class BiddingGame:
         self.playerlist = playerlist
         self.mode_proposals = game_state['mode_proposals']
         self.game_mode = game_state['game_mode']
-        # set offensive players
-        self.offensive_players = [game_state['declaring_player']]
-        if self.game_mode[0] == PARTNER_MODE:
-            for player in self.playerlist:
-                if (7, self.game_mode[1]) in player.starting_hand:
-                    self.offensive_players.append(self.playerlist.index(player))
-                    break
-        # initialize mode to beat
-        if len(self.mode_proposals) >= 4:
-            self.mode_to_beat = game_state['game_mode'][0]
-        else:
-            self.mode_to_beat = sum([1 for mode in self.mode_proposals if mode[0] != NO_GAME])
-        # initializing deciding players and current player index
+        self.initialize_offensive_players(game_state)
+        self.initialize_mode_to_beat(game_state)
+        self.initialize_deciding_players(playerlist)
+
+    def initialize_deciding_players(self, playerlist):
         self.deciding_players = set(range(len(playerlist)))
         for proposal in self.mode_proposals:
             while self.current_player_index not in self.deciding_players and len(self.deciding_players) > 0:
@@ -31,6 +23,20 @@ class BiddingGame:
             if proposal == (NO_GAME, None):
                 self.deciding_players.remove(self.current_player_index)
             self.next_player()
+
+    def initialize_mode_to_beat(self, game_state):
+        if len(self.mode_proposals) >= 4:
+            self.mode_to_beat = game_state['game_mode'][0]
+        else:
+            self.mode_to_beat = sum([1 for mode in self.mode_proposals if mode[0] != NO_GAME])
+
+    def initialize_offensive_players(self, game_state):
+        self.offensive_players = [game_state['declaring_player']]
+        if self.game_mode[0] == PARTNER_MODE:
+            for player in self.playerlist:
+                if (7, self.game_mode[1]) in player.starting_hand:
+                    self.offensive_players.append(self.playerlist.index(player))
+                    break
 
     def get_current_player(self):
         return self.playerlist[self.current_player_index]
