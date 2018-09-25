@@ -98,7 +98,7 @@
                     pos: self.pos
                     size: self.size
 
-        GridLayout:
+        BiddingLayout:
             id: modebuttons
             pos_hint: {'center_x': 0.5, 'top': 0.7}
             size_hint: 0.6, 0.2
@@ -109,57 +109,57 @@
                 id: no_game
                 size_hint: 0.2, 0.05
                 text: 'Weiter'
-                on_press: root.print_msg('Weiter')
+                on_release: root.set_propositiontext('Weiter', 'player0_proposal')
 
             Button:
                 id: partner_acorns
                 size_hint: 0.2, 0.05
                 text: 'Mit der Alten'
-                on_press: root.print_msg('Auf die Alte')
+                on_release: root.set_propositiontext('I dad spuin!', 'player0_proposal')
 
             Button:
                 id: partner_leaves
                 size_hint: 0.2, 0.05
                 text: 'Mit der Blauen'
-                on_press: root.print_msg('Auf die Blaue')
+                on_release: root.set_propositiontext('I dad spuin!', 'player0_proposal')
 
             Button:
                 id: partner_bells
                 size_hint: 0.2, 0.05
                 text: 'Mit der Schellen'
-                on_press: root.print_msg('Auf die Schellen')
+                on_release: root.set_propositiontext('I dad spuin!', 'player0_proposal')
 
             Button:
                 id: wenz
                 size_hint: 0.2, 0.05
                 text: 'Wenz'
-                on_press: root.print_msg('Wenz')
+                on_release: root.set_propositiontext('I dad spuin!', 'player0_proposal')
 
             Button:
                 id: solo_acorns
                 size_hint: 0.2, 0.05
                 text: 'Eichel Solo'
-                on_press: root.print_msg('Eichel Solo')
+                on_release: root.set_propositiontext('I dad spuin!', 'player0_proposal')
 
             Button:
                 id: solo_leaves
                 size_hint: 0.2, 0.05
                 text: 'Gras Solo'
-                on_press: root.print_msg('Gras Solo')
+                on_release: root.set_propositiontext('I dad spuin!', 'player0_proposal')
 
             Button:
                 id: solo_hearts
                 size_hint: 0.2, 0.05
                 text: 'Herz Solo'
-                on_press: root.print_msg('Herz Solo')
+                on_release: root.set_propositiontext('I dad spuin!', 'player0_proposal')
 
             Button:
                 id: solo_schellen
                 size_hint: 0.2, 0.05
                 text: 'Schellen Solo'
-                on_press: root.print_msg('Schellen Solo')
+                on_release: root.set_propositiontext('I dad spuin!', 'player0_proposal')
 
-        CardWidget:
+        CardWidgetTrickplay:
             id: cards
             pos_hint: {'center_x': 0.5, 'top': 0.21}
             size_hint: 0.75, 0.2
@@ -168,51 +168,53 @@
 
             ImageButton:
                 id: A
-                source: '../images/Rueckseite.jpg'
+                source: ''
                 allow_stretch: True
                 on_release: root.ids.cards.remove_widget(root.ids.A)
 
             ImageButton:
                 id: B
-                source: '../images/8Eichel.jpg'
+                source: ''
                 allow_stretch: True
                 on_release: root.ids.cards.remove_widget(root.ids.B)
 
             ImageButton:
                 id: C
-                source: '../images/9Eichel.jpg'
+                source: ''
                 allow_stretch: True
                 on_release: root.ids.cards.remove_widget(root.ids.C)
 
             ImageButton:
                 id: D
-                source: '../images/AEichel.jpg'
+                source: ''
                 allow_stretch: True
                 on_release: root.ids.cards.remove_widget(root.ids.D)
 
             ImageButton:
                 id: E
-                source: '../images/7Herz.jpg'
+                source: ''
                 allow_stretch: True
                 on_release: root.ids.cards.remove_widget(root.ids.E)
 
             ImageButton:
                 id: F
-                source: '../images/KHerz.jpg'
+                source: ''
                 allow_stretch: True
                 on_release: root.ids.cards.remove_widget(root.ids.F)
 
             ImageButton:
                 id: G
-                source: '../images/UHerz.jpg'
+                source: ''
                 allow_stretch: True
                 on_release: root.ids.cards.remove_widget(root.ids.G)
 
             ImageButton:
                 id: H
-                source: '../images/OGras.jpg'
+                source: ''
                 allow_stretch: True
                 on_release: root.ids.cards.remove_widget(root.ids.H)
+
+
 
         Button:
             id: menu_btn

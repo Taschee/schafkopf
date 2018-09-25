@@ -1,4 +1,5 @@
 import random
+from functools import partial
 from pathlib import PurePath
 
 from schafkopf.card_deck import CardDeck
@@ -37,6 +38,10 @@ class MenuScreen(Screen):
     pass
 
 
+class BiddingLayout(GridLayout):
+    pass
+
+
 class PlayingScreen(Screen):
     def __init__(self, **kwargs):
         Screen.__init__(self, **kwargs)
@@ -54,6 +59,7 @@ class PlayingScreen(Screen):
             widget.source = str(filepath)
         self.current_game_state = self.new_game_state(player_hands)
 
+
     def new_game_state(self, player_hands):
         game_state = {'player_hands': player_hands,
                       'leading_player_index': self.leading_player_index,
@@ -69,12 +75,16 @@ class PlayingScreen(Screen):
     def print_msg(self, string):
         print(string)
 
+    def set_propositiontext(self, text, player_id):
+        self.ids[player_id].text = text
+
+
 
 class ImageButton(ButtonBehavior, Image):
     pass
 
 
-class CardWidget(GridLayout):
+class CardWidgetTrickplay(GridLayout):
     def do_layout(self, *args):
         width = self.width
         width_per_child = int(width // 8)
@@ -92,11 +102,11 @@ class CardWidget(GridLayout):
         self.do_layout()
 
     def add_widget(self, widget):
-        super(CardWidget, self).add_widget(widget)
+        super(CardWidgetTrickplay, self).add_widget(widget)
         self.do_layout()
 
     def remove_widget(self, widget):
-        super(CardWidget, self).remove_widget(widget)
+        super(CardWidgetTrickplay, self).remove_widget(widget)
         self.do_layout()
 
 
