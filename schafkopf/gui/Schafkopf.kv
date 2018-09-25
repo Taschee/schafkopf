@@ -1,7 +1,7 @@
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
 
 
-<MyScreenManager>:
+<GameScreenManager>:
     transition: FadeTransition()
     MenuScreen:
     PlayingScreen:
@@ -45,11 +45,12 @@
                 size: self.size
                 pos:self.pos
 
+
         Label:
             id: player0_proposal
             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
             size_hint: 0.15, 0.1
-            text: 'Weiter'
+            text: ''
             color: (0, 0, 0, 1)
             canvas.before:
                 Color:
@@ -62,7 +63,7 @@
             id: player1_proposal
             pos_hint: {'center_x': 0.075, 'center_y': 0.6}
             size_hint: 0.15, 0.1
-            text: 'Auf die Schellen'
+            text: ''
             color: (0, 0, 0, 1)
             canvas.before:
                 Color:
@@ -75,7 +76,7 @@
             id: player2_proposal
             pos_hint: {'center_x': 0.5, 'center_y': 0.9}
             size_hint: 0.15, 0.1
-            text: 'Weiter'
+            text: ''
             color: (0, 0, 0, 1)
             canvas.before:
                 Color:
@@ -83,11 +84,12 @@
                 Ellipse:
                     pos: self.pos
                     size: self.size
+
         Label:
             id: player3_proposal
             pos_hint: {'center_x': 0.925, 'center_y': 0.6}
             size_hint: 0.15, 0.1
-            text: 'Weiter'
+            text: ''
             color: (0, 0, 0, 1)
             canvas.before:
                 Color:
