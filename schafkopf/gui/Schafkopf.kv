@@ -6,7 +6,6 @@
     MenuScreen:
     PlayingScreen:
 
-
 <MenuScreen>
     name: 'menu_screen'
     FloatLayout:
@@ -98,66 +97,48 @@
                     pos: self.pos
                     size: self.size
 
-        BiddingLayout:
-            id: modebuttons
+        GridLayout:
+            id: mode_buttons
             pos_hint: {'center_x': 0.5, 'top': 0.7}
             size_hint: 0.6, 0.2
 
             rows: 3
             cols: 3
-            Button:
+            BidButton:
                 id: no_game
-                size_hint: 0.2, 0.05
                 text: 'Weiter'
-                on_release:
 
-            Button:
+            BidButton:
                 id: partner_acorns
-                size_hint: 0.2, 0.05
                 text: 'Mit der Alten'
-                on_release:
 
-            Button:
+            BidButton:
                 id: partner_leaves
-                size_hint: 0.2, 0.05
                 text: 'Mit der Blauen'
-                on_release:
 
-            Button:
+            BidButton:
                 id: partner_bells
-                size_hint: 0.2, 0.05
                 text: 'Mit der Schellen'
-                on_release:
 
-            Button:
+            BidButton:
                 id: wenz
-                size_hint: 0.2, 0.05
                 text: 'Wenz'
-                on_release:
 
-            Button:
+            BidButton:
                 id: solo_acorns
-                size_hint: 0.2, 0.05
                 text: 'Eichel Solo'
-                on_release:
 
-            Button:
+            BidButton:
                 id: solo_leaves
-                size_hint: 0.2, 0.05
                 text: 'Gras Solo'
-                on_release:
 
-            Button:
+            BidButton:
                 id: solo_hearts
-                size_hint: 0.2, 0.05
                 text: 'Herz Solo'
-                on_release:
 
-            Button:
+            BidButton:
                 id: solo_bells
-                size_hint: 0.2, 0.05
                 text: 'Schellen Solo'
-                on_release:
 
         CardWidgetTrickplay:
             id: cards

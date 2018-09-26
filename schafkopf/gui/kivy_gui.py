@@ -2,6 +2,9 @@ import random
 from functools import partial
 from pathlib import PurePath
 
+from kivy.properties import StringProperty
+from kivy.uix.button import Button
+
 from schafkopf.card_deck import CardDeck
 from schafkopf.game import Game
 from schafkopf.helpers import sort_hand
@@ -24,37 +27,54 @@ BIDDING_IDS = {(NO_GAME, None): 'no_game', (PARTNER_MODE, ACORNS): 'partner_acor
                (SOLO, HEARTS): 'solo_hearts', (SOLO, BELLS): 'solo_bells'}
 
 class GameScreenManager(ScreenManager):
+    def __init__(self, playerlist):
+        super(GameScreenManager, self).__init__()
+        screen = self.get_screen('playing_screen')
+        screen.playerlist = playerlist
 
     def new_game(self):
         screen = self.get_screen('playing_screen')
         screen.play_new_game()
         self.current = 'playing_screen'
 
-
-
 class MenuScreen(Screen):
     pass
 
 
-class BiddingLayout(GridLayout):
-    pass
+class BidButton(Button):
+    def __init__(self, **kwargs):
+        super(BidButton, self).__init__(**kwargs)
+        self._callbacks = []
+        self.size_hint = 0.2, 0.05
+
+
+class ImageButton(ButtonBehavior, Image):
+    def __init__(self, **kwargs):
+        super(ImageButton, self).__init__(**kwargs)
+        self._callbacks = []
 
 
 class PlayingScreen(Screen):
     def __init__(self, **kwargs):
-        Screen.__init__(self, **kwargs)
+        super(PlayingScreen, self).__init__(**kwargs)
         self.leading_player_index = random.choice(range(4))
-        self.playerlist = [DummyPlayer(),
-                           HeuristicsPlayer(),
-                           HeuristicsPlayer(),
-                           HeuristicsPlayer()]
         self.current_game_state = None
+        self.human_player_index = 0
+
+    def set_callback(self, callback, btn, *args):
+        btn._callbacks.append(callback)
+        btn.bind(on_release=callback)
+
+    def clear_callbacks(self, btn, *args):
+        while len(btn._callbacks) > 0:
+            cb = btn._callbacks[-1]
+            btn.unbind(on_release=cb)
+            btn._callbacks.remove(cb)
 
     def play_new_game(self):
         # deal and display cards
         player_hands = CardDeck().shuffle_and_deal_hands()
-        human_player_index = 0
-        hand = sort_hand(player_hands[human_player_index])
+        hand = sort_hand(player_hands[self.human_player_index])
         for card, widget in zip(hand, self.ids.cards.children):
             im_name = SYMBOLS[str(card[0])] + SUITS[str(card[1])] + ".jpg"
             filepath = PurePath('..', 'images', im_name)
@@ -64,16 +84,16 @@ class PlayingScreen(Screen):
         curr_pl = self.current_game_state['current_player_index']
         game = Game(players=self.playerlist, game_state=self.current_game_state)
 
-        while game.get_current_player() != human_player_index:
+        while game.get_current_player() != self.human_player_index:
             game.next_action()
         self.current_game_state = game.get_game_state()
 
-        # set prop texts before first player decision
+        # set proposal texts before first player decision
         mode_props = self.current_game_state['mode_proposals']
 
-        for prop in mode_props:
+        for proposal in mode_props:
             id = 'player{}_proposal'.format(curr_pl)
-            if prop[0] == 0:
+            if proposal[0] == 0:
                 self.ids[id].text = 'Weiter'
             else:
                 self.ids[id].text = 'I dad spuin!'
@@ -82,10 +102,30 @@ class PlayingScreen(Screen):
         # set on release actions on game mode decision buttons
 
         legal_actions = game.get_possible_actions()
-        print(legal_actions)
         for action in legal_actions:
             action_id = BIDDING_IDS[action]
-            self.ids[action_id].bind(on_release=partial(self.print_msg, action_id))
+            btn = self.ids[action_id]
+            self.set_callback(btn=btn, callback=partial(self.make_proposal, action))
+
+    def make_proposal(self, proposal, *args):
+        self.playerlist[self.human_player_index].favorite_mode = proposal
+        # update game_state
+        game = Game(players=self.playerlist, game_state=self.current_game_state)
+        game.next_action()
+        self.current_game_state = game.get_game_state()
+        # update screen
+        id = 'player{}_proposal'.format(self.human_player_index)
+        if proposal[0] == 0:
+            self.ids[id].text = 'Weiter'
+        else:
+            self.ids[id].text = 'I dad spuin!'
+        # remove bindings
+        for btn in self.ids['mode_buttons'].children:
+            print(btn._callbacks)
+            self.clear_callbacks(btn)
+            print(btn._callbacks)
+
+
 
 
     def new_game_state(self, player_hands):
@@ -105,13 +145,6 @@ class PlayingScreen(Screen):
 
     def set_propositiontext(self, text, player_id):
         self.ids[player_id].text = text
-
-
-
-
-
-class ImageButton(ButtonBehavior, Image):
-    pass
 
 
 class CardWidgetTrickplay(GridLayout):
@@ -141,10 +174,15 @@ class CardWidgetTrickplay(GridLayout):
 
 
 class SchafkopfApp(App):
+    def __init__(self, playerlist):
+        super(SchafkopfApp, self).__init__()
+        self.playerlist = playerlist
+
     def build(self):
-        return GameScreenManager()
+        return GameScreenManager(playerlist)
 
 
 if __name__ == '__main__':
-    tut_app = SchafkopfApp()
+    playerlist = [DummyPlayer(), HeuristicsPlayer(), HeuristicsPlayer(), HeuristicsPlayer()]
+    tut_app = SchafkopfApp(playerlist)
     tut_app.run()
