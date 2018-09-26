@@ -52,6 +52,7 @@ class ImageButton(ButtonBehavior, Image):
     def __init__(self, **kwargs):
         super(ImageButton, self).__init__(**kwargs)
         self._callbacks = []
+        self.allow_stretch = True
 
 
 class PlayingScreen(Screen):
@@ -59,6 +60,7 @@ class PlayingScreen(Screen):
         super(PlayingScreen, self).__init__(**kwargs)
         self.leading_player_index = random.choice(range(4))
         self.current_game_state = None
+        self.playerlist = None
         self.human_player_index = 0
 
     def set_callback(self, callback, btn, *args):
@@ -74,38 +76,40 @@ class PlayingScreen(Screen):
     def play_new_game(self):
         # deal and display cards
         player_hands = CardDeck().shuffle_and_deal_hands()
-        hand = sort_hand(player_hands[self.human_player_index])
-        for card, widget in zip(hand, self.ids.cards.children):
-            im_name = SYMBOLS[str(card[0])] + SUITS[str(card[1])] + ".jpg"
-            filepath = PurePath('..', 'images', im_name)
-            widget.source = str(filepath)
-
         self.current_game_state = self.new_game_state(player_hands)
+
+        self.display_human_player_hand()
+
         curr_pl = self.current_game_state['current_player_index']
-        game = Game(players=self.playerlist, game_state=self.current_game_state)
-
-        while game.get_current_player() != self.human_player_index:
+        while curr_pl != self.human_player_index:
+            # play one action
+            game = Game(players=self.playerlist, game_state=self.current_game_state)
             game.next_action()
-        self.current_game_state = game.get_game_state()
-
-        # set proposal texts before first player decision
-        mode_props = self.current_game_state['mode_proposals']
-
-        for proposal in mode_props:
+            self.current_game_state = game.get_game_state()
+            # set proposal text in screen ########## maybe do this automatically with some property?
+            last_proposal = self.current_game_state['mode_proposals'][-1]
             id = 'player{}_proposal'.format(curr_pl)
-            if proposal[0] == 0:
+            if last_proposal[0] == NO_GAME:
                 self.ids[id].text = 'Weiter'
             else:
                 self.ids[id].text = 'I dad spuin!'
-            curr_pl = (curr_pl + 1) % 4
+            curr_pl = self.current_game_state['current_player_index']
 
-        # set on release actions on game mode decision buttons
+        # set on_release actions on game mode decision buttons
 
+        game = Game(players=self.playerlist, game_state=self.current_game_state)
         legal_actions = game.get_possible_actions()
         for action in legal_actions:
             action_id = BIDDING_IDS[action]
             btn = self.ids[action_id]
             self.set_callback(btn=btn, callback=partial(self.make_proposal, action))
+
+    def display_human_player_hand(self):
+        hand = sort_hand(self.current_game_state['player_hands'][self.human_player_index])
+        for card, widget in zip(hand, self.ids.cards.children):
+            im_name = SYMBOLS[str(card[0])] + SUITS[str(card[1])] + ".jpg"
+            filepath = PurePath('..', 'images', im_name)
+            widget.source = str(filepath)
 
     def make_proposal(self, proposal, *args):
         self.playerlist[self.human_player_index].favorite_mode = proposal
@@ -121,9 +125,26 @@ class PlayingScreen(Screen):
             self.ids[id].text = 'I dad spuin!'
         # remove bindings
         for btn in self.ids['mode_buttons'].children:
-            print(btn._callbacks)
             self.clear_callbacks(btn)
-            print(btn._callbacks)
+        self.next_opp_proposals()
+
+    def next_opp_proposals(self):
+        pass
+        game = Game(players=playerlist, game_state=self.current_game_state)
+        bidding_ended = game.bidding_game.finished()
+        while not bidding_ended:
+            if game.get_current_player() != self.human_player_index:
+                game.next_action()
+                self.current_game_state = game.get_game_state()
+                bidding_ended = game.bidding_game.finished()
+                # update proposal texts
+            else:
+                legal_actions = game.get_possible_actions()
+                print('player needs to make proposal again!')
+                break
+
+        print(self.current_game_state['mode_proposals'])
+        print('Bidding ended!')
 
 
 
@@ -179,7 +200,7 @@ class SchafkopfApp(App):
         self.playerlist = playerlist
 
     def build(self):
-        return GameScreenManager(playerlist)
+        return GameScreenManager(self.playerlist)
 
 
 if __name__ == '__main__':
