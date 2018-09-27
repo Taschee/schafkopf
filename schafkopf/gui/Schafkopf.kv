@@ -143,10 +143,6 @@
 
         CardWidgetTrickplay:
             id: cards
-            pos_hint: {'center_x': 0.5, 'top': 0.21}
-            size_hint: 0.75, 0.2
-            rows: 1
-            cols: 8
 
             ImageButton:
                 id: A
@@ -171,6 +167,26 @@
 
             ImageButton:
                 id: H
+
+        Image:
+            id: player0_card
+            size_hint: 0.07, 0.2
+            pos_hint: {'center_x': 0.5, 'center_y': 0.49}
+
+        Image:
+            id: player1_card
+            size_hint: 0.07, 0.2
+            pos_hint: {'center_x': 0.4, 'center_y': 0.6}
+
+        Image:
+            id: player2_card
+            size_hint: 0.07, 0.2
+            pos_hint: {'center_x': 0.5, 'center_y': 0.71}
+
+        Image:
+            id: player3_card
+            size_hint: 0.07, 0.2
+            pos_hint: {'center_x': 0.6, 'center_y': 0.6}
 
 
         Button:

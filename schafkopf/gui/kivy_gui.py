@@ -1,9 +1,10 @@
 import random
 from functools import partial
 from pathlib import PurePath
+import time
 
-from kivy.properties import StringProperty
 from kivy.uix.button import Button
+from kivy.uix.floatlayout import FloatLayout
 
 from schafkopf.card_deck import CardDeck
 from schafkopf.game import Game
@@ -15,8 +16,8 @@ from schafkopf.players import RandomPlayer, HeuristicsPlayer, DummyPlayer
 from kivy.app import App
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.image import Image
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.clock import Clock
 
 
 SUITS = {'0': 'Schellen', '1': 'Herz', '2': 'Gras', '3': 'Eichel'}
@@ -104,13 +105,22 @@ class PlayingScreen(Screen):
         # deal and display cards
         player_hands = CardDeck().shuffle_and_deal_hands()
         self.current_game_state = self.new_game_state(player_hands)
-        # display hand and proposal labels
+        # display hand
         self.display_human_player_hand()
-        for pl in range(4):
-            label_id = 'player{}_proposal'.format(pl)
-            self.set_proposition_text(label_id, '')
-            self.add_widget_to_display_by_id(label_id)
+        # remove current trick
+        self.remove_current_trick_from_display()
 
+        self.start_bidding()
+
+        # set callbacks for legal actions
+        game = Game(players=self.playerlist, game_state=self.current_game_state)
+        legal_actions = game.get_possible_actions()
+        for action in legal_actions:
+            action_id = BIDDING_IDS[action]
+            btn = self.ids[action_id]
+            self.set_callback(btn=btn, callback=partial(self.make_first_proposal, action))
+
+    def start_bidding(self):
         curr_pl = self.current_game_state['current_player_index']
         while curr_pl != self.human_player_index:
             # play one action
@@ -126,20 +136,22 @@ class PlayingScreen(Screen):
                 self.set_proposition_text(label_id, 'I dad spuin!')
             curr_pl = self.current_game_state['current_player_index']
 
-        # set callbacks for legal actions
-        game = Game(players=self.playerlist, game_state=self.current_game_state)
-        legal_actions = game.get_possible_actions()
-        for action in legal_actions:
-            action_id = BIDDING_IDS[action]
-            btn = self.ids[action_id]
-            self.set_callback(btn=btn, callback=partial(self.make_first_proposal, action))
+    def remove_current_trick_from_display(self):
+        for pl in range(4):
+            widget_id = 'player{}_card'.format(pl)
+            self.remove_widget_from_display_by_id(widget_id)
 
     def display_human_player_hand(self):
         hand = sort_hand(self.current_game_state['player_hands'][self.human_player_index])
-        for card, widget in zip(hand, self.ids.cards.children):
-            im_name = SYMBOLS[str(card[0])] + SUITS[str(card[1])] + ".jpg"
-            filepath = PurePath('..', 'images', im_name)
-            widget.source = str(filepath)
+        for card, widget in zip(hand, self.ids['cards'].children):
+            filepath = self.get_filepath(card)
+            widget.source = filepath
+            widget.text = str(card)
+
+    def get_filepath(self, card):
+        im_name = SYMBOLS[str(card[0])] + SUITS[str(card[1])] + ".jpg"
+        filepath = PurePath('..', 'images', im_name)
+        return str(filepath)
 
     def make_first_proposal(self, proposal, *args):
         self.playerlist[self.human_player_index].favorite_mode = proposal
@@ -244,24 +256,123 @@ class PlayingScreen(Screen):
             else:
                 self.remove_widget_from_display_by_id(label_id)
 
+        # remove mode buttons
+        self.remove_widget_from_display_by_id('mode_buttons')
+
+        self.play_next_card()
+
+    def play_next_card(self, *args):
+        game = Game(players=self.playerlist, game_state=self.current_game_state)
 
 
+        print(self.current_game_state)                   #############
+
+
+        if not game.finished():
+            curr_pl = game.get_current_player()
+            if curr_pl == self.human_player_index:
+                # set callbacks for legal actions
+                legal_actions = game.get_possible_actions()
+
+
+                print(' legal actions : ', legal_actions)   ################
+
+
+                for card in legal_actions:
+                    # determine which button corresponds to this card
+                    for widget_id in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
+                        btn = self.ids[widget_id]
+                        if btn.text == str(card):
+                            break
+                    assert btn
+                    self.set_callback(btn=btn, callback=partial(self.choose_card, card))
+            else:
+                # play opponent game, update current game state
+                game.next_action()
+                self.current_game_state = game.get_game_state()
+                # display image
+
+
+                print(curr_pl)             ##########################
+
+
+
+                widget_id = 'player{}_card'.format(curr_pl)
+                if not game.trick_game.current_trick.finished():
+                    card = self.current_game_state['current_trick'].cards[curr_pl]
+                else:
+                    card = self.current_game_state['tricks'][-1].cards[curr_pl]
+                file_path = self.get_filepath(card)
+                self.add_widget_to_display_by_id(widget_id)
+                self.ids[widget_id].source = file_path
+
+                if game.trick_game.current_trick.finished():
+                    self.finish_trick()
+                else:
+                    self.play_next_card()
+
+        else:
+            self.finish_game()
+
+    def choose_card(self, card, *args):
+        # update current game state
+        self.playerlist[self.human_player_index].favorite_cards = [card]
+        game = Game(players=self.playerlist, game_state=self.current_game_state)
+        game.next_action()
+        self.current_game_state = game.get_game_state()
+        # display image
+        widget_id = 'player{}_card'.format(self.human_player_index)
+        file_path = self.get_filepath(card)
+        self.add_widget_to_display_by_id(widget_id)
+        self.ids[widget_id].source = file_path
+
+        # remove all callbacks
+        for btn in self.ids['cards'].children:
+            self.clear_callbacks(btn)
+
+        if game.trick_game.current_trick.num_cards == 0:
+            self.finish_trick()
+        else:
+
+
+
+            print(' Choose card was run')     ###################
+
+
+
+            self.play_next_card()
+
+
+    def finish_trick(self):
+        time.sleep(2)
+        print('finish trick')
+        pass
+
+    def finish_game(self):
+        # calculate and show winners, rewards etc.
+        pass
 
     def print_msg(self, string, *args):
         print(string)
 
 
 
-class CardWidgetTrickplay(GridLayout):
+class CardWidgetTrickplay(FloatLayout):
     def do_layout(self, *args):
-        width = self.width
+        width = int(self.width * 0.6)
+        height = int(self.height * 0.2)
         width_per_child = int(width // 8)
-        positions = range(0, 8 * width_per_child, width_per_child)
-        for position, child in zip(positions, self.children):
-            child.height = self.height
-            child.x = self.x + position
-            child.y = self.y
-            child.width = width_per_child
+        start_x = int(0.2 * self.width)
+        x_positions = range(start_x, start_x + 8 * width_per_child, width_per_child)
+        y_position = self.height * 0.01
+        for position, child in zip(x_positions, self.children):
+            child.height = 0.9 * height
+            child.width = 0.9 * width_per_child
+            child.x = position
+            child.y = y_position
+
+    def on_children(self, *args):
+        self.do_layout()
 
     def on_size(self, *args):
         self.do_layout()
