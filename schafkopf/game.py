@@ -21,6 +21,11 @@ class Game:
         self.trick_game = TrickGame(playerlist=players, game_state=state)
         self.winners = None
 
+    def get_current_player(self):
+        if not self.bidding_game.finished():
+            return self.bidding_game.current_player_index
+        else:
+            return self.trick_game.current_player_index
 
     def get_public_info(self):
         if not self.bidding_game.finished():
@@ -30,6 +35,7 @@ class Game:
 
     def get_game_state(self):
         game_state = self.get_public_info()
+        game_state['game_mode'] = self.bidding_game.game_mode
         game_state['mode_proposals'] = self.bidding_game.mode_proposals
         game_state['player_hands'] = [player.get_hand() for player in self.playerlist]
         game_state['possible_actions'] = self.get_possible_actions()
