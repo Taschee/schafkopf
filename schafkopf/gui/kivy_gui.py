@@ -25,6 +25,10 @@ BIDDING_IDS = {(NO_GAME, None): 'no_game', (PARTNER_MODE, ACORNS): 'partner_acor
                (PARTNER_MODE, LEAVES): 'partner_leaves', (PARTNER_MODE, BELLS): 'partner_bells',
                (WENZ, None): 'wenz', (SOLO, ACORNS): 'solo_acorns', (SOLO, LEAVES): 'solo_leaves',
                (SOLO, HEARTS): 'solo_hearts', (SOLO, BELLS): 'solo_bells'}
+GAME_MODE_TEXTS = {(PARTNER_MODE, ACORNS): 'Auf die Alte!', (PARTNER_MODE, LEAVES): 'Auf die Blaue!',
+                   (PARTNER_MODE, BELLS): 'Auf die Schellen!',
+                   (WENZ, None): 'Wenz', (SOLO, ACORNS): 'Eichel Solo!', (SOLO, LEAVES): 'Gras Solo',
+                   (SOLO, HEARTS): 'Herz Solo', (SOLO, BELLS): 'Schellen Solo'}
 
 class GameScreenManager(ScreenManager):
     def __init__(self, playerlist):
@@ -58,7 +62,6 @@ class ImageButton(ButtonBehavior, Image):
 class PlayingScreen(Screen):
     def __init__(self, **kwargs):
         super(PlayingScreen, self).__init__(**kwargs)
-        self.leading_player_index = random.choice(range(4))
         self.current_game_state = None
         self.playerlist = None
         self.human_player_index = 0
@@ -73,86 +76,22 @@ class PlayingScreen(Screen):
             btn.unbind(on_release=cb)
             btn._callbacks.remove(cb)
 
-    def play_new_game(self):
-        # deal and display cards
-        player_hands = CardDeck().shuffle_and_deal_hands()
-        self.current_game_state = self.new_game_state(player_hands)
+    def set_proposition_text(self, label_id, text, *args):
+        self.ids[label_id].text = text
 
-        self.display_human_player_hand()
+    def remove_widget_from_display_by_id(self, widget_id, *args):
+        self.ids['display'].remove_widget(self.ids[widget_id])
 
-        curr_pl = self.current_game_state['current_player_index']
-        while curr_pl != self.human_player_index:
-            # play one action
-            game = Game(players=self.playerlist, game_state=self.current_game_state)
-            game.next_action()
-            self.current_game_state = game.get_game_state()
-            # set proposal text in screen ########## maybe do this automatically with some property?
-            last_proposal = self.current_game_state['mode_proposals'][-1]
-            id = 'player{}_proposal'.format(curr_pl)
-            if last_proposal[0] == NO_GAME:
-                self.ids[id].text = 'Weiter'
-            else:
-                self.ids[id].text = 'I dad spuin!'
-            curr_pl = self.current_game_state['current_player_index']
-
-        # set on_release actions on game mode decision buttons
-
-        game = Game(players=self.playerlist, game_state=self.current_game_state)
-        legal_actions = game.get_possible_actions()
-        for action in legal_actions:
-            action_id = BIDDING_IDS[action]
-            btn = self.ids[action_id]
-            self.set_callback(btn=btn, callback=partial(self.make_proposal, action))
-
-    def display_human_player_hand(self):
-        hand = sort_hand(self.current_game_state['player_hands'][self.human_player_index])
-        for card, widget in zip(hand, self.ids.cards.children):
-            im_name = SYMBOLS[str(card[0])] + SUITS[str(card[1])] + ".jpg"
-            filepath = PurePath('..', 'images', im_name)
-            widget.source = str(filepath)
-
-    def make_proposal(self, proposal, *args):
-        self.playerlist[self.human_player_index].favorite_mode = proposal
-        # update game_state
-        game = Game(players=self.playerlist, game_state=self.current_game_state)
-        game.next_action()
-        self.current_game_state = game.get_game_state()
-        # update screen
-        id = 'player{}_proposal'.format(self.human_player_index)
-        if proposal[0] == 0:
-            self.ids[id].text = 'Weiter'
-        else:
-            self.ids[id].text = 'I dad spuin!'
-        # remove bindings
-        for btn in self.ids['mode_buttons'].children:
-            self.clear_callbacks(btn)
-        self.next_opp_proposals()
-
-    def next_opp_proposals(self):
-        pass
-        game = Game(players=playerlist, game_state=self.current_game_state)
-        bidding_ended = game.bidding_game.finished()
-        while not bidding_ended:
-            if game.get_current_player() != self.human_player_index:
-                game.next_action()
-                self.current_game_state = game.get_game_state()
-                bidding_ended = game.bidding_game.finished()
-                # update proposal texts
-            else:
-                legal_actions = game.get_possible_actions()
-                print('player needs to make proposal again!')
-                break
-
-        print(self.current_game_state['mode_proposals'])
-        print('Bidding ended!')
-
-
-
+    def add_widget_to_display_by_id(self, widget_id, *args):
+        widget = self.ids[widget_id]
+        if widget not in self.ids['display'].children:
+            self.ids['display'].add_widget(self.ids[widget_id])
 
     def new_game_state(self, player_hands):
+        leading_player_index = random.choice(range(4))
         game_state = {'player_hands': player_hands,
-                      'leading_player_index': self.leading_player_index,
-                      'current_player_index': self.leading_player_index,
+                      'leading_player_index': leading_player_index,
+                      'current_player_index': leading_player_index,
                       'mode_proposals': [],
                       'game_mode': (NO_GAME, None),
                       'trumpcards': [],
@@ -161,11 +100,156 @@ class PlayingScreen(Screen):
                       'current_trick': None}
         return game_state
 
+    def play_new_game(self):
+        # deal and display cards
+        player_hands = CardDeck().shuffle_and_deal_hands()
+        self.current_game_state = self.new_game_state(player_hands)
+        # display hand and proposal labels
+        self.display_human_player_hand()
+        for pl in range(4):
+            label_id = 'player{}_proposal'.format(pl)
+            self.set_proposition_text(label_id, '')
+            self.add_widget_to_display_by_id(label_id)
+
+        curr_pl = self.current_game_state['current_player_index']
+        while curr_pl != self.human_player_index:
+            # play one action
+            game = Game(players=self.playerlist, game_state=self.current_game_state)
+            game.next_action()
+            self.current_game_state = game.get_game_state()
+            # set proposal text in screen
+            last_proposal = self.current_game_state['mode_proposals'][-1]
+            label_id = 'player{}_proposal'.format(curr_pl)
+            if last_proposal[0] == NO_GAME:
+                self.set_proposition_text(label_id, 'Weiter')
+            else:
+                self.set_proposition_text(label_id, 'I dad spuin!')
+            curr_pl = self.current_game_state['current_player_index']
+
+        # set callbacks for legal actions
+        game = Game(players=self.playerlist, game_state=self.current_game_state)
+        legal_actions = game.get_possible_actions()
+        for action in legal_actions:
+            action_id = BIDDING_IDS[action]
+            btn = self.ids[action_id]
+            self.set_callback(btn=btn, callback=partial(self.make_first_proposal, action))
+
+    def display_human_player_hand(self):
+        hand = sort_hand(self.current_game_state['player_hands'][self.human_player_index])
+        for card, widget in zip(hand, self.ids.cards.children):
+            im_name = SYMBOLS[str(card[0])] + SUITS[str(card[1])] + ".jpg"
+            filepath = PurePath('..', 'images', im_name)
+            widget.source = str(filepath)
+
+    def make_first_proposal(self, proposal, *args):
+        self.playerlist[self.human_player_index].favorite_mode = proposal
+        # update game_state
+        game = Game(players=self.playerlist, game_state=self.current_game_state)
+        game.next_action()
+        self.current_game_state = game.get_game_state()
+        # update screen
+        label_id = 'player{}_proposal'.format(self.human_player_index)
+        if proposal[0] == NO_GAME:
+            self.set_proposition_text(label_id, 'Weiter')
+        else:
+            self.set_proposition_text(label_id, 'I dad spuin!')
+        # remove bindings
+        for btn in self.ids['mode_buttons'].children:
+            self.clear_callbacks(btn)
+        self.finish_first_proposals()
+
+    def finish_first_proposals(self):
+        game = Game(players=playerlist, game_state=self.current_game_state)
+
+        while len(self.current_game_state['mode_proposals']) < 4:
+            curr_pl = game.get_current_player()
+            assert curr_pl != self.human_player_index
+            game.next_action()
+            self.current_game_state = game.get_game_state()
+            label_id = 'player{}_proposal'.format(curr_pl)
+            # update proposal texts
+            last_proposal = self.current_game_state['mode_proposals'][-1]
+            if last_proposal[0] == NO_GAME:
+                self.set_proposition_text(label_id, 'Weiter')
+            else:
+                self.set_proposition_text(label_id, 'I dad spuin!')
+
+        if game.bidding_game.finished():
+            self.prepare_trick_play()
+        else:
+            self.continue_bidding()
+
+    def continue_bidding(self):
+        curr_pl = self.current_game_state['current_player_index']
+        game = Game(players=self.playerlist, game_state=self.current_game_state)
+
+        if curr_pl == self.human_player_index:
+            # set callbacks for legal actions
+            legal_actions = game.get_possible_actions()
+            for action in legal_actions:
+                action_id = BIDDING_IDS[action]
+                btn = self.ids[action_id]
+                self.set_callback(btn=btn, callback=partial(self.make_second_proposal, action))
+        else:
+            curr_pl = game.get_current_player()
+            game.next_action()
+            self.current_game_state = game.get_game_state()
+            label_id = 'player{}_proposal'.format(curr_pl)
+            # update proposal text
+            last_proposal = self.current_game_state['mode_proposals'][-1]
+            if last_proposal[0] == NO_GAME:
+                self.set_proposition_text(label_id, 'Weiter')
+            elif last_proposal[0] == PARTNER_MODE:
+                self.set_proposition_text(label_id, 'I hätt a Saupiel!')
+            elif last_proposal[0] == WENZ:
+                self.set_proposition_text(label_id, 'I hätt an Wenz')
+            elif last_proposal[0] == SOLO:
+                self.set_proposition_text(label_id, 'I hätt a Solo!')
+
+        if game.bidding_game.finished():
+            self.prepare_trick_play()
+        else:
+            self.continue_bidding()
+
+    def make_second_proposal(self, proposal, *args):
+        self.playerlist[self.human_player_index].favorite_mode = proposal
+        # update game_state
+        game = Game(players=self.playerlist, game_state=self.current_game_state)
+        game.next_action()
+        self.current_game_state = game.get_game_state()
+        # update screen
+        label_id = 'player{}_proposal'.format(self.human_player_index)
+        if proposal[0] == NO_GAME:
+            self.set_proposition_text(label_id, 'Weiter')
+        elif proposal[0] == PARTNER_MODE:
+            self.set_proposition_text(label_id, 'I hätt a Sauspiel!')
+        elif proposal[0] == WENZ:
+            self.set_proposition_text(label_id, 'I hätt an Wenz!')
+        elif proposal[0] == SOLO:
+            self.set_proposition_text(label_id, 'I hätt a Solo!')
+        # remove bindings
+        for btn in self.ids['mode_buttons'].children:
+            self.clear_callbacks(btn)
+
+        self.continue_bidding()
+
+    def prepare_trick_play(self):
+        # remove proposal labels for non declarers and display game mode
+        dec_pl = self.current_game_state['declaring_player']
+        for pl in range(4):
+            label_id = 'player{}_proposal'.format(pl)
+            if pl == dec_pl:
+                mode_text = GAME_MODE_TEXTS[self.current_game_state['game_mode']]
+                self.set_proposition_text(label_id, mode_text)
+            else:
+                self.remove_widget_from_display_by_id(label_id)
+
+
+
+
     def print_msg(self, string, *args):
         print(string)
 
-    def set_propositiontext(self, text, player_id):
-        self.ids[player_id].text = text
 
 
 class CardWidgetTrickplay(GridLayout):
