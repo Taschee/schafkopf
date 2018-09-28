@@ -5,6 +5,7 @@
     transition: FadeTransition()
     MenuScreen:
     PlayingScreen:
+    GameResultsScreen:
 
 <MenuScreen>
     name: 'menu_screen'
@@ -18,8 +19,8 @@
 
         Button:
             size_hint: 0.4, 0.2
-            pos_hint: {'center_x': 0.5, 'center_y': 0.62}
-            text: 'Schafkopf!'
+            pos_hint: {'center_x': 0.5, 'center_y': 0.72}
+            text: 'Neues Spiel'
             background_normal: ''
             background_color: 0, 0, 0, 1
             on_release: app.root.new_game()
@@ -27,7 +28,7 @@
         Button:
             id: exit_btn
             size_hint: 0.4, 0.2
-            pos_hint: {'center_x': 0.5, 'center_y': 0.38}
+            pos_hint: {'center_x': 0.5, 'center_y': 0.28}
             text: 'Exit'
             background_normal: ''
             background_color: 0, 0, 0, 1
@@ -201,3 +202,49 @@
             pos_hint: {'right': 1, 'y': 0}
             size_hint: 0.05, 0.05
             on_release: app.root.current = 'menu_screen'
+
+
+<GameResultsScreen>:
+    name: 'result_screen'
+    FloatLayout:
+        canvas:
+            Color:
+                rgba: 0.4, 0.16, 0.1, 1
+            Rectangle:
+                size: self.size
+                pos:self.pos
+
+        Label:
+            id: winners
+            size_hint: None, None
+            size: self.texture_size
+            font_size: 0.04 * root.height
+            pos_hint: {'center_x': 0.5, 'center_y': 0.92}
+            text: ''
+
+        Label:
+            id: rewards
+            size_hint: None, None
+            size: self.texture_size
+            font_size: 0.04 * root.height
+            pos_hint: {'center_x': 0.5, 'center_y': 0.72}
+            text: ''
+
+
+        Button:
+            id: next_game
+            size_hint: 0.3, 0.1
+            pos_hint: {'center_x': 0.5, 'center_y': 0.38}
+            text: 'Weiterspielen'
+            background_normal: ''
+            background_color: 0, 0, 0, 1
+            on_release: app.root.new_game()
+
+        Button:
+            id: exit_btn
+            size_hint: 0.3, 0.1
+            pos_hint: {'center_x': 0.5, 'center_y': 0.24}
+            text: 'Exit'
+            background_normal: ''
+            background_color: 0, 0, 0, 1
+            on_release: app.stop()

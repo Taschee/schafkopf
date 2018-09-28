@@ -26,8 +26,8 @@ BIDDING_IDS = {(NO_GAME, None): 'no_game', (PARTNER_MODE, ACORNS): 'partner_acor
                (PARTNER_MODE, LEAVES): 'partner_leaves', (PARTNER_MODE, BELLS): 'partner_bells',
                (WENZ, None): 'wenz', (SOLO, ACORNS): 'solo_acorns', (SOLO, LEAVES): 'solo_leaves',
                (SOLO, HEARTS): 'solo_hearts', (SOLO, BELLS): 'solo_bells'}
-GAME_MODE_TEXTS = {(PARTNER_MODE, ACORNS): 'Auf die Alte!', (PARTNER_MODE, LEAVES): 'Auf die Blaue!',
-                   (PARTNER_MODE, BELLS): 'Auf die Schellen!',
+GAME_MODE_TEXTS = {(PARTNER_MODE, ACORNS): 'Rufspiel mit der Alten', (PARTNER_MODE, LEAVES): 'Rufspiel mit der Blauen!',
+                   (PARTNER_MODE, BELLS): 'Rufspiel mit der Schellen!',
                    (WENZ, None): 'Wenz', (SOLO, ACORNS): 'Eichel Solo!', (SOLO, LEAVES): 'Gras Solo',
                    (SOLO, HEARTS): 'Herz Solo', (SOLO, BELLS): 'Schellen Solo'}
 
@@ -41,6 +41,9 @@ class GameScreenManager(ScreenManager):
         screen = self.get_screen('playing_screen')
         screen.play_new_game()
         self.current = 'playing_screen'
+
+class GameResultsScreen(Screen):
+    pass
 
 class MenuScreen(Screen):
     pass
@@ -339,9 +342,25 @@ class PlayingScreen(Screen):
         self.play_next_card()
 
     def finish_game(self, *args):
-        # calculate and show winners, rewards etc.
-        print(' ------- Finished game! ------- ')
-        pass
+        # calculate winners, rewards etc.
+        game = Game(players=self.playerlist, game_state=self.current_game_state)
+        game_mode_str = GAME_MODE_TEXTS[self.current_game_state['game_mode']]
+        final_score = game.score_offensive_players()
+        rewards = game.get_payouts()
+        winners = game.winners
+        # display results on result screen
+        result_screen = self.manager.get_screen('result_screen')
+        if final_score > 60:
+            result_screen.ids['winners'].text = '{} gewonnen von {} mit {} Punkten'.format(game_mode_str,
+                                                                                           winners,
+                                                                                           final_score)
+        else:
+            result_screen.ids['winners'].text = '{} gewonnen von {} mit {} Punkten'.format(game_mode_str,
+                                                                                           winners,
+                                                                                           final_score)
+        result_screen.ids['rewards'].text = 'Auszahlung : '+format(rewards)
+        self.manager.current = 'result_screen'
+
 
     def print_msg(self, string, *args):
         print(string)
