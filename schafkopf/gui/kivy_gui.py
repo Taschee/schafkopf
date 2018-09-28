@@ -83,10 +83,35 @@ class PlayingScreen(Screen):
     def remove_widget_from_display_by_id(self, widget_id, *args):
         self.ids['display'].remove_widget(self.ids[widget_id])
 
+    def remove_card_from_display(self, card):
+        card_str = str(card)
+        player_hand_widget = self.ids['player_hand']
+        for wid in player_hand_widget.children:
+            if wid.text == card_str:
+                player_hand_widget.remove_widget(wid)
+
+
     def add_widget_to_display_by_id(self, widget_id, *args):
         widget = self.ids[widget_id]
         if widget not in self.ids['display'].children:
             self.ids['display'].add_widget(self.ids[widget_id])
+
+    def display_human_player_hand(self):
+        hand = sort_hand(self.current_game_state['player_hands'][self.human_player_index])
+        for card, widget in zip(hand, self.ids['player_hand'].children):
+            filepath = self.get_filepath(card)
+            widget.source = filepath
+            widget.text = str(card)
+
+    def remove_current_trick_from_display(self):
+        for pl in range(4):
+            widget_id = 'player{}_card'.format(pl)
+            self.remove_widget_from_display_by_id(widget_id)
+
+    def get_filepath(self, card):
+        im_name = SYMBOLS[str(card[0])] + SUITS[str(card[1])] + ".jpg"
+        filepath = PurePath('..', 'images', im_name)
+        return str(filepath)
 
     def new_game_state(self, player_hands):
         leading_player_index = random.choice(range(4))
@@ -138,23 +163,6 @@ class PlayingScreen(Screen):
             self.set_proposition_text(label_id, 'Weiter')
         else:
             self.set_proposition_text(label_id, 'I dad spuin!')
-
-    def remove_current_trick_from_display(self):
-        for pl in range(4):
-            widget_id = 'player{}_card'.format(pl)
-            self.remove_widget_from_display_by_id(widget_id)
-
-    def display_human_player_hand(self):
-        hand = sort_hand(self.current_game_state['player_hands'][self.human_player_index])
-        for card, widget in zip(hand, self.ids['cards'].children):
-            filepath = self.get_filepath(card)
-            widget.source = filepath
-            widget.text = str(card)
-
-    def get_filepath(self, card):
-        im_name = SYMBOLS[str(card[0])] + SUITS[str(card[1])] + ".jpg"
-        filepath = PurePath('..', 'images', im_name)
-        return str(filepath)
 
     def make_first_proposal(self, proposal, *args):
         self.playerlist[self.human_player_index].favorite_mode = proposal
@@ -263,10 +271,6 @@ class PlayingScreen(Screen):
                 # set callbacks for legal actions
                 legal_actions = game.get_possible_actions()
 
-
-                print('Human Player!')
-
-
                 for card in legal_actions:
                     # determine which button corresponds to this card
                     for widget_id in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
@@ -276,8 +280,6 @@ class PlayingScreen(Screen):
                     assert btn
                     self.set_callback(btn=btn, callback=partial(self.choose_card, card))
             else:
-
-                print(' Player: ', curr_pl)
 
                 # play opponent game, update current game state
                 game.next_action()
@@ -290,13 +292,6 @@ class PlayingScreen(Screen):
                     card = self.current_game_state['current_trick'].cards[curr_pl]
                 else:
                     card = self.current_game_state['tricks'][-1].cards[curr_pl]
-
-
-
-                print(self.current_game_state)
-                print(self.current_game_state['current_trick'])
-                print(card)
-
 
                 file_path = self.get_filepath(card)
                 self.add_widget_to_display_by_id(widget_id)
@@ -317,12 +312,6 @@ class PlayingScreen(Screen):
         game.next_action()
         self.current_game_state = game.get_game_state()
 
-
-        print(self.current_game_state)
-        print(self.current_game_state['current_trick'])
-        print(card)
-
-
         # display image
         widget_id = 'player{}_card'.format(self.human_player_index)
         file_path = self.get_filepath(card)
@@ -330,17 +319,21 @@ class PlayingScreen(Screen):
         self.ids[widget_id].source = file_path
 
         # remove all callbacks
-        for btn in self.ids['cards'].children:
+        for btn in self.ids['player_hand'].children:
             self.clear_callbacks(btn)
 
+        # remove played card widget
+        self.remove_card_from_display(card)
+
         if game.trick_game.current_trick.num_cards == 0:
-            Clock.schedule_once(self.finish_trick, 1)
+            self.finish_trick()
         else:
             self.play_next_card()
 
 
     def finish_trick(self, *args):
         # remove current trick widgets
+        Clock.schedule_once(partial(print, 'Finished trick!'), 2)
         self.remove_current_trick_from_display()
         self.play_next_card()
 
