@@ -142,7 +142,7 @@
                 text: 'Schellen Solo'
 
         CardWidgetTrickplay:
-            id: cards
+            id: player_hand
 
             ImageButton:
                 id: A
@@ -188,6 +188,12 @@
             size_hint: 0.07, 0.2
             pos_hint: {'center_x': 0.6, 'center_y': 0.6}
 
+        Button:
+            id: next_trick_button
+            text: 'Naechster Stich'
+            pos_hint:{'center_x': 0.8, 'center_y': 0.3}
+            size_hint: 0.15, 0.05
+            on_release: root.next_trick()
 
         Button:
             id: menu_btn

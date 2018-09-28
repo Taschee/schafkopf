@@ -134,9 +134,14 @@ class PlayingScreen(Screen):
         self.display_human_player_hand()
         # remove current trick
         self.remove_current_trick_from_display()
-
+        self.remove_widget_from_display_by_id('next_trick_button')
         self.start_bidding()
 
+    def start_bidding(self):
+        curr_pl = self.current_game_state['current_player_index']
+        while curr_pl != self.human_player_index:
+            self.make_first_opponent_proposal(curr_pl)
+            curr_pl = self.current_game_state['current_player_index']
         # set callbacks for legal actions
         game = Game(players=self.playerlist, game_state=self.current_game_state)
         legal_actions = game.get_possible_actions()
@@ -144,12 +149,6 @@ class PlayingScreen(Screen):
             action_id = BIDDING_IDS[action]
             btn = self.ids[action_id]
             self.set_callback(btn=btn, callback=partial(self.make_first_proposal, action))
-
-    def start_bidding(self):
-        curr_pl = self.current_game_state['current_player_index']
-        while curr_pl != self.human_player_index:
-            self.make_first_opponent_proposal(curr_pl)
-            curr_pl = self.current_game_state['current_player_index']
 
     def make_first_opponent_proposal(self, curr_pl, *args):
         # play one action
@@ -330,10 +329,12 @@ class PlayingScreen(Screen):
         else:
             self.play_next_card()
 
-
     def finish_trick(self, *args):
+        self.add_widget_to_display_by_id('next_trick_button')
+
+    def next_trick(self, *args):
         # remove current trick widgets
-        Clock.schedule_once(partial(print, 'Finished trick!'), 2)
+        self.remove_widget_from_display_by_id('next_trick_button')
         self.remove_current_trick_from_display()
         self.play_next_card()
 
