@@ -123,18 +123,21 @@ class PlayingScreen(Screen):
     def start_bidding(self):
         curr_pl = self.current_game_state['current_player_index']
         while curr_pl != self.human_player_index:
-            # play one action
-            game = Game(players=self.playerlist, game_state=self.current_game_state)
-            game.next_action()
-            self.current_game_state = game.get_game_state()
-            # set proposal text in screen
-            last_proposal = self.current_game_state['mode_proposals'][-1]
-            label_id = 'player{}_proposal'.format(curr_pl)
-            if last_proposal[0] == NO_GAME:
-                self.set_proposition_text(label_id, 'Weiter')
-            else:
-                self.set_proposition_text(label_id, 'I dad spuin!')
+            self.make_first_opponent_proposal(curr_pl)
             curr_pl = self.current_game_state['current_player_index']
+
+    def make_first_opponent_proposal(self, curr_pl, *args):
+        # play one action
+        game = Game(players=self.playerlist, game_state=self.current_game_state)
+        game.next_action()
+        self.current_game_state = game.get_game_state()
+        # set proposal text in screen
+        last_proposal = self.current_game_state['mode_proposals'][-1]
+        label_id = 'player{}_proposal'.format(curr_pl)
+        if last_proposal[0] == NO_GAME:
+            self.set_proposition_text(label_id, 'Weiter')
+        else:
+            self.set_proposition_text(label_id, 'I dad spuin!')
 
     def remove_current_trick_from_display(self):
         for pl in range(4):
@@ -171,27 +174,16 @@ class PlayingScreen(Screen):
         self.finish_first_proposals()
 
     def finish_first_proposals(self):
-        game = Game(players=playerlist, game_state=self.current_game_state)
-
         while len(self.current_game_state['mode_proposals']) < 4:
-            curr_pl = game.get_current_player()
-            assert curr_pl != self.human_player_index
-            game.next_action()
-            self.current_game_state = game.get_game_state()
-            label_id = 'player{}_proposal'.format(curr_pl)
-            # update proposal texts
-            last_proposal = self.current_game_state['mode_proposals'][-1]
-            if last_proposal[0] == NO_GAME:
-                self.set_proposition_text(label_id, 'Weiter')
-            else:
-                self.set_proposition_text(label_id, 'I dad spuin!')
-
+            curr_pl = self.current_game_state['current_player_index']
+            self.make_first_opponent_proposal(curr_pl)
+        game = Game(players=playerlist, game_state=self.current_game_state)
         if game.bidding_game.finished():
             self.prepare_trick_play()
         else:
             self.continue_bidding()
 
-    def continue_bidding(self):
+    def continue_bidding(self, *args):
         curr_pl = self.current_game_state['current_player_index']
         game = Game(players=self.playerlist, game_state=self.current_game_state)
 
@@ -245,7 +237,7 @@ class PlayingScreen(Screen):
 
         self.continue_bidding()
 
-    def prepare_trick_play(self):
+    def prepare_trick_play(self, *args):
         # remove proposal labels for non declarers and display game mode
         dec_pl = self.current_game_state['declaring_player']
         for pl in range(4):
@@ -264,18 +256,15 @@ class PlayingScreen(Screen):
     def play_next_card(self, *args):
         game = Game(players=self.playerlist, game_state=self.current_game_state)
 
-
-        print(self.current_game_state)                   #############
-
-
         if not game.finished():
             curr_pl = game.get_current_player()
+
             if curr_pl == self.human_player_index:
                 # set callbacks for legal actions
                 legal_actions = game.get_possible_actions()
 
 
-                print(' legal actions : ', legal_actions)   ################
+                print('Human Player!')
 
 
                 for card in legal_actions:
@@ -287,26 +276,33 @@ class PlayingScreen(Screen):
                     assert btn
                     self.set_callback(btn=btn, callback=partial(self.choose_card, card))
             else:
+
+                print(' Player: ', curr_pl)
+
                 # play opponent game, update current game state
                 game.next_action()
                 self.current_game_state = game.get_game_state()
                 # display image
 
-
-                print(curr_pl)             ##########################
-
-
-
                 widget_id = 'player{}_card'.format(curr_pl)
-                if not game.trick_game.current_trick.finished():
+
+                if game.trick_game.current_trick.num_cards != 0:
                     card = self.current_game_state['current_trick'].cards[curr_pl]
                 else:
                     card = self.current_game_state['tricks'][-1].cards[curr_pl]
+
+
+
+                print(self.current_game_state)
+                print(self.current_game_state['current_trick'])
+                print(card)
+
+
                 file_path = self.get_filepath(card)
                 self.add_widget_to_display_by_id(widget_id)
                 self.ids[widget_id].source = file_path
 
-                if game.trick_game.current_trick.finished():
+                if game.trick_game.current_trick.num_cards == 0:
                     self.finish_trick()
                 else:
                     self.play_next_card()
@@ -320,6 +316,13 @@ class PlayingScreen(Screen):
         game = Game(players=self.playerlist, game_state=self.current_game_state)
         game.next_action()
         self.current_game_state = game.get_game_state()
+
+
+        print(self.current_game_state)
+        print(self.current_game_state['current_trick'])
+        print(card)
+
+
         # display image
         widget_id = 'player{}_card'.format(self.human_player_index)
         file_path = self.get_filepath(card)
@@ -331,25 +334,19 @@ class PlayingScreen(Screen):
             self.clear_callbacks(btn)
 
         if game.trick_game.current_trick.num_cards == 0:
-            self.finish_trick()
+            Clock.schedule_once(self.finish_trick, 1)
         else:
-
-
-
-            print(' Choose card was run')     ###################
-
-
-
             self.play_next_card()
 
 
-    def finish_trick(self):
-        time.sleep(2)
-        print('finish trick')
-        pass
+    def finish_trick(self, *args):
+        # remove current trick widgets
+        self.remove_current_trick_from_display()
+        self.play_next_card()
 
-    def finish_game(self):
+    def finish_game(self, *args):
         # calculate and show winners, rewards etc.
+        print(' ------- Finished game! ------- ')
         pass
 
     def print_msg(self, string, *args):
@@ -365,7 +362,10 @@ class CardWidgetTrickplay(FloatLayout):
         start_x = int(0.2 * self.width)
         x_positions = range(start_x, start_x + 8 * width_per_child, width_per_child)
         y_position = self.height * 0.01
-        for position, child in zip(x_positions, self.children):
+
+        player_card_widgets = self.children
+
+        for position, child in zip(x_positions, player_card_widgets):
             child.height = 0.9 * height
             child.width = 0.9 * width_per_child
             child.x = position
