@@ -1,10 +1,6 @@
 import random
 from functools import partial
 from pathlib import PurePath
-import time
-
-from kivy.uix.button import Button
-from kivy.uix.floatlayout import FloatLayout
 
 from schafkopf.card_deck import CardDeck
 from schafkopf.game import Game
@@ -13,9 +9,10 @@ from schafkopf.suits import *
 from schafkopf.game_modes import *
 from schafkopf.players import RandomPlayer, HeuristicsPlayer, DummyPlayer
 
+from schafkopf.gui.player_hand_widget import PlayerHandWidget
+from schafkopf.gui.bid_button import BidButton
+from schafkopf.gui.image_button import ImageButton
 from kivy.app import App
-from kivy.uix.behaviors import ButtonBehavior
-from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.clock import Clock
 
@@ -42,25 +39,13 @@ class GameScreenManager(ScreenManager):
         screen.play_new_game()
         self.current = 'playing_screen'
 
+
 class GameResultsScreen(Screen):
     pass
 
+
 class MenuScreen(Screen):
     pass
-
-
-class BidButton(Button):
-    def __init__(self, **kwargs):
-        super(BidButton, self).__init__(**kwargs)
-        self._callbacks = []
-        self.size_hint = 0.2, 0.05
-
-
-class ImageButton(ButtonBehavior, Image):
-    def __init__(self, **kwargs):
-        super(ImageButton, self).__init__(**kwargs)
-        self._callbacks = []
-        self.allow_stretch = True
 
 
 class PlayingScreen(Screen):
@@ -365,42 +350,6 @@ class PlayingScreen(Screen):
 
     def print_msg(self, string, *args):
         print(string)
-
-
-
-class CardWidgetTrickplay(FloatLayout):
-    def do_layout(self, *args):
-        width = int(self.width * 0.6)
-        height = int(self.height * 0.2)
-        width_per_child = int(width // 8)
-        start_x = int(0.2 * self.width)
-        x_positions = range(start_x, start_x + 8 * width_per_child, width_per_child)
-        y_position = self.height * 0.01
-
-        player_card_widgets = self.children
-
-        for position, child in zip(x_positions, player_card_widgets):
-            child.height = 0.9 * height
-            child.width = 0.9 * width_per_child
-            child.x = position
-            child.y = y_position
-
-    def on_children(self, *args):
-        self.do_layout()
-
-    def on_size(self, *args):
-        self.do_layout()
-
-    def on_pos(self, *args):
-        self.do_layout()
-
-    def add_widget(self, widget):
-        super(CardWidgetTrickplay, self).add_widget(widget)
-        self.do_layout()
-
-    def remove_widget(self, widget):
-        super(CardWidgetTrickplay, self).remove_widget(widget)
-        self.do_layout()
 
 
 class SchafkopfApp(App):
