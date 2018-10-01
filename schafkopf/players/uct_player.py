@@ -12,8 +12,9 @@ from schafkopf.trick import Trick
 
 class UCTPlayer(Player):
 
-    def __init__(self, name="UCT", ucb_const=1, num_samples=10, num_simulations=100):
+    def __init__(self, name="UCT", ucb_const=1, num_samples=10, num_simulations=100, simulation_player=None):
         Player.__init__(self, name=name)
+        self.simulation_player = simulation_player
         self.ucb_const = ucb_const
         self.num_samples = num_samples
         self.num_simulations = num_simulations
@@ -64,7 +65,11 @@ class UCTPlayer(Player):
         return game.get_game_state()
 
     def simulation(self, selected_node):
-        playerlist = [RandomPlayer(), RandomPlayer(), RandomPlayer(), RandomPlayer()]
+        if self.simulation_player is None:
+            playerlist = [RandomPlayer(), RandomPlayer(), RandomPlayer(), RandomPlayer()]
+        else:
+            playerlist = [self.simulation_player(), self.simulation_player(),
+                          self.simulation_player(), self.simulation_player()]
         game_simulation = Game(players=playerlist, game_state=deepcopy(selected_node.game_state))
         game_simulation.play()
         rewards = game_simulation.get_payouts()
