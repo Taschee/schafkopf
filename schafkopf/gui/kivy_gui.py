@@ -7,7 +7,7 @@ from schafkopf.game import Game
 from schafkopf.helpers import sort_hand
 from schafkopf.suits import *
 from schafkopf.game_modes import *
-from schafkopf.players import RandomPlayer, HeuristicsPlayer, DummyPlayer
+from schafkopf.players import RandomPlayer, HeuristicsPlayer, DummyPlayer, UCTPlayer
 
 from schafkopf.gui.player_hand_widget import PlayerHandWidget
 from schafkopf.gui.bid_button import BidButton
@@ -23,8 +23,8 @@ BIDDING_IDS = {(NO_GAME, None): 'no_game', (PARTNER_MODE, ACORNS): 'partner_acor
                (PARTNER_MODE, LEAVES): 'partner_leaves', (PARTNER_MODE, BELLS): 'partner_bells',
                (WENZ, None): 'wenz', (SOLO, ACORNS): 'solo_acorns', (SOLO, LEAVES): 'solo_leaves',
                (SOLO, HEARTS): 'solo_hearts', (SOLO, BELLS): 'solo_bells'}
-GAME_MODE_TEXTS = {(PARTNER_MODE, ACORNS): 'Mit der Alten', (PARTNER_MODE, LEAVES): 'Mit der Blauen!',
-                   (PARTNER_MODE, BELLS): 'Mit der Schellen',
+GAME_MODE_TEXTS = {(NO_GAME, None): 'Weiter', (PARTNER_MODE, ACORNS): 'Mit der Alten',
+                   (PARTNER_MODE, LEAVES): 'Mit der Blauen!', (PARTNER_MODE, BELLS): 'Mit der Schellen',
                    (WENZ, None): 'Wenz', (SOLO, ACORNS): 'Eichel Solo', (SOLO, LEAVES): 'Gras Solo',
                    (SOLO, HEARTS): 'Herz Solo', (SOLO, BELLS): 'Schellen Solo'}
 
@@ -245,7 +245,6 @@ class PlayingScreen(Screen):
 
         # remove mode buttons
         self.remove_widget_from_display_by_id('mode_buttons')
-
         self.play_next_card()
 
     def play_next_card(self, *args):
@@ -330,22 +329,32 @@ class PlayingScreen(Screen):
     def finish_game(self, *args):
         # calculate winners, rewards etc.
         game = Game(players=self.playerlist, game_state=self.current_game_state)
-        game_mode_str = GAME_MODE_TEXTS[self.current_game_state['game_mode']]
-        final_score = game.score_offensive_players()
-        rewards = game.get_payouts()
-        winners = game.determine_winners()
-        # display results on result screen
-        result_screen = self.manager.get_screen('result_screen')
-        if final_score > 60:
-            result_screen.ids['winners'].text = '{} gewonnen von {} mit {} Punkten'.format(game_mode_str,
-                                                                                           winners,
-                                                                                           final_score)
+        game_mode = self.current_game_state['game_mode']
+        if game_mode[0] != NO_GAME:
+            game_mode_str = GAME_MODE_TEXTS[game_mode]
+            final_score = game.score_offensive_players()
+            rewards = game.get_payouts()
+            winners = game.determine_winners()
+            # display results on result screen
+            result_screen = self.manager.get_screen('result_screen')
+            if final_score > 60:
+                result_screen.ids['winners'].text = '{} gewonnen von {} mit {} Punkten'.format(game_mode_str,
+                                                                                               winners,
+                                                                                               final_score)
+            else:
+                result_screen.ids['winners'].text = '{} gewonnen von {} mit {} Punkten'.format(game_mode_str,
+                                                                                               winners,
+                                                                                               final_score)
+            result_screen.ids['rewards'].text = 'Auszahlung : '+format(rewards)
+            self.manager.current = 'result_screen'
         else:
-            result_screen.ids['winners'].text = '{} gewonnen von {} mit {} Punkten'.format(game_mode_str,
-                                                                                           winners,
-                                                                                           final_score)
-        result_screen.ids['rewards'].text = 'Auszahlung : '+format(rewards)
-        self.manager.current = 'result_screen'
+            game_mode_str = GAME_MODE_TEXTS[game_mode]
+            rewards = game.get_payouts()
+            # display results on result screen
+            result_screen = self.manager.get_screen('result_screen')
+            result_screen.ids['winners'].text = 'Zamgschmissen'
+            result_screen.ids['rewards'].text = 'Auszahlung : ' + format(rewards)
+            self.manager.current = 'result_screen'
 
 
     def print_msg(self, string, *args):
