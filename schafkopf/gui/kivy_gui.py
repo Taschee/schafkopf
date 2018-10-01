@@ -26,9 +26,9 @@ BIDDING_IDS = {(NO_GAME, None): 'no_game', (PARTNER_MODE, ACORNS): 'partner_acor
                (PARTNER_MODE, LEAVES): 'partner_leaves', (PARTNER_MODE, BELLS): 'partner_bells',
                (WENZ, None): 'wenz', (SOLO, ACORNS): 'solo_acorns', (SOLO, LEAVES): 'solo_leaves',
                (SOLO, HEARTS): 'solo_hearts', (SOLO, BELLS): 'solo_bells'}
-GAME_MODE_TEXTS = {(PARTNER_MODE, ACORNS): 'Rufspiel mit der Alten', (PARTNER_MODE, LEAVES): 'Rufspiel mit der Blauen!',
-                   (PARTNER_MODE, BELLS): 'Rufspiel mit der Schellen!',
-                   (WENZ, None): 'Wenz', (SOLO, ACORNS): 'Eichel Solo!', (SOLO, LEAVES): 'Gras Solo',
+GAME_MODE_TEXTS = {(PARTNER_MODE, ACORNS): 'Mit der Alten', (PARTNER_MODE, LEAVES): 'Mit der Blauen!',
+                   (PARTNER_MODE, BELLS): 'Mit der Schellen',
+                   (WENZ, None): 'Wenz', (SOLO, ACORNS): 'Eichel Solo', (SOLO, LEAVES): 'Gras Solo',
                    (SOLO, HEARTS): 'Herz Solo', (SOLO, BELLS): 'Schellen Solo'}
 
 class GameScreenManager(ScreenManager):
@@ -275,7 +275,8 @@ class PlayingScreen(Screen):
 
                 for card in legal_actions:
                     # determine which button corresponds to this card
-                    for widget_id in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
+                    widget_ids = ['card_{}'.format(i) for i in range(1, 9)]
+                    for widget_id in widget_ids:
                         btn = self.ids[widget_id]
                         if btn.text == str(card):
                             break

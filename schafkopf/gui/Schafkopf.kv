@@ -39,13 +39,32 @@
     name: 'playing_screen'
     FloatLayout:
         id: display
+        player0_proposal: player0_proposal.__self__
+        player1_proposal: player1_proposal.__self__
+        player2_proposal_proposal: player0_proposal.__self__
+        player3_proposal_proposal: player0_proposal.__self__
+        player0_card: player0_card.__self__
+        player1_card: player1_card.__self__
+        player2_card: player2_card.__self__
+        player3_card: player3_card.__self__
+        mode_buttons: mode_buttons.__self__
+        player_hand: player_hand.__self__
+        next_trick_button: next_trick_button.__self__
+        card_1: card_1.__self__
+        card_2: card_1.__self__
+        card_3: card_1.__self__
+        card_4: card_1.__self__
+        card_5: card_1.__self__
+        card_6: card_1.__self__
+        card_7: card_1.__self__
+        card_8: card_1.__self__
+
         canvas:
             Color:
                 rgba: 0.4, 0.16, 0.1, 1
             Rectangle:
                 size: self.size
                 pos:self.pos
-
 
         Label:
             id: player0_proposal
@@ -146,28 +165,28 @@
             id: player_hand
 
             ImageButton:
-                id: A
+                id: card_1
 
             ImageButton:
-                id: B
+                id: card_2
 
             ImageButton:
-                id: C
+                id: card_3
 
             ImageButton:
-                id: D
+                id: card_4
 
             ImageButton:
-                id: E
+                id: card_5
 
             ImageButton:
-                id: F
+                id: card_6
 
             ImageButton:
-                id: G
+                id: card_7
 
             ImageButton:
-                id: H
+                id: card_8
 
         Image:
             id: player0_card
