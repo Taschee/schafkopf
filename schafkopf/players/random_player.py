@@ -1,7 +1,7 @@
-from schafkopf.players.player import Player
-from schafkopf.game_modes import NO_GAME, WENZ, PARTNER_MODE, SOLO
-from schafkopf.suits import ACORNS, LEAVES, BELLS, SUITS
 import random
+from schafkopf.game_modes import NO_GAME
+from schafkopf.players.player import Player
+
 
 class RandomPlayer(Player):
     """Random Player that never declares a game mode and randomly plays cards"""

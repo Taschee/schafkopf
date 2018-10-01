@@ -1,9 +1,11 @@
-from schafkopf.players.player import Player
-from schafkopf.ranks import OBER, UNTER, ACE, SEVEN, EIGHT, NINE, TEN, KING, RANKS
-from schafkopf.suits import HEARTS, LEAVES, ACORNS, BELLS, SUITS
-from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
 import random
+
 import numpy as np
+
+from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
+from schafkopf.players.player import Player
+from schafkopf.ranks import OBER, UNTER, ACE, SEVEN, EIGHT, NINE, TEN, KING
+from schafkopf.suits import HEARTS, LEAVES, SUITS
 
 
 class HeuristicsPlayer(Player):

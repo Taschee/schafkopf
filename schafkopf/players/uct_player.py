@@ -1,12 +1,11 @@
 import random
 from copy import deepcopy
 
-from schafkopf.players.mc_tree import MCTree
-
 from schafkopf.game import Game
 from schafkopf.helpers import sample_opponent_hands, sample_mode_proposals
 from schafkopf.players import DummyPlayer, RandomPlayer
 from schafkopf.players.mc_node import MCNode
+from schafkopf.players.mc_tree import MCTree
 from schafkopf.players.player import Player
 from schafkopf.trick import Trick
 

@@ -1,10 +1,11 @@
 import keras
 import numpy as np
-from schafkopf.players.player import Player
+
 import schafkopf.players.data.encodings as enc
 from schafkopf.game_modes import GAME_MODES, PARTNER_MODE, SOLO, WENZ
-from schafkopf.suits import ACORNS, HEARTS
 from schafkopf.players.data.data_processing import switch_suits_played_cards, switch_card_suit
+from schafkopf.players.player import Player
+from schafkopf.suits import ACORNS, HEARTS
 
 
 class NNPlayer(Player):

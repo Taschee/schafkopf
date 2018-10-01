@@ -1,6 +1,7 @@
-from schafkopf.players.player import Player
-from schafkopf.game_modes import NO_GAME
 import random
+
+from schafkopf.game_modes import NO_GAME
+from schafkopf.players.player import Player
 
 
 class DummyPlayer(Player):
