@@ -333,7 +333,7 @@ class PlayingScreen(Screen):
         game_mode_str = GAME_MODE_TEXTS[self.current_game_state['game_mode']]
         final_score = game.score_offensive_players()
         rewards = game.get_payouts()
-        winners = game.winners
+        winners = game.determine_winners()
         # display results on result screen
         result_screen = self.manager.get_screen('result_screen')
         if final_score > 60:
