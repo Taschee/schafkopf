@@ -33,6 +33,7 @@ class HeuristicsPlayer(Player):
                 chosen_card = self.choose_card_wenz(public_info, options)
             else:
                 chosen_card = self.choose_card_solo(public_info, options)
+            assert chosen_card in self.hand, 'Card {} not in hand: {}'.format(chosen_card, self.hand)
             self.hand.remove(chosen_card)
             return chosen_card
 

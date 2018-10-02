@@ -12,9 +12,9 @@ from schafkopf.trick import Trick
 
 class UCTPlayer(Player):
 
-    def __init__(self, name="UCT", ucb_const=1, num_samples=10, num_simulations=100, simulation_player=None):
+    def __init__(self, name="UCT", ucb_const=1, num_samples=10, num_simulations=100, simulation_player_list=None):
         Player.__init__(self, name=name)
-        self.simulation_player = simulation_player
+        self.simulation_player_list = simulation_player_list
         self.ucb_const = ucb_const
         self.num_samples = num_samples
         self.num_simulations = num_simulations
@@ -65,11 +65,10 @@ class UCTPlayer(Player):
         return game.get_game_state()
 
     def simulation(self, selected_node):
-        if self.simulation_player is None:
+        if self.simulation_player_list is None:
             playerlist = [RandomPlayer(), RandomPlayer(), RandomPlayer(), RandomPlayer()]
         else:
-            playerlist = [self.simulation_player(), self.simulation_player(),
-                          self.simulation_player(), self.simulation_player()]
+            playerlist = self.simulation_player_list
         game_simulation = Game(players=playerlist, game_state=deepcopy(selected_node.game_state))
         game_simulation.play()
         rewards = game_simulation.get_payouts()
@@ -153,6 +152,6 @@ class UCTPlayer(Player):
             """
 
             card = max(move_counts, key=move_counts.get)
-
+        assert card in self.hand, 'Card {} not in hand: {}'.format(card, self.hand)
         self.hand.remove(card)
         return card

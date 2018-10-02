@@ -50,6 +50,8 @@ class NNPlayer(Player):
             elif public_info['game_mode'][0] == SOLO:
                 best_card = switch_card_suit(best_card, game_suit, HEARTS)
 
+            assert best_card in self.hand, 'Card {} not in hand: {}'.format(best_card, self.hand)
+
             self.hand.remove(best_card)
             return best_card
 

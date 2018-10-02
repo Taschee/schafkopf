@@ -26,6 +26,7 @@ class DummyPlayer(Player):
                 break
         else:
             card = random.choice(options)
+        assert card in self.hand, 'Card {} not in hand: {}'.format(card, self.hand)
         self.hand.remove(card)
         return card
 
