@@ -2,11 +2,13 @@ import random
 from copy import deepcopy
 
 from schafkopf.game import Game
+from schafkopf.game_modes import PARTNER_MODE, WENZ, SOLO
 from schafkopf.helpers import sample_opponent_hands, sample_mode_proposals
 from schafkopf.players import DummyPlayer, RandomPlayer
 from schafkopf.players.mc_node import MCNode
 from schafkopf.players.mc_tree import MCTree
 from schafkopf.players.player import Player
+from schafkopf.suits import LEAVES, ACORNS, BELLS, HEARTS
 from schafkopf.trick import Trick
 
 
@@ -69,7 +71,18 @@ class UCTPlayer(Player):
             playerlist = [RandomPlayer(), RandomPlayer(), RandomPlayer(), RandomPlayer()]
         else:
             playerlist = self.simulation_player_list
-        game_simulation = Game(players=playerlist, game_state=deepcopy(selected_node.game_state))
+        # in case the game mode is not yet publicly declared (in bidding phase), take a random suit
+        sim_game_state = deepcopy(selected_node.game_state)
+        game_type = sim_game_state['game_mode'][0]
+        game_suit = sim_game_state['game_mode'][1]
+        if game_type == PARTNER_MODE and game_suit is None:
+            ran_suit = random.choice([BELLS, ACORNS, LEAVES])
+            sim_game_state['game_mode'] = (game_type, ran_suit)
+        # if game_type is not known yet, but at least two proposals are made:
+        elif game_type > PARTNER_MODE and len(sim_game_state['mode_proposals']) <= 4:
+            sim_game_state['game_mode'] = random.choice([(WENZ, None), (SOLO, ACORNS), (SOLO, HEARTS),
+                                                         (SOLO, BELLS), (SOLO, LEAVES)])
+        game_simulation = Game(players=playerlist, game_state=deepcopy(sim_game_state))
         game_simulation.play()
         rewards = game_simulation.get_payouts()
         return rewards

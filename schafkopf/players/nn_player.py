@@ -9,12 +9,25 @@ from schafkopf.suits import ACORNS, HEARTS
 
 
 class NNPlayer(Player):
-    def __init__(self, game_mode_nn, partner_nn, wenz_nn, solo_nn, name='NNPlayer'):
+    def __init__(self, game_mode_nn=None, partner_nn=None, wenz_nn=None, solo_nn=None, name='NNPlayer'):
         Player.__init__(self, name=name)
-        self.game_mode_nn = keras.models.load_model(game_mode_nn)
-        self.partner_nn = keras.models.load_model(partner_nn)
-        self.solo_nn = keras.models.load_model(solo_nn)
-        self.wenz_nn = keras.models.load_model(wenz_nn)
+        try:
+            self.game_mode_nn = keras.models.load_model(game_mode_nn)
+        except:
+            self.game_mode_nn = None
+        try:
+            self.partner_nn = keras.models.load_model(partner_nn)
+        except:
+            self.partner_nn = None
+        try:
+            self.solo_nn = keras.models.load_model(solo_nn)
+        except:
+            self.solo_nn = None
+        try:
+            self.wenz_nn = keras.models.load_model(wenz_nn)
+        except:
+            self.wenz_nn = None
+
 
     def choose_game_mode(self, public_info, options):
         hand_encoded = enc.encode_one_hot_hand(self.hand)
@@ -32,9 +45,13 @@ class NNPlayer(Player):
             self.hand.remove(card)
             return card
         else:
+            # predict next card (with possibly switched suits)
             pred = self.make_card_prediction(public_info)
 
+            # switch option suits accordingly
             options_switched_suits = self.switch_suits_options(options, public_info)
+
+            # set all non legal actions from the prediction to zero
 
             card_deck = [(i // 4, i % 4) for i in range(32)]
             for card in card_deck:
@@ -50,7 +67,7 @@ class NNPlayer(Player):
             elif public_info['game_mode'][0] == SOLO:
                 best_card = switch_card_suit(best_card, game_suit, HEARTS)
 
-            assert best_card in self.hand, 'Card {} not in hand: {}'.format(best_card, self.hand)
+            assert best_card in self.hand, 'Card {} not in hand: {} '.format(best_card, self.hand)
 
             self.hand.remove(best_card)
             return best_card
