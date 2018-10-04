@@ -1,5 +1,3 @@
-# script for switching suits to only play Solos in Hearts and Partner Mode in Acorns
-
 import pickle
 from schafkopf.game_modes import SOLO, WENZ, PARTNER_MODE
 from schafkopf.suits import HEARTS, ACORNS
