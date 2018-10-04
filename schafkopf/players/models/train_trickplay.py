@@ -26,7 +26,7 @@ def lstm_model():
 
 def wider_lstm_model():
     model = Sequential()
-    model.add(LSTM(500, input_shape=(28, 36), return_sequences=True))
+    model.add(LSTM(500, input_shape=(28, 36)))
     model.add(Dropout(0.2))
     model.add(Dense(32, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
