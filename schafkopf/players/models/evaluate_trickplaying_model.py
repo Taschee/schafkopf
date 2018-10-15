@@ -12,11 +12,12 @@ from schafkopf.suits import ACORNS, HEARTS, SUITS
 from schafkopf.trick import Trick
 
 
+# make this more reproducible ->
 game_mode = (PARTNER_MODE, ACORNS)
 
-filepath = '../data/test_data_solo.p'
+filepath = '../data/test_data_wenz.p'
 
-modelpath = 'solo_model_wider_data_10.hdf5'
+modelpath = 'wenz_model_wider_data_10.hdf5'
 
 
 def suit_in_hand(suit, hand, trumpcards):
@@ -143,12 +144,10 @@ def evaluate_model_on_testdata(model, num_games):
                 count += 1
     print(count, ' / ', num_games, ' Accuracy : ', count / num_games)
 
+
 def main():
-
     model = keras.models.load_model(modelpath)
-
     num_games = num_games_in_file(filepath)
-
     evaluate_model_on_testdata(model, num_games)
 
 
