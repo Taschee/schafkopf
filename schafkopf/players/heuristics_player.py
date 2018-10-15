@@ -5,15 +5,15 @@ import numpy as np
 from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ, SOLO
 from schafkopf.players.player import Player
 from schafkopf.ranks import OBER, UNTER, ACE, SEVEN, EIGHT, NINE, TEN, KING
-from schafkopf.suits import HEARTS, LEAVES, SUITS
+from schafkopf.suits import HEARTS, LEAVES, SUITS, BELLS, ACORNS
 
 
 class HeuristicsPlayer(Player):
 
     def choose_game_mode(self, public_info, options):
         chosen_partner_mode = self.choose_partner_mode(options)
-        chosen_wenz = self.choose_wenz(public_info)
-        chosen_solo = self.choose_solo(public_info)
+        chosen_wenz = self.choose_wenz(public_info, options)
+        chosen_solo = self.choose_solo(public_info, options)
         chosen_mode = chosen_partner_mode
         if chosen_wenz[0] > chosen_mode[0]:
             chosen_mode = chosen_wenz
@@ -65,25 +65,31 @@ class HeuristicsPlayer(Player):
         else:
             return (NO_GAME, None)
 
-    def choose_wenz(self, public_info):
-        num_unter = len(self.rank_in_hand(UNTER))
-        aces_in_hand = self.rank_in_hand(ACE)
-        num_aces = len(aces_in_hand)
-        if num_unter >= 3:
-            if num_aces >= 2:
-                return (WENZ, None)
-            elif num_aces == 1:
-                suit_of_ace = aces_in_hand[0][1]
-                if len(self.suit_in_hand(suit_of_ace, wenz=True)) >= 3:
+    def choose_wenz(self, public_info, options):
+        if (WENZ, None) not in options:
+            return (NO_GAME, None)
+        else:
+            num_unter = len(self.rank_in_hand(UNTER))
+            aces_in_hand = self.rank_in_hand(ACE)
+            num_aces = len(aces_in_hand)
+            if num_unter >= 3:
+                if num_aces >= 2:
                     return (WENZ, None)
+                elif num_aces == 1:
+                    suit_of_ace = aces_in_hand[0][1]
+                    if len(self.suit_in_hand(suit_of_ace, wenz=True)) >= 3:
+                        return (WENZ, None)
+                    else:
+                        return (NO_GAME, None)
                 else:
                     return (NO_GAME, None)
             else:
                 return (NO_GAME, None)
-        else:
+
+    def choose_solo(self, public_info, options):
+        if len(options & {(SOLO, HEARTS), (SOLO, LEAVES), (SOLO, BELLS), (SOLO, ACORNS)}) == 0:
             return (NO_GAME, None)
 
-    def choose_solo(self, public_info):
         num_ober = len(self.rank_in_hand(OBER))
         num_unter = len(self.rank_in_hand(UNTER))
 
