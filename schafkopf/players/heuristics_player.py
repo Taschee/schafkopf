@@ -479,7 +479,10 @@ class HeuristicsPlayer(Player):
             else:
                 aces = self.aces_in_hand(public_info)
                 non_aces = [card for card in self.hand if card not in aces]
-                return random.choice(non_aces)
+                if len(non_aces) > 0:
+                    return random.choice(non_aces)
+                else:
+                    return random.choice(options)
 
         else:
             # in case of no UNTER as first card: play best suitcard if possible, or if possible, use UNTER to take trick
