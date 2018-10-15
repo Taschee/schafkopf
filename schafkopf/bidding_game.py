@@ -103,6 +103,7 @@ class BiddingGame:
         public_info = self.get_public_info()
 
         chosen_mode = player.choose_game_mode(options=options, public_info=public_info)
+        assert chosen_mode in options, 'Chosen mode was not legal'
 
         self.mode_proposals.append(chosen_mode)
         if chosen_mode[0] == NO_GAME:
@@ -113,6 +114,7 @@ class BiddingGame:
                 self.mode_to_beat += 1
             # the first player making a public announcement of chosen type, can propose game, that is lower (by one)!
             elif len(self.mode_proposals) == 4:
+                self.mode_to_beat -= 1
                 # if <= 1 actual proposals: game mode and offensive players are already decided
                 if len(self.deciding_players) <= 1:
                     self.game_mode = max(self.mode_proposals, key=lambda x: x[0])
