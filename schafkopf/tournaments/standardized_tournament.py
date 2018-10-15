@@ -23,39 +23,39 @@ def play_standardized_tournament(playerlist):
                 game.play()
                 payouts = game.get_payouts()
                 print('Game mode : ', game.bidding_game.game_mode)
-                print('Offensive players : ', game.bidding_game.offensive_players)
-                print('Payouts : ', payouts)
-                for i in range(4):
-                    total_rewards[i] += payouts[i]
+                print('Offensive players : ', [(pl - i) % 4 for pl in game.bidding_game.offensive_players])
+                print('Payouts : ', [payouts[(pl - i) % 4] for pl in range(4)])
+                for j in range(4):
+                    total_rewards[j] += payouts[(j - i) % 4]
 
-    print('\n Final Results : ', total_rewards)
+        print('\n Final Results : ', total_rewards)
 
 
 def main():
-    sim_player_list = [NNPlayer(game_mode_nn='../players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
-                                partner_nn='../players/models/partner_model_wider_data_2.hdf5',
-                                solo_nn='../players/models/solo_model_wider_data_10.hdf5',
-                                wenz_nn='../players/models/wenz_model_wider_data_10.hdf5'),
-                       NNPlayer(game_mode_nn='../players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
-                                partner_nn='../players/models/partner_model_wider_data_2.hdf5',
-                                solo_nn='../players/models/solo_model_wider_data_10.hdf5',
-                                wenz_nn='../players/models/wenz_model_wider_data_10.hdf5'),
-                       NNPlayer(game_mode_nn='../players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
-                                partner_nn='../players/models/partner_model_wider_data_2.hdf5',
-                                solo_nn='../players/models/solo_model_wider_data_10.hdf5',
-                                wenz_nn='../players/models/wenz_model_wider_data_10.hdf5'),
-                       NNPlayer(game_mode_nn='../players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
-                                partner_nn='../players/models/partner_model_wider_data_2.hdf5',
-                                solo_nn='../players/models/solo_model_wider_data_10.hdf5',
-                                wenz_nn='../players/models/wenz_model_wider_data_10.hdf5')]
+    # sim_player_list = [NNPlayer(game_mode_nn='../players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
+    #                             partner_nn='../players/models/partner_model_wider_data_2.hdf5',
+    #                             solo_nn='../players/models/solo_model_wider_data_10.hdf5',
+    #                             wenz_nn='../players/models/wenz_model_wider_data_10.hdf5'),
+    #                    NNPlayer(game_mode_nn='../players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
+    #                             partner_nn='../players/models/partner_model_wider_data_2.hdf5',
+    #                             solo_nn='../players/models/solo_model_wider_data_10.hdf5',
+    #                             wenz_nn='../players/models/wenz_model_wider_data_10.hdf5'),
+    #                    NNPlayer(game_mode_nn='../players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
+    #                             partner_nn='../players/models/partner_model_wider_data_2.hdf5',
+    #                             solo_nn='../players/models/solo_model_wider_data_10.hdf5',
+    #                             wenz_nn='../players/models/wenz_model_wider_data_10.hdf5'),
+    #                    NNPlayer(game_mode_nn='../players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
+    #                             partner_nn='../players/models/partner_model_wider_data_2.hdf5',
+    #                             solo_nn='../players/models/solo_model_wider_data_10.hdf5',
+    #                             wenz_nn='../players/models/wenz_model_wider_data_10.hdf5')]
 
     playerlist = [  # UCTPlayer(num_samples=10, num_simulations=10, ucb_const=1, simulation_player_list=None),
                     # UCTPlayer(name="A", num_samples=10, num_simulations=100, ucb_const=1),
-                    # NNPlayer(game_mode_nn='../players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
-                    #          partner_nn='../players/models/partner_model_wider_data_2.hdf5',
-                    #          solo_nn='../players/models/solo_model_wider_data_10.hdf5',
-                    #          wenz_nn='../players/models/wenz_model_wider_data_10.hdf5'),
-                    HeuristicsPlayer(),
+                    NNPlayer(game_mode_nn='../players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
+                             partner_nn='../players/models/partner_model_wider_data_2.hdf5',
+                             solo_nn='../players/models/solo_model_wider_data_10.hdf5',
+                             wenz_nn='../players/models/wenz_model_wider_data_10.hdf5'),
+                    # HeuristicsPlayer(),
                     # RandomPlayer(),
                     HeuristicsPlayer(name="B"),
                     HeuristicsPlayer(name="C"),
