@@ -160,11 +160,11 @@ class UCTPlayer(Player):
             num_workers = mp.cpu_count()
             pool = mp.Pool(num_workers)
 
-            # maybe change this to choosing highest average payout/ucb_value? Now: most frequent best action is chosen
             results = pool.map(func=self.uct_search, iterable=sampled_states)
             """
 
             card = max(move_counts, key=move_counts.get)
+
         assert card in self.hand, 'Card {} not in hand: {}'.format(card, self.hand)
         self.hand.remove(card)
         return card
