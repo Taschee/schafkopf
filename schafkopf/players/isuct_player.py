@@ -59,9 +59,9 @@ class ISUCTPlayer(Player):
             if child.previous_action in not_visited_actions:
                 not_visited_actions.remove(child.previous_action)       #### check if action in set - done ?
         chosen_action = random.choice(tuple(not_visited_actions))
-        new_public_info = self.get_new_public_info(game_state=node.game_state,      ############## state is public info now #########
+        new_public_info = self.get_new_public_info(game_state=game_state,      ############## state is public info now #########
                                                    action=chosen_action)
-        new_game_state = self.get_new_state(game_state=node.game_state,
+        new_game_state = self.get_new_state(game_state=game_state,
                                             action=chosen_action)
         new_infoset = self.get_infoset(new_public_info, self.hand)
         new_node = ISMCNode(parent=node, infoset=new_infoset, previous_action=chosen_action)
