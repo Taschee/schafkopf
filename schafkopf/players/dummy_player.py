@@ -20,10 +20,13 @@ class DummyPlayer(Player):
             return chosen_mode
 
     def play_card(self, public_info, options=None):
-        for fav_card in self.favorite_cards:
-            if fav_card in options:
-                card = fav_card
-                break
+        if len(self.favorite_cards) > 0:
+            for fav_card in self.favorite_cards:
+                if fav_card in options:
+                    card = fav_card
+                    break
+            else:
+                card = random.choice(options)
         else:
             card = random.choice(options)
         assert card in self.hand, 'Card {} not in hand: {}'.format(card, self.hand)
