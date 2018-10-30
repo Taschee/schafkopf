@@ -158,10 +158,7 @@ class ISUCTPlayer(Player):
     def play_card(self, public_info, options=None):
         if len(options) == 1:
             card = list(options)[0]
-            self.hand.remove(card)
-            return card
         else:
-
             move_counts = {move: 0 for move in options}
             move_av_rewards = {move: 0 for move in options}
 
@@ -174,10 +171,10 @@ class ISUCTPlayer(Player):
             # play card with highest visit count
             card = max(move_counts, key=move_counts.get)
 
-            assert card in self.hand, 'Card {} not in hand: {}'.format(card, self.hand)
-            assert card in options, 'Card {} not in options: '.format(card)
-            self.hand.remove(card)
-            return card
+        assert card in self.hand, 'Card {} not in hand: {}'.format(card, self.hand)
+        assert card in options, 'Card {} not in options: '.format(card)
+        self.hand.remove(card)
+        return card
 
     def get_infoset(self, public_info, hand):
         infoset = deepcopy(public_info)
