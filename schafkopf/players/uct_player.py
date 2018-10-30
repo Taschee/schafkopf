@@ -32,7 +32,7 @@ class UCTPlayer(Player):
 
         results = []
         for child in mc_tree.root_node.children:
-            results.append((child.previous_action, child.visits, child.get_average_reward(child.current_player)))
+            results.append((child.previous_action, child.visits, child.get_average_reward(root_node.current_player)))
 
         return results
 
