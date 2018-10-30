@@ -45,21 +45,21 @@ class ISUCTPlayer(Player):
 
     def selection(self, mc_tree, game_state):
         current_node = mc_tree.root_node
-        while not current_node.is_terminal(game_state):      ##############  is terminal too -> done ?
-            if not current_node.fully_expanded(game_state):  ########## have to change "fully expanded" -> done ?
+        while not current_node.is_terminal(game_state):
+            if not current_node.fully_expanded(game_state):
                 return self.expand(mc_tree=mc_tree, node=current_node, game_state=game_state)
             else:
-                current_node = current_node.best_child(ucb_const=self.ucb_const)
-        new_game_state = self.get_new_state(game_state=game_state, action=current_node.previous_action)
-        return current_node, new_game_state
+                current_node = current_node.best_child(ucb_const=self.ucb_const, game_state=game_state)
+                game_state = self.get_new_state(game_state=game_state, action=current_node.previous_action)
+        return current_node, game_state
 
     def expand(self, mc_tree, node, game_state):
-        not_visited_actions = set(game_state["possible_actions"])       ## - done ?
+        not_visited_actions = set(game_state["possible_actions"])
         for child in node.children:
             if child.previous_action in not_visited_actions:
-                not_visited_actions.remove(child.previous_action)       #### check if action in set - done ?
+                not_visited_actions.remove(child.previous_action)
         chosen_action = random.choice(tuple(not_visited_actions))
-        new_public_info = self.get_new_public_info(game_state=game_state,      ############## state is public info now #########
+        new_public_info = self.get_new_public_info(game_state=game_state,
                                                    action=chosen_action)
         new_game_state = self.get_new_state(game_state=game_state,
                                             action=chosen_action)
@@ -90,6 +90,12 @@ class ISUCTPlayer(Player):
     def simulation(self, game_state):
         if self.simulation_player_list is None:
             playerlist = [RandomPlayer(), RandomPlayer(), RandomPlayer(), RandomPlayer()]
+            # if bidding isn't over and >= 2 proposals are made, in simulation uct_player should stick with his proposal
+            game = Game(players=playerlist, game_state=game_state)
+            if not game.bidding_game.finished():
+                player_pos = self.get_player_position(game_state)
+                favorite_mode = game_state['mode_proposals'][(player_pos - game.leading_player_index) % 4]
+                playerlist[player_pos] = DummyPlayer(favorite_mode=favorite_mode)
         else:
             playerlist = self.simulation_player_list
         # in case the game mode is not yet publicly declared (in bidding phase), take a random suit
@@ -100,7 +106,8 @@ class ISUCTPlayer(Player):
             ran_suit = random.choice([BELLS, ACORNS, LEAVES])
             sim_game_state['game_mode'] = (game_type, ran_suit)
         # if game_type is not known yet, but at least two proposals are made:
-        elif game_type > PARTNER_MODE and len(sim_game_state['mode_proposals']) <= 4:
+        elif game_type > PARTNER_MODE and len(sim_game_state['mode_proposals']) <= 4 \
+                and sim_game_state['declaring_player'] != sim_game_state['current_player_index'] - 1:
             sim_game_state['game_mode'] = random.choice([(WENZ, None), (SOLO, ACORNS), (SOLO, HEARTS),
                                                          (SOLO, BELLS), (SOLO, LEAVES)])
         game_simulation = Game(players=playerlist, game_state=deepcopy(sim_game_state))
@@ -137,7 +144,7 @@ class ISUCTPlayer(Player):
             move_counts = {move: 0 for move in options}
             move_av_rewards = {move: 0 for move in options}
 
-            mc_results = self.isuct_search(public_info=public_info)        ########## here public info and self.hand
+            mc_results = self.isuct_search(public_info=public_info)
 
             for move, move_count, average_reward in mc_results:
                 move_counts[move] += move_count

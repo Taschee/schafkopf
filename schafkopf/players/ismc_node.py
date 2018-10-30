@@ -38,9 +38,10 @@ class ISMCNode:
         else:
             return False
 
-    def best_child(self, ucb_const):
+    def best_child(self, ucb_const, game_state):
+        poss_children = [child for child in self.children if child.previous_action in game_state['possible_actions']]
         if not self.is_leaf():
-            return max(self.children, key=lambda child: child.ucb_value(ucb_const))
+            return max(poss_children, key=lambda child: child.ucb_value(ucb_const))
 
     def ucb_value(self, ucb_const):
         if self.visits != 0:
