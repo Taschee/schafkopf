@@ -41,7 +41,7 @@ class Player:
     def get_player_position(self, game_state):
         for pos in range(4):
             hand = set(game_state['player_hands'][pos])
-            if len(hand & set(self.set_starting_hand)) > 0:
+            if len(hand & set(self.starting_hand)) > 0:
                 return pos
             
 
