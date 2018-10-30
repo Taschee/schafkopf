@@ -20,7 +20,7 @@ class DummyPlayer(Player):
             return chosen_mode
 
     def play_card(self, public_info, options=None):
-        if len(self.favorite_cards) > 0:
+        if self.favorite_cards is not None:
             for fav_card in self.favorite_cards:
                 if fav_card in options:
                     card = fav_card
