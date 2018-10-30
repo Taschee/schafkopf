@@ -69,6 +69,12 @@ class UCTPlayer(Player):
     def simulation(self, selected_node):
         if self.simulation_player_list is None:
             playerlist = [RandomPlayer(), RandomPlayer(), RandomPlayer(), RandomPlayer()]
+            # if bidding isn't over and >= 2 proposals are made, in simulation uct_player should stick with his proposal
+            game = Game(players=playerlist, game_state=selected_node.game_state)
+            if not game.bidding_game.finished():
+                player_pos = self.get_player_position(selected_node.game_state)
+                favorite_mode = selected_node.game_state['mode_proposals'][(player_pos - game.leading_player_index) % 4]
+                playerlist[player_pos] = DummyPlayer(favorite_mode=favorite_mode)
         else:
             playerlist = self.simulation_player_list
         # in case the game mode is not yet publicly declared (in bidding phase), take a random suit
