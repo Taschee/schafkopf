@@ -178,3 +178,52 @@ def load_data_trickplay(file, num_samples=1):    # maybe augment data as well?
                 y_data[game_num * num_samples + num] = y
 
     return x_data, y_data
+
+
+def prepare_data_inference(game_data_dic, num_samples):
+    '''creates lists X, Y with X containing card_seq and Y containing encoded player_hands (starting player first)'''
+    played_cards = game_data_dic['played_cards']
+    player_hands = game_data_dic['player_hands']
+    card_sequences = []
+    hands_to_predict = []
+
+    # create num_samples different sequences from one game
+    seq_lenghts = random.sample(range(1, 27), num_samples)
+
+    for seq_len in seq_lenghts:
+        seq = played_cards[:seq_len]
+        seq_encoded = enc.encode_played_cards(seq, next_rel_pos=played_cards[seq_len][1])
+        card_sequences.append(seq_encoded)
+
+        player_hands_to_predict = np.zeros(128)
+
+        for hand, index in zip(player_hands, range(len(player_hands))):
+            # encode hand
+            remaining_hand = [card for card in hand if card not in seq]
+            rem_hand_encoded = enc.encode_hand_inference(remaining_hand)
+            player_hands_to_predict[index * 32: index * 32 + 32] = rem_hand_encoded
+
+        hands_to_predict.append(player_hands_to_predict)
+
+    return card_sequences, hands_to_predict
+
+
+def load_data_inference(file, num_samples=1):    # maybe augment data as well?
+
+    num_games = num_games_in_file(file)
+
+    with open(file, 'rb') as infile:
+
+        x_data = np.zeros(shape=(num_games * num_samples, 28, 36))
+        y_data = np.zeros(shape=(num_games * num_samples, 128))
+
+        for game_num in range(num_games):
+            game_data_dic = pickle.load(infile)
+            card_sequences, hands_to_predict = prepare_data_inference(game_data_dic, num_samples)
+            for num in range(num_samples):
+                x = card_sequences[num]
+                y = hands_to_predict[num]
+                x_data[game_num * num_samples + num] = x
+                y_data[game_num * num_samples + num] = y
+
+    return x_data, y_data
