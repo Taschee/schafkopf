@@ -79,3 +79,23 @@ def test_encode_played_cards():
     goal = np.zeros((28, 36))
     goal[0][35] = 1
     assert np.array_equal(enc.encode_played_cards(seq, next_rel_pos), goal)
+
+
+def test_encode_hand_inference():
+    hand = [(4, 3), (2, 0), (1, 1), (3, 3), (3, 2), (4, 2), (2, 2)]
+    goal = np.zeros(32)
+    goal[19] = 1
+    goal[8] = 1
+    goal[5] = 1
+    goal[15] = 1
+    goal[14] = 1
+    goal[10] = 1
+    goal[18] = 1
+    assert np.array_equal(enc.encode_hand_inference(hand), goal)
+    sec_hand = [(2, 1), (0, 0), (7, 3), (7, 2)]
+    sec_goal = np.zeros(32)
+    sec_goal[0] = 1
+    sec_goal[9] = 1
+    sec_goal[31] = 1
+    sec_goal[30] = 1
+    assert np.array_equal(enc.encode_hand_inference(sec_hand), sec_goal)
