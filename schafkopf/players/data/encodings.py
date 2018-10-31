@@ -13,15 +13,22 @@ def encode_one_hot_card(card):
 
 def decode_one_hot_card(encoded_card):
     index = np.where(encoded_card == 1)[0][0]
-    return (index // 4, index % 4)
+    card_decoded = (index // 4, index % 4)
+    return card_decoded
 
 
 def encode_one_hot_hand(hand):
     hand = sort_hand(hand)
-    enc_hand = np.zeros((8, 32))
+    enc_hand = np.zeros((len(hand), 32))
     for card, i in zip(hand, range(len(hand))):
         enc_hand[i] = encode_one_hot_card(card)
     return enc_hand
+
+
+def encode_hand_inference(hand):
+    enc_hand_one_hot = encode_one_hot_hand(hand)
+    hand_encoded = np.sum(enc_hand_one_hot.transpose(), axis=1)
+    return hand_encoded
 
 
 def encode_one_hot_player_position(position):
