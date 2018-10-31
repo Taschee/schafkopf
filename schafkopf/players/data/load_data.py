@@ -198,8 +198,7 @@ def prepare_data_inference(game_data_dic, num_samples):
         player_hands_to_predict = np.zeros(128)
 
         for hand, index in zip(player_hands, range(len(player_hands))):
-            # encode hand
-            remaining_hand = [card for card in hand if card not in seq]
+            remaining_hand = [card for card in hand if card not in [c[0] for c in seq]]
             rem_hand_encoded = enc.encode_hand_inference(remaining_hand)
             player_hands_to_predict[index * 32: index * 32 + 32] = rem_hand_encoded
 
