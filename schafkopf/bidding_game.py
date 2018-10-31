@@ -112,9 +112,9 @@ class BiddingGame:
             # before all players made at least one proposal, mode to beat is just the number of actual game proposals
             if len(self.mode_proposals) < 4:
                 self.mode_to_beat += 1
-            # the first player making a public announcement of chosen type, can propose game, that is lower (by one)!
+            # the first player making a public announcement has to propose at least a wenz now, if mode is not decided!
             elif len(self.mode_proposals) == 4:
-                self.mode_to_beat -= 1
+                self.mode_to_beat = 1
                 # if <= 1 actual proposals: game mode and offensive players are already decided
                 if len(self.deciding_players) <= 1:
                     self.game_mode = max(self.mode_proposals, key=lambda x: x[0])
