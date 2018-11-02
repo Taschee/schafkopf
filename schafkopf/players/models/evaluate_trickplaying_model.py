@@ -12,12 +12,12 @@ from schafkopf.suits import ACORNS, HEARTS, SUITS
 from schafkopf.trick import Trick
 
 
-# make this more reproducible ->
+# make this more reproducible
 game_mode = (PARTNER_MODE, ACORNS)
 
-filepath = '../data/test_data_wenz.p'
+filepath = '../data/test_data_partner.p'
 
-modelpath = 'wenz_model_wider_data_10.hdf5'
+modelpath = 'partner_model_wider_data_2.hdf5'
 
 
 def suit_in_hand(suit, hand, trumpcards):
@@ -47,7 +47,6 @@ def possible_cards(game_mode, current_trick, hand, previously_ran_away):
                 poss_cards = hand
         else:
             poss_cards = hand
-
     else:
         first_card = current_trick.cards[current_trick.leading_player_index]
 
@@ -67,7 +66,6 @@ def possible_cards(game_mode, current_trick, hand, previously_ran_away):
         else:
             suit = first_card[1]
             poss_cards = suit_in_hand(suit, hand, trumpcards)
-
     return poss_cards[:]
 
 
@@ -104,45 +102,48 @@ def evaluate_model_on_testdata(model, num_games):
 
             data_dic = pickle.load(f)
 
-            x_list, y_list = prepare_data_trickplay(data_dic, num_samples=1)
-            x = x_list[0]
-            y = y_list[0]
+            x_list, y_list = prepare_data_trickplay(data_dic, num_samples=27)
 
-            predictions = model.predict(np.array([x]))[0]
+            for i in range(27):
+                x = x_list[i]
+                y = y_list[i]
 
-            card_to_predict = enc.decode_one_hot_card(y)
-            card_sequence = []
+                predictions = model.predict(np.array([x]))[0]
 
-            # find current player
-            for card, pl in data_dic['played_cards']:
-                if card == card_to_predict:
-                    player = pl
-                    break
-                else:
-                    card_sequence.append((card, pl))
+                card_to_predict = enc.decode_one_hot_card(y)
+                card_sequence = []
 
-            player_hand = data_dic['player_hands'][player]
-            assert card_to_predict in player_hand, 'Card to predict was not in player hand'
+                # find current player
+                for card, pl in data_dic['played_cards']:
+                    if card == card_to_predict:
+                        player = pl
+                        break
+                    else:
+                        card_sequence.append((card, pl))
 
-            for crd, pl in data_dic['played_cards']:
-                if crd == card_to_predict:
-                    break
-                elif pl == player:
-                    player_hand = [c for c in player_hand if c != crd]
+                player_hand = data_dic['player_hands'][player]
+                assert card_to_predict in player_hand, 'Card to predict was not in player hand'
+
+                for crd, pl in data_dic['played_cards']:
+                    if crd == card_to_predict:
+                        break
+                    elif pl == player:
+                        player_hand = [c for c in player_hand if c != crd]
 
 
-            options = get_possible_cards(game_mode, card_sequence, player_hand)
+                options = get_possible_cards(game_mode, card_sequence, player_hand)
 
-            deck = [(i // 4, i % 4) for i in range(32)]
-            pred_actual = predictions[:]
-            for c in deck:
-                if c not in options:
-                    index = c[0] * 4 + c[1]
-                    pred_actual[index] = 0
+                deck = [(i // 4, i % 4) for i in range(32)]
+                pred_actual = predictions[:]
+                for c in deck:
+                    if c not in options:
+                        index = c[0] * 4 + c[1]
+                        pred_actual[index] = 0
 
-            if np.argmax(y) == np.argmax(pred_actual):
-                count += 1
-    print(count, ' / ', num_games, ' Accuracy : ', count / num_games)
+                if np.argmax(y) == np.argmax(pred_actual):
+                    count += 1
+
+    print(count, ' / ', num_games * 27, ' Accuracy : ', count / (num_games * 27))
 
 
 def main():
@@ -153,4 +154,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
