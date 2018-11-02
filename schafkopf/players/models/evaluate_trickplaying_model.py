@@ -12,7 +12,6 @@ from schafkopf.suits import ACORNS, HEARTS, SUITS
 from schafkopf.trick import Trick
 
 
-# make this more reproducible
 game_mode = (PARTNER_MODE, ACORNS)
 
 filepath = '../data/test_data_partner.p'
@@ -130,7 +129,6 @@ def evaluate_model_on_testdata(model, num_games):
                     elif pl == player:
                         player_hand = [c for c in player_hand if c != crd]
 
-
                 options = get_possible_cards(game_mode, card_sequence, player_hand)
 
                 deck = [(i // 4, i % 4) for i in range(32)]
@@ -147,8 +145,11 @@ def evaluate_model_on_testdata(model, num_games):
 
 
 def main():
+    print('loading model')
     model = keras.models.load_model(modelpath)
+    print('counting number of games')
     num_games = num_games_in_file(filepath)
+    print('evaluating model')
     evaluate_model_on_testdata(model, num_games)
 
 
