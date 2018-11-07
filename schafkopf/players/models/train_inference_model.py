@@ -47,9 +47,8 @@ def deeper_lstm_model():
 def train(model, x_train, y_train, x_val, y_val, epochs, modelname='model.hdf5'):
 
     checkpoint = ModelCheckpoint(modelname, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-    early_stopping = EarlyStopping(patience=7)
     tensorboard = TensorBoard(log_dir='./logs')
-    callback_list = [checkpoint, TerminateOnNaN(), early_stopping, tensorboard]
+    callback_list = [checkpoint, TerminateOnNaN(), tensorboard]
 
     model.fit(x_train, y_train,
               epochs=epochs,

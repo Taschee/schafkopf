@@ -2,6 +2,7 @@ import pickle
 import argparse
 from keras.models import Sequential
 from keras.layers import Dense
+from schafkopf.players.models.train_val_tensorboard import TrainValTensorBoard
 from keras.layers import Dropout
 from keras.layers import LSTM
 from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard, TerminateOnNaN
@@ -49,7 +50,8 @@ def train(model, x_train, y_train, x_val, y_val, epochs, modelname='model.hdf5')
     checkpoint = ModelCheckpoint(modelname, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
     early_stopping = EarlyStopping(patience=7)
     tensorboard = TensorBoard(log_dir='./logs')
-    callback_list = [checkpoint, TerminateOnNaN(), early_stopping, tensorboard]
+    train_val_tensorboard = TrainValTensorBoard(log_dir='./logs')
+    callback_list = [checkpoint, TerminateOnNaN(), early_stopping, train_val_tensorboard]
 
     model.fit(x_train, y_train,
               epochs=epochs,
