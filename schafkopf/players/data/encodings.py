@@ -25,6 +25,14 @@ def encode_one_hot_hand(hand):
     return enc_hand
 
 
+def decode_on_hot_hand(hand_encoded):
+    hand = []
+    for card_enc in hand_encoded:
+        card = decode_one_hot_card(card_enc)
+        hand.append(card)
+    return hand
+
+
 def encode_hand_inference(hand):
     enc_hand_one_hot = encode_one_hot_hand(hand)
     hand_encoded = np.sum(enc_hand_one_hot.transpose(), axis=1)
