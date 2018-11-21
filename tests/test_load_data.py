@@ -2,7 +2,7 @@ import numpy as np
 import schafkopf.players.data.load_data as ld
 import schafkopf.players.data.encodings as enc
 from schafkopf.game_modes import PARTNER_MODE
-from schafkopf.ranks import KING
+from schafkopf.ranks import KING, TEN, OBER, NINE, EIGHT, SEVEN
 from schafkopf.suits import BELLS, ACORNS, LEAVES, HEARTS
 
 
@@ -64,3 +64,29 @@ def test_prepare_data_inference():
     for i in range(128):
         assert goal[i] == pl_hands[i], 'failed at card {}'.format(i)
     assert np.array_equal(goal, pl_hands)
+
+
+def test_prepare_extended_data_inference():
+    card_sequences, player_hands, hands_to_predict = ld.prepare_extended_data_inference(game_data_dic, num_samples=26)
+    assert len(player_hands) == 26
+    opp_hands = None
+    chosen_seq = None
+    pl_hand = None
+    for seq, hand, opp in zip(card_sequences, player_hands, range(len(hands_to_predict))):
+        if np.array_equal(seq[21][:32], np.zeros(32)) and not np.array_equal(seq[20][:32], np.zeros(32)):
+            chosen_seq = seq
+            pl_hand = hand
+            opp_hands = hands_to_predict[opp]
+
+    assert opp_hands is not None
+    assert chosen_seq is not None
+    assert pl_hand is not None
+    opp_hand_1 = enc.decode_hand_inference(opp_hands[:32])
+    opp_hand_2 = enc.decode_hand_inference(opp_hands[32:64])
+    opp_hand_3 = enc.decode_hand_inference(opp_hands[64:])
+    assert set(opp_hand_1) == {(TEN, BELLS), (KING, HEARTS), (OBER, BELLS)}
+    assert set(opp_hand_2) == {(NINE, ACORNS), (OBER, HEARTS), (EIGHT, HEARTS)}
+    assert set(opp_hand_3) == {(NINE, BELLS), (EIGHT, BELLS), (SEVEN, BELLS)}
+    assert set(enc.decode_on_hot_hand(pl_hand)) == {(3, 2), (3, 1), (0, 1), (7, 3), (6, 3), (2, 2), (0, 2), (7, 0)}
+    assert chosen_seq[20][31] == 1
+    assert chosen_seq[20][33] == 1
