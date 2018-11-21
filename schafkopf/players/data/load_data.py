@@ -235,7 +235,7 @@ def prepare_extended_data_inference(game_data_dic, num_samples):
 
         shift = 0
         for index, hand in enumerate(player_hands):
-            start_ind = index + shift
+            start_ind = (index + shift) * 32
             if index == next_player:
                 shift = -1
                 continue
