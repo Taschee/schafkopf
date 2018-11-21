@@ -39,6 +39,15 @@ def encode_hand_inference(hand):
     return hand_encoded
 
 
+def decode_hand_inference(hand_enc):
+    card_indices = np.where(hand_enc == 1)[0]
+    hand_still_enc = np.zeros((len(card_indices), 32))
+    for i, card_index in enumerate(card_indices):
+        hand_still_enc[i][card_index] = 1
+    hand = decode_on_hot_hand(hand_still_enc)
+    return hand
+
+
 def encode_one_hot_player_position(position):
     position_encoded = np.zeros(4)
     position_encoded[position] = 1
