@@ -47,7 +47,7 @@ def test_switch_suits_card_sequence(example_public_info):
 
 
 def test_prediction(example_public_info):
-    player = NNPlayer(game_mode_nn='../schafkopf/players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
+    player = NNPlayer(game_mode_nn='../schafkopf/players/models/bigger_classifier200.hdf5',
                       partner_nn='../schafkopf/players/models/partner_model_bigger_1.hdf5',
                       solo_nn='../schafkopf/players/models/solo_model_bigger_1.hdf5',
                       wenz_nn='../schafkopf/players/models/wenz_model_bigger_1.hdf5')
