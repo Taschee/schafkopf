@@ -184,6 +184,7 @@ def prepare_data_inference(game_data_dic, num_samples):
     '''creates lists X, Y with X containing card_seq and Y containing encoded player_hands (starting player first)'''
     played_cards = game_data_dic['played_cards']
     player_hands = game_data_dic['player_hands']
+
     card_sequences = []
     hands_to_predict = []
 
@@ -197,7 +198,7 @@ def prepare_data_inference(game_data_dic, num_samples):
 
         player_hands_to_predict = np.zeros(128)
 
-        for hand, index in zip(player_hands, range(len(player_hands))):
+        for index, hand in enumerate(player_hands):
             remaining_hand = [card for card in hand if card not in [c[0] for c in seq]]
             rem_hand_encoded = enc.encode_hand_inference(remaining_hand)
             player_hands_to_predict[index * 32: index * 32 + 32] = rem_hand_encoded
@@ -205,6 +206,72 @@ def prepare_data_inference(game_data_dic, num_samples):
         hands_to_predict.append(player_hands_to_predict)
 
     return card_sequences, hands_to_predict
+
+
+def prepare_extended_data_inference(game_data_dic, num_samples):
+    """creates lists [X1, X2], Y with X1 containing card_seq, X2 containing the player hand,
+     and Y containing encoded opponent_hands (starting player first)"""
+    played_cards = game_data_dic['played_cards']
+    player_hands = game_data_dic['player_hands']
+
+    card_sequences = []
+    aux_input_hands = []
+    hands_to_predict = []
+
+    # create num_samples different sequences from one game
+    seq_lenghts = random.sample(range(1, 27), num_samples)
+
+    for seq_len in seq_lenghts:
+        seq = played_cards[:seq_len]
+        seq_encoded = enc.encode_played_cards(seq, next_rel_pos=played_cards[seq_len][1])
+        card_sequences.append(seq_encoded)
+
+        next_player = played_cards[seq_len][1]
+        pl_hand = player_hands[next_player]
+        hand_enc = enc.encode_one_hot_hand(pl_hand)
+        aux_input_hands.append(hand_enc)
+
+        player_hands_to_predict = np.zeros(96)
+
+        shift = 0
+        for index, hand in enumerate(player_hands):
+            start_ind = index + shift
+            if index == next_player:
+                shift = -1
+                continue
+            else:
+                remaining_hand = [card for card in hand if card not in [c[0] for c in seq]]
+                rem_hand_encoded = enc.encode_hand_inference(remaining_hand)
+                player_hands_to_predict[start_ind: start_ind + 32] = rem_hand_encoded
+
+        hands_to_predict.append(player_hands_to_predict)
+
+    return card_sequences, aux_input_hands, hands_to_predict
+
+
+def load_extended_data_inference(file, num_samples=1):    # maybe augment data as well?
+
+    num_games = num_games_in_file(file)
+
+    with open(file, 'rb') as infile:
+
+        x_card_seq = np.zeros(shape=(num_games * num_samples, 28, 36))
+        x_aux_input_hands = np.zeros(shape=(num_games * num_samples, 8, 32))
+        y_data = np.zeros(shape=(num_games * num_samples, 96))
+
+        for game_num in range(num_games):
+            game_data_dic = pickle.load(infile)
+            card_sequences, aux_hands, hands_to_predict = prepare_extended_data_inference(game_data_dic, num_samples)
+            for num in range(num_samples):
+                x1 = card_sequences[num]
+                x2 = aux_hands[num]
+                y = hands_to_predict[num]
+
+                x_card_seq[game_num * num_samples + num] = x1
+                x_aux_input_hands[game_num * num_samples + num] = x2
+                y_data[game_num * num_samples + num] = y
+
+    return [x_card_seq, x_aux_input_hands], y_data
 
 
 def load_data_inference(file, num_samples=1):    # maybe augment data as well?
@@ -226,3 +293,4 @@ def load_data_inference(file, num_samples=1):    # maybe augment data as well?
                 y_data[game_num * num_samples + num] = y
 
     return x_data, y_data
+
