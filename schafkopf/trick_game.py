@@ -94,6 +94,11 @@ class TrickGame:
                 suit = first_card[1]
                 poss_cards = self.suit_in_hand(suit, hand)
 
+            # check if searched Ace can be played
+            if self.game_mode[0] == PARTNER_MODE and (ACE, self.game_mode[1]) in poss_cards:
+                if not self.previously_ran_away():
+                    poss_cards.remove((ACE, self.game_mode[1]))
+
         return poss_cards[:]
 
     def reset_current_trick(self):
