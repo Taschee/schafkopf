@@ -34,14 +34,16 @@ for pair in false_pred_list:
 fig, ax = plt.subplots(1, 1)
 tick_labels = ['No game', 'Partner, bells', 'Partner, Leaves', 'Partner, Acorns',
                'Wenz', 'Solo, Bells', 'Solo, Hearts', 'Solo, Leaves', 'Solo, Acorns']
+
 for y_pred, y_true in pairs:
-    plt.scatter(y_pred, y_true, s=4*false_counts[(y_pred, y_true)], c='blue', alpha=0.6)
+    plt.scatter(y_pred, y_true, s=3*false_counts[(y_pred, y_true)], c='blue', alpha=0.6)
+
 ax.set_xticks(np.arange(0, 9, 1))
-ax.set_xticklabels(tick_labels, rotation='vertical', fontsize=6)
+ax.set_xticklabels(tick_labels, rotation='vertical', fontsize=11)
 ax.set_yticks(np.arange(0, 9, 1))
-ax.set_yticklabels(tick_labels, rotation='horizontal', fontsize=6)
-ax.set_xlabel('Bidding network')
-ax.set_ylabel('Human player')
+ax.set_yticklabels(tick_labels, rotation='horizontal', fontsize=11)
+ax.set_xlabel('Bidding network', fontsize=13)
+ax.set_ylabel('Human player', fontsize=13)
 ax.axis('equal')
 plt.tight_layout()
 plt.show()

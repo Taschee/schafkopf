@@ -5,7 +5,7 @@ from schafkopf.suits import BELLS, ACORNS, HEARTS, LEAVES
 import schafkopf.players.data.encodings as enc
 
 
-filepath = "bigger_classifier200.hdf5"
+filepath = "bigger_classifier50.hdf5"
 
 model = keras.models.load_model(filepath)
 
