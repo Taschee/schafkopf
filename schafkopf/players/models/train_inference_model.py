@@ -77,7 +77,7 @@ def soph_model():
 
 def train(model, x_train, y_train, x_val, y_val, epochs, modelname='model.hdf5'):
 
-    checkpoint = ModelCheckpoint(modelname, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+    checkpoint = ModelCheckpoint(modelname, monitor='mse', verbose=1, save_best_only=True, mode='max')
     tensorboard = TensorBoard(log_dir='./logs')
     callback_list = [checkpoint, TerminateOnNaN(), tensorboard]
 
