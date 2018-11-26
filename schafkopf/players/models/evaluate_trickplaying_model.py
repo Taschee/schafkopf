@@ -14,9 +14,9 @@ from schafkopf.trick import Trick
 
 game_mode = (PARTNER_MODE, ACORNS)
 
-filepath = '../data/test_data_partner.p'
+filepath = '../data/test_data_solo.p'
 
-modelpath = 'partner_model_wider_data_2.hdf5'
+modelpath = 'solo_model_wider_data_10.hdf5'
 
 
 def suit_in_hand(suit, hand, trumpcards):
@@ -145,12 +145,13 @@ def evaluate_model_on_testdata(model, num_games):
 
 
 def main():
-    print('loading model')
     model = keras.models.load_model(modelpath)
-    print('counting number of games')
     num_games = num_games_in_file(filepath)
-    print('evaluating model')
     evaluate_model_on_testdata(model, num_games)
+
+    x_test, y_test = load_data_trickplay(filepath, num_samples=27)
+    results = model.evaluate(x_test, y_test, verbose=0)
+    print('Accuracy', results[1])
 
 
 if __name__ == '__main__':
