@@ -14,9 +14,9 @@ from schafkopf.trick import Trick
 
 game_mode = (PARTNER_MODE, ACORNS)
 
-filepath = '../data/test_data_solo.p'
+filepath = '../data/test_data_partner.p'
 
-modelpath = 'solo_model_wider_data_10.hdf5'
+modelpath = 'partner_model_deeper_data_2.hdf5'
 
 
 def suit_in_hand(suit, hand, trumpcards):
