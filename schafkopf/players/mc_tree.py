@@ -46,7 +46,7 @@ class MCTree:
         return max_depth
 
     def average_depth(self):
-        all_depths = [leave.get_depth() for leave in self.get_leaves()]
+        all_depths = [self.get_depth(leave) for leave in self.get_leaves()]
         return sum(all_depths) / len(all_depths)
 
     def visualize_tree(self, format="png", ucb=None, filename=None):
