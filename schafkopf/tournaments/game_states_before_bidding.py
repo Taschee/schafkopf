@@ -3,7 +3,8 @@ import random
 import pickle
 
 from schafkopf.card_deck import CardDeck
-from schafkopf.game_modes import NO_GAME
+from schafkopf.game_modes import NO_GAME, WENZ, PARTNER_MODE, SOLO
+from schafkopf.suits import SUITS, ACORNS, LEAVES, BELLS
 
 
 def define_game_state(player_hands, leading_player_index, mode_proposals):
@@ -15,7 +16,9 @@ def define_game_state(player_hands, leading_player_index, mode_proposals):
             "mode_proposals": mode_proposals,
             "tricks": [],
             "current_trick": None,
-            "possible_actions": player_hands[leading_player_index]}
+            "possible_actions": [(NO_GAME, None), (WENZ, None)] +
+                                [(PARTNER_MODE, suit) for suit in [ACORNS, LEAVES, BELLS]] +
+                                [(SOLO, suit) for suit in SUITS]}
 
 
 def main():
