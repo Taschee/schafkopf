@@ -95,6 +95,7 @@ class TrickGame:
                 poss_cards = self.suit_in_hand(suit, hand)
 
             # check if searched Ace can be played
+            poss_cards = poss_cards[:]
             if self.game_mode[0] == PARTNER_MODE and (ACE, self.game_mode[1]) in poss_cards:
                 if not self.previously_ran_away() and len(poss_cards) > 1:
                     poss_cards.remove((ACE, self.game_mode[1]))
@@ -109,9 +110,21 @@ class TrickGame:
         current_player = self.get_current_player()
         if self.current_trick.num_cards == 0:
             self.current_trick.leading_player_index = self.current_player_index
+        if self.current_player_index == 3:
+            print('\n')
+            print(current_player.get_hand())
         options = self.possible_cards(self.current_trick, current_player.get_hand())
+        if self.current_player_index == 3:
+            print('after getting options')
+            print(current_player.get_hand())
         info = self.get_public_info()
+        if self.current_player_index == 3:
+            print('after getting public info')
+            print(current_player.get_hand())
         next_card = current_player.play_card(public_info=info, options=options)
+        if self.current_player_index == 3:
+            print('after playing card')
+            print(current_player.get_hand())
         assert next_card in options, 'Player {} tried to play non legal card'.format(current_player)
         self.current_trick.cards[self.current_player_index] = next_card
         self.current_trick.num_cards += 1
