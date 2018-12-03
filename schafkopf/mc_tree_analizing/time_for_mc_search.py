@@ -3,24 +3,41 @@ from schafkopf.game import Game
 from schafkopf.game_modes import NO_GAME, PARTNER_MODE
 from schafkopf.players.random_player import RandomPlayer
 from schafkopf.players.uct_player import UCTPlayer
+from schafkopf.players.nn_player import NNPlayer
 from schafkopf.ranks import *
 from schafkopf.suits import *
 
+sim_player_list = [NNPlayer(game_mode_nn='../players/models/bigger_classifier200.hdf5',
+                               partner_nn='../players/models/partner_model_bigger_1.hdf5',
+                               solo_nn='../players/models/solo_model_bigger_1.hdf5',
+                               wenz_nn='../players/models/wenz_model_bigger_1.hdf5'),
+                   NNPlayer(game_mode_nn='../players/models/bigger_classifier200.hdf5',
+                            partner_nn='../players/models/partner_model_bigger_1.hdf5',
+                            solo_nn='../players/models/solo_model_bigger_1.hdf5',
+                            wenz_nn='../players/models/wenz_model_bigger_1.hdf5'),
+                   NNPlayer(game_mode_nn='../players/models/bigger_classifier200.hdf5',
+                            partner_nn='../players/models/partner_model_bigger_1.hdf5',
+                            solo_nn='../players/models/solo_model_bigger_1.hdf5',
+                            wenz_nn='../players/models/wenz_model_bigger_1.hdf5'),
+                   NNPlayer(game_mode_nn='../players/models/bigger_classifier200.hdf5',
+                            partner_nn='../players/models/partner_model_bigger_1.hdf5',
+                            solo_nn='../players/models/solo_model_bigger_1.hdf5',
+                            wenz_nn='../players/models/wenz_model_bigger_1.hdf5')]
 
-playerlist = [UCTPlayer(name="A", num_samples=10, num_simulations=1000),
+playerlist = [UCTPlayer(name="A", num_samples=10, num_simulations=1000, simulation_player_list=None),
               RandomPlayer(name="B"),
               RandomPlayer(name="C"),
               RandomPlayer(name="D")]
 
 
 player_hands_partner = [[(OBER, ACORNS), (OBER, BELLS), (UNTER, BELLS), (ACE, BELLS),
-             (KING, LEAVES), (TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)],
-            [(OBER, LEAVES), (OBER, HEARTS), (UNTER, ACORNS), (ACE, HEARTS),
-             (SEVEN, HEARTS), (ACE, ACORNS), (KING, BELLS), (SEVEN, BELLS)],
-            [(UNTER, LEAVES), (TEN, LEAVES), (KING, HEARTS), (KING, ACORNS),
-             (TEN, HEARTS), (SEVEN, LEAVES), (EIGHT, ACORNS), (NINE, BELLS)],
-            [(UNTER, HEARTS), (ACE, LEAVES), (TEN, BELLS), (EIGHT, HEARTS),
-             (EIGHT, LEAVES), (EIGHT, BELLS), (NINE, HEARTS), (NINE, LEAVES)]]
+                         (KING, LEAVES), (TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)],
+                        [(OBER, LEAVES), (OBER, HEARTS), (UNTER, ACORNS), (ACE, HEARTS),
+                         (SEVEN, HEARTS), (ACE, ACORNS), (KING, BELLS), (SEVEN, BELLS)],
+                        [(UNTER, LEAVES), (TEN, LEAVES), (KING, HEARTS), (KING, ACORNS),
+                         (TEN, HEARTS), (SEVEN, LEAVES), (EIGHT, ACORNS), (NINE, BELLS)],
+                        [(UNTER, HEARTS), (ACE, LEAVES), (TEN, BELLS), (EIGHT, HEARTS),
+                         (EIGHT, LEAVES), (EIGHT, BELLS), (NINE, HEARTS), (NINE, LEAVES)]]
 
 
 leading_player = 0
@@ -46,10 +63,12 @@ def main():
     game = Game(game_state=game_state_after_bidding, players=playerlist)
     public_info = game.get_public_info()
     current_player = game.trick_game.get_current_player()
-
     game_state = current_player.sample_game_state(public_info)
 
     start_time = time.time()
+
+    print('Start !')
+
     best_action = current_player.uct_search(game_state=game_state)
     end_time = time.time()
 

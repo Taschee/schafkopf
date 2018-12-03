@@ -6,7 +6,7 @@ from schafkopf.game_modes import *
 import time
 from schafkopf.game import Game
 
-playerlist = [ISUCTPlayer(name="A", num_simulations=100, simulation_player_list=None),
+playerlist = [ISUCTPlayer(name="A", num_simulations=100, simulation_player_list=None, ucb_const=2),
               RandomPlayer(name="B"),
               RandomPlayer(name="C"),
               RandomPlayer(name="D")]
