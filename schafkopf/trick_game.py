@@ -110,21 +110,9 @@ class TrickGame:
         current_player = self.get_current_player()
         if self.current_trick.num_cards == 0:
             self.current_trick.leading_player_index = self.current_player_index
-        if self.current_player_index == 3:
-            print('\n')
-            print(current_player.get_hand())
         options = self.possible_cards(self.current_trick, current_player.get_hand())
-        if self.current_player_index == 3:
-            print('after getting options')
-            print(current_player.get_hand())
         info = self.get_public_info()
-        if self.current_player_index == 3:
-            print('after getting public info')
-            print(current_player.get_hand())
         next_card = current_player.play_card(public_info=info, options=options)
-        if self.current_player_index == 3:
-            print('after playing card')
-            print(current_player.get_hand())
         assert next_card in options, 'Player {} tried to play non legal card'.format(current_player)
         self.current_trick.cards[self.current_player_index] = next_card
         self.current_trick.num_cards += 1
