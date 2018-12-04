@@ -159,6 +159,33 @@ def prepare_data_trickplay(game_data_dic, num_samples=1):
     return card_sequences, cards_to_predict
 
 
+def prepare_extended_data_trickplay(game_data_dic, num_samples=1):
+    played_cards = game_data_dic['played_cards']
+    player_hands = game_data_dic['player_hands']
+
+    card_sequences = []
+    aux_input_hands = []
+    cards_to_predict = []
+
+    # create num_samples different sequences from one game
+    seq_lenghts = random.sample(range(27), num_samples)
+
+    for seq_len in seq_lenghts:
+        seq = played_cards[:seq_len]
+        seq_encoded = enc.encode_played_cards(seq, next_rel_pos=played_cards[seq_len][1])
+        card_sequences.append(seq_encoded)
+
+        next_player = played_cards[seq_len][1]
+        pl_hand = player_hands[next_player]
+        hand_enc = enc.encode_one_hot_hand(pl_hand)
+        aux_input_hands.append(hand_enc)
+
+        next_card = played_cards[seq_len][0]
+        cards_to_predict.append(enc.encode_one_hot_card(next_card))
+
+    return card_sequences, aux_input_hands, cards_to_predict
+
+
 def load_data_trickplay(file, num_samples=1):    # maybe augment data as well?
 
     num_games = num_games_in_file(file)
@@ -178,6 +205,31 @@ def load_data_trickplay(file, num_samples=1):    # maybe augment data as well?
                 y_data[game_num * num_samples + num] = y
 
     return x_data, y_data
+
+
+def load_extended_data_trickplay(file, num_samples=1):
+
+    num_games = num_games_in_file(file)
+
+    with open(file, 'rb') as infile:
+
+        x_card_seq = np.zeros(shape=(num_games * num_samples, 28, 36))
+        x_aux_input_hands = np.zeros(shape=(num_games * num_samples, 8, 32))
+        y_data = np.zeros(shape=(num_games * num_samples, 32))
+
+        for game_num in range(num_games):
+            game_data_dic = pickle.load(infile)
+            card_sequences, aux_hands, cards_to_predict = prepare_extended_data_trickplay(game_data_dic, num_samples)
+            for num in range(num_samples):
+                x1 = card_sequences[num]
+                x2 = aux_hands[num]
+                y = cards_to_predict[num]
+
+                x_card_seq[game_num * num_samples + num] = x1
+                x_aux_input_hands[game_num * num_samples + num] = x2
+                y_data[game_num * num_samples + num] = y
+
+    return [x_card_seq, x_aux_input_hands], y_data
 
 
 def prepare_data_inference(game_data_dic, num_samples):
@@ -249,7 +301,7 @@ def prepare_extended_data_inference(game_data_dic, num_samples):
     return card_sequences, aux_input_hands, hands_to_predict
 
 
-def load_extended_data_inference(file, num_samples=1):    # maybe augment data as well?
+def load_extended_data_inference(file, num_samples=1):
 
     num_games = num_games_in_file(file)
 
