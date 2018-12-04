@@ -5,14 +5,10 @@ import numpy as np
 import pickle
 import keras
 import time
+import matplotlib.pyplot as plt
 
 from schafkopf.players.data.load_data import prepare_data_inference, num_games_in_file, prepare_extended_data_inference
 
-filepath = '../data/test_data_solo.p'
-
-modelpath = 'inference_model_solo_wider.hdf5'
-
-extended_model = False
 
 def top_k_indices(vector, k=1):
     ind = np.argpartition(a=vector, kth=-k)[-k:]
@@ -35,7 +31,10 @@ def find_curr_player(seq):
     return player
 
 
-def evaluate_model_on_testdata(model, num_games, threshold=0.7):
+def evaluate_model_on_testdata(model, filepath, extended_model=True, threshold=0.7):
+
+    num_games = num_games_in_file(filepath)
+
     with open(filepath, 'rb') as f:
 
         count_best_card = 0
@@ -184,6 +183,10 @@ def evaluate_model_on_testdata(model, num_games, threshold=0.7):
 
                     # analyze opponent hand predictions only
 
+                    predictions = model.predict(np.array([x]))[0]
+                    predictions[curr_player_hand_indices] = 0
+                    top_indices = top_k_indices(predictions, k=5)
+
                     if top_indices[0] in correct_indices and top_indices[0] not in curr_player_hand_indices:
                         count_best_card += 1
                         num_correct += 1
@@ -226,18 +229,19 @@ def evaluate_model_on_testdata(model, num_games, threshold=0.7):
 
                     count_num_correct_in_top_5 += num_correct
 
-    print('Analysis all hands : ')
-    print(count_best_all_hands, ' / ', num_games * 26, ' Predicted best card in : ', count_best_all_hands / (num_games * 26))
-    print(count_two_all_hands, ' / ', num_games * 26, ' Predicted sec card in : ', count_two_all_hands / (num_games * 26))
-    print(count_three_all_hands, ' / ', num_games * 26, ' Predicted third card in : ', count_three_all_hands / (num_games * 26))
-    print(count_four_all_hands, ' / ', num_games * 26, ' Predicted fourth card in : ', count_four_all_hands / (num_games * 26))
-    print(count_five_all_hands, ' / ', num_games * 26, ' Predicted fifth card in : ', count_five_all_hands / (num_games * 26))
-    print('Average number of correct predictions: ', count_num_correct_in_top_5_all_hands / (num_games * 26))
-    print('Bigger then threshold {} : {} / {} correct, {}'.format(threshold,
-                                                                  count_correct_positives_all_hands,
-                                                                  count_correct_positives_all_hands + count_false_positives_all_hands,
-                                                                  count_correct_positives_all_hands / (
-                                                                  count_correct_positives_all_hands + count_false_positives_all_hands)))
+    if not extended_model:
+        print('Analysis all hands : ')
+        print(count_best_all_hands, ' / ', num_games * 26, ' Predicted best card in : ', count_best_all_hands / (num_games * 26))
+        print(count_two_all_hands, ' / ', num_games * 26, ' Predicted sec card in : ', count_two_all_hands / (num_games * 26))
+        print(count_three_all_hands, ' / ', num_games * 26, ' Predicted third card in : ', count_three_all_hands / (num_games * 26))
+        print(count_four_all_hands, ' / ', num_games * 26, ' Predicted fourth card in : ', count_four_all_hands / (num_games * 26))
+        print(count_five_all_hands, ' / ', num_games * 26, ' Predicted fifth card in : ', count_five_all_hands / (num_games * 26))
+        print('Average number of correct predictions: ', count_num_correct_in_top_5_all_hands / (num_games * 26))
+        print('Bigger then threshold {} : {} / {} correct, {}'.format(threshold,
+                                                                      count_correct_positives_all_hands,
+                                                                      count_correct_positives_all_hands + count_false_positives_all_hands,
+                                                                      count_correct_positives_all_hands / (
+                                                                      count_correct_positives_all_hands + count_false_positives_all_hands)))
 
     print('Analysis only opponent hands : ')
     print(count_best_card, ' / ', num_games * 26, ' Predicted best card in : ', count_best_card / (num_games * 26))
@@ -251,13 +255,30 @@ def evaluate_model_on_testdata(model, num_games, threshold=0.7):
                                                                   count_correct_positives + count_false_positives,
                                                                   count_correct_positives / (count_correct_positives + count_false_positives)))
 
+    return count_correct_positives / (count_correct_positives + count_false_positives)
 
 def main():
+    filepath = '../data/test_data_solo.p'
+
+    modelpath = 'inference_model_solo_extended.hdf5'
+
+    extended_model = True
     model = keras.models.load_model(modelpath)
-    num_games = num_games_in_file(filepath)
+
     t = time.time()
-    evaluate_model_on_testdata(model, num_games, threshold=0.75)
+    thresholds = [0.001, 0.005, 0.01, 0.015, 0.02, 0.03] + [0.05 * i for i in range(1, 20)] + [0.99]
+    accuracies = []
+    for threshold in thresholds:
+        accuracy_threshold = evaluate_model_on_testdata(model, filepath,
+                                                        extended_model=extended_model,
+                                                        threshold=threshold)
+        accuracies.append(accuracy_threshold)
+
     print('Took {} seconds'.format(time.time() - t))
+    print('Thresholds: ', thresholds)
+    print('Accuracies: ', accuracies)
+
+
 
 if __name__ == '__main__':
     main()

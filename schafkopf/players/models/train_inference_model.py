@@ -38,7 +38,7 @@ def lstm_model():
     model.add(LSTM(250, input_shape=(28, 36)))
     model.add(Dropout(0.2))
     model.add(Dense(128, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=[inference_metric])
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['mse'])
     return model
 
 
@@ -47,7 +47,7 @@ def wider_lstm_model():
     model.add(LSTM(500, input_shape=(28, 36)))
     model.add(Dropout(0.2))
     model.add(Dense(128, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=[inference_metric])
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['mse'])
     return model
 
 
@@ -58,7 +58,7 @@ def deeper_lstm_model():
     model.add(LSTM(250))
     model.add(Dropout(0.2))
     model.add(Dense(128, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=[inference_metric])
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['mse'])
     return model
 
 
