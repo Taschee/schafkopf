@@ -38,9 +38,8 @@ def evaluate_model_on_testdata(model, filepath, extended_model=True, threshold=0
     with open(filepath, 'rb') as f:
 
         count_correct_positives = 0
-        count_correct_positives_all_hands = 0
         count_false_positives = 0
-        count_false_positives_all_hands = 0
+        num_pred = 0
 
         for num in range(num_games):
 
@@ -62,17 +61,18 @@ def evaluate_model_on_testdata(model, filepath, extended_model=True, threshold=0
 
                     for index in top_indices:
                         if predictions[top_indices[index]] > threshold:
+                            num_pred += 1
                             if top_indices[index] in correct_indices:
                                 count_correct_positives += 1
                             else:
                                 count_false_positives += 1
 
-    return count_correct_positives / (count_correct_positives + count_false_positives)
+    return count_correct_positives / (count_correct_positives + count_false_positives), num_pred
 
 def main():
-    filepath = '../data/test_data_solo.p'
+    filepath = '../data/test_data_partner.p'
 
-    modelpath = 'inference_model_solo_extended.hdf5'
+    modelpath = 'inference_model_partner_extended.hdf5'
 
     extended_model = True
     model = keras.models.load_model(modelpath)
@@ -80,16 +80,19 @@ def main():
     t = time.time()
     thresholds = [0.001, 0.005, 0.01, 0.015, 0.02, 0.03] + [0.05 * i for i in range(1, 20)] + [0.99]
     accuracies = []
+    numbers_of_predictions = []
     for count, threshold in enumerate(thresholds):
         print(count / len(thresholds))
-        accuracy_threshold = evaluate_model_on_testdata(model, filepath,
-                                                        extended_model=extended_model,
-                                                        threshold=threshold)
+        accuracy_threshold, num_pred = evaluate_model_on_testdata(model, filepath,
+                                                                  extended_model=extended_model,
+                                                                  threshold=threshold)
         accuracies.append(accuracy_threshold)
+        numbers_of_predictions.append(num_pred)
 
     print('Took {} seconds'.format(time.time() - t))
     print('Thresholds: ', thresholds)
     print('Accuracies: ', accuracies)
+    print('Number of predictions: ', numbers_of_predictions)
 
 
 
