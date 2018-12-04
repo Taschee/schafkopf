@@ -82,7 +82,7 @@ def main():
     accuracies = []
     numbers_of_predictions = []
     for count, threshold in enumerate(thresholds):
-        print(count / len(thresholds))
+        print(str(count / len(thresholds))[:4])
         accuracy_threshold, num_pred = evaluate_model_on_testdata(model, filepath,
                                                                   extended_model=extended_model,
                                                                   threshold=threshold)
