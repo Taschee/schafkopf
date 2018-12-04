@@ -1,10 +1,9 @@
 import pickle
 import argparse
-from keras.models import Sequential
-from keras.layers import Dense
+import keras
+from keras.models import Sequential, Model
 from schafkopf.players.models.train_val_tensorboard import TrainValTensorBoard
-from keras.layers import Dropout
-from keras.layers import LSTM
+from keras.layers import LSTM, Input, Flatten, Dropout, Dense
 from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard, TerminateOnNaN
 
 
@@ -45,6 +44,19 @@ def deeper_lstm_model():
     return model
 
 
+def soph_model():
+    seq_input = Input(shape=(28, 36),  name='seq_input')
+    seq_lstm = LSTM(250)(seq_input)
+    hand_input = Input(shape=(8, 32), name='hand_imput')
+    flatten = Flatten()(hand_input)
+    concat_layer = keras.layers.concatenate([seq_lstm, flatten])
+    hidden = Dense(250, activation='elu', kernel_initializer='he_uniform')(concat_layer)
+    out_layer = Dense(96, activation='sigmoid')(hidden)
+    model = Model(inputs=[seq_input, hand_input], outputs=out_layer)
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['mse'])
+    return model
+
+
 def train(model, x_train, y_train, x_val, y_val, epochs, modelname='model.hdf5'):
 
     checkpoint = ModelCheckpoint(modelname, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
@@ -68,16 +80,30 @@ def main():
     parser.add_argument('--epochs', help='number of training epochs', type=int)
     parser.add_argument('--wider_lstm', help='use two lstm blocks of 250 cells', action='store_true')
     parser.add_argument('--deeper_lstm', help='use two lstm blocks of 250 cells', action='store_true')
+    parser.add_argument('--soph_model', help='use the more sophisticated model with player hand as second input',
+                        actio='store_true')
     args = parser.parse_args()
 
     x_train, y_train, x_val, y_val, _, _ = load_data(args.data)
+
+    if args.soph_model:
+        assert type(x_train) == list \
+               and x_train[0].shape[1:] == (28, 36) \
+               and x_train[1].shape[1:] == (8, 32), 'Wrong trainings data format'
+        assert y_train.shape[1:] == (32, ), 'Wrong trainings data format'
+    else:
+        assert x_train.shape[1:] == (28, 36), 'Wrong trainings data format'
+        assert y_train.shape[1:] == (32, ), 'Wrong trainings data format'
 
     if args.epochs:
         num_epochs = args.epochs
     else:
         num_epochs = 20
 
-    if args.deeper_lstm:
+    if args.soph_model:
+        model = soph_model()
+
+    elif args.deeper_lstm:
         model = deeper_lstm_model()
     elif args.wider_lstm:
         model = wider_lstm_model()
