@@ -5,18 +5,12 @@ import pickle
 import keras
 
 from schafkopf.game_modes import PARTNER_MODE, WENZ, SOLO
-from schafkopf.players.data.load_data import load_data_trickplay, prepare_data_trickplay, num_games_in_file
+from schafkopf.players.data.load_data import load_data_trickplay, prepare_data_trickplay, \
+    num_games_in_file, prepare_extended_data_trickplay, load_extended_data_trickplay
 import schafkopf.players.data.encodings as enc
 from schafkopf.ranks import OBER, UNTER, ACE, TEN, KING, NINE, EIGHT, SEVEN
 from schafkopf.suits import ACORNS, HEARTS, SUITS
 from schafkopf.trick import Trick
-
-
-game_mode = (PARTNER_MODE, ACORNS)
-
-filepath = '../data/test_data_partner.p'
-
-modelpath = 'partner_model_deeper_data_2.hdf5'
 
 
 def suit_in_hand(suit, hand, trumpcards):
@@ -92,7 +86,12 @@ def get_possible_cards(game_mode, card_sequence, player_hand):
         return possible_cards(game_mode, curr_trick, player_hand, previously_ran_away)
 
 
-def evaluate_model_on_testdata(model, num_games):
+def evaluate_model_on_testdata(modelpath, filepath, extended_model):
+
+    model = keras.models.load_model(modelpath)
+
+    num_games = num_games_in_file(filepath)
+
     with open(filepath, 'rb') as f:
 
         count = 0
@@ -101,13 +100,20 @@ def evaluate_model_on_testdata(model, num_games):
 
             data_dic = pickle.load(f)
 
-            x_list, y_list = prepare_data_trickplay(data_dic, num_samples=27)
+            if not extended_model:
+                x_list, y_list = prepare_data_trickplay(data_dic, num_samples=27)
+            else:
+                card_seq, aux_hands, y_list = prepare_extended_data_trickplay(data_dic, num_samples=27)
 
             for i in range(27):
-                x = x_list[i]
-                y = y_list[i]
 
-                predictions = model.predict(np.array([x]))[0]
+                y = y_list[i]
+                if not extended_model:
+                    x = x_list[i]
+                    predictions = model.predict(np.array([x]))[0]
+                else:
+                    x = [np.array([card_seq[i]]), np.array([aux_hands[i]])]
+                    predictions = model.predict(x)[0]
 
                 card_to_predict = enc.decode_one_hot_card(y)
                 card_sequence = []
@@ -129,6 +135,12 @@ def evaluate_model_on_testdata(model, num_games):
                     elif pl == player:
                         player_hand = [c for c in player_hand if c != crd]
 
+                if 'solo' in filepath:
+                    game_mode = (SOLO, HEARTS)
+                elif 'wenz' in filepath:
+                    game_mode = (WENZ, None)
+                else:
+                    game_mode = (PARTNER_MODE, ACORNS)
                 options = get_possible_cards(game_mode, card_sequence, player_hand)
 
                 deck = [(i // 4, i % 4) for i in range(32)]
@@ -145,11 +157,17 @@ def evaluate_model_on_testdata(model, num_games):
 
 
 def main():
-    model = keras.models.load_model(modelpath)
-    num_games = num_games_in_file(filepath)
-    evaluate_model_on_testdata(model, num_games)
+    extended_model = True
+    filepath = '../data/test_data_partner.p'
+    modelpath = 'trickplay_model_partner_extended.hdf5'
 
-    x_test, y_test = load_data_trickplay(filepath, num_samples=27)
+    evaluate_model_on_testdata(modelpath, filepath, extended_model=extended_model)
+
+    model = keras.models.load_model(modelpath)
+    if not extended_model:
+        x_test, y_test = load_data_trickplay(filepath, num_samples=27)
+    else:
+        x_test, y_test = load_extended_data_trickplay(filepath, num_samples=27)
     results = model.evaluate(x_test, y_test, verbose=0)
     print('Accuracy', results[1])
 
