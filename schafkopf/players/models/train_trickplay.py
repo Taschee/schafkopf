@@ -53,7 +53,7 @@ def soph_model():
     hidden = Dense(250, activation='elu', kernel_initializer='he_uniform')(concat_layer)
     out_layer = Dense(32, activation='sigmoid')(hidden)
     model = Model(inputs=[seq_input, hand_input], outputs=out_layer)
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['mse'])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 
 
