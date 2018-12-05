@@ -50,10 +50,22 @@ def test_prediction(example_public_info):
     player = NNPlayer(game_mode_nn='../schafkopf/players/models/bigger_classifier200.hdf5',
                       partner_nn='../schafkopf/players/models/partner_model_bigger_1.hdf5',
                       solo_nn='../schafkopf/players/models/solo_model_bigger_1.hdf5',
-                      wenz_nn='../schafkopf/players/models/wenz_model_bigger_1.hdf5')
+                      wenz_nn='../schafkopf/players/models/wenz_model_bigger_1.hdf5',
+                      use_extended_models=False)
     prediction = player.make_card_prediction(example_public_info)
-    print('\n Prediction : \n',player.make_card_prediction(example_public_info))
+    print('\n Prediction : \n', prediction)
     assert len(prediction) == 32
+    player_extended = NNPlayer(game_mode_nn='../schafkopf/players/models/bigger_classifier200.hdf5',
+                               partner_nn='../schafkopf/players/models/trickplay_model_partner_extended.hdf5',
+                               solo_nn='../schafkopf/players/models/trickplay_model_solo_extended.hdf5',
+                               wenz_nn='../schafkopf/players/models/trickplay_model_wenz_extended.hdf5',
+                               use_extended_models=True)
+    starting_hand = [(3, 1), (4, 1), (3, 3), (6, 0), (6, 2), (6, 1), (3, 0), (0, 2)]
+    player_extended.pick_up_cards(starting_hand)
+    player_extended.set_starting_hand(starting_hand)
+    prediction_ext = player_extended.make_card_prediction(example_public_info)
+    print('\n Prediction : \n', prediction_ext)
+    assert len(prediction_ext) == 32
 
 
 def test_suits_options(example_public_info):

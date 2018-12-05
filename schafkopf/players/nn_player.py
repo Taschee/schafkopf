@@ -9,8 +9,9 @@ from schafkopf.suits import ACORNS, HEARTS
 
 
 class NNPlayer(Player):
-    def __init__(self, game_mode_nn=None, partner_nn=None, wenz_nn=None, solo_nn=None, name='NNPlayer'):
+    def __init__(self, game_mode_nn=None, partner_nn=None, wenz_nn=None, solo_nn=None, use_extended_models=False, name='NNPlayer'):
         Player.__init__(self, name=name)
+        self.use_extended_models = use_extended_models
         try:
             self.game_mode_nn = keras.models.load_model(game_mode_nn)
         except:
@@ -83,16 +84,25 @@ class NNPlayer(Player):
         return options_switched_suits
 
     def make_card_prediction(self, public_info):
+
         card_sequence = self.create_card_sequence(public_info)
         card_seq_switched_suits = self.switch_suits(card_sequence, public_info)
         rel_pos = (public_info['current_trick'].current_player_index - public_info['declaring_player']) % 4
         card_seq_encoded = enc.encode_played_cards(card_seq_switched_suits, rel_pos)
-        if public_info['game_mode'][0] == PARTNER_MODE:
-            pred = self.partner_nn.predict(np.array([card_seq_encoded]))[0]
-        elif public_info['game_mode'][0] == WENZ:
-            pred = self.wenz_nn.predict(np.array([card_seq_encoded]))[0]
+
+        if not self.use_extended_models:
+            x = np.array([card_seq_encoded])
         else:
-            pred = self.solo_nn.predict(np.array([card_seq_encoded]))[0]
+            hand_encoded = enc.encode_one_hot_hand(self.starting_hand)
+            x = [np.array([card_seq_encoded]), np.array([hand_encoded])]
+
+        if public_info['game_mode'][0] == PARTNER_MODE:
+            pred = self.partner_nn.predict(x)[0]
+        elif public_info['game_mode'][0] == WENZ:
+            pred = self.wenz_nn.predict(x)[0]
+        else:
+            pred = self.solo_nn.predict(x)[0]
+
         return pred
 
     def create_card_sequence(self, public_info):
