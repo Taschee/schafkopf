@@ -46,12 +46,12 @@ def deeper_lstm_model():
 
 def soph_model():
     seq_input = Input(shape=(28, 36),  name='seq_input')
-    seq_lstm = LSTM(250)(seq_input)
+    seq_lstm = LSTM(500)(seq_input)
     hand_input = Input(shape=(8, 32), name='hand_imput')
     flatten = Flatten()(hand_input)
     concat_layer = keras.layers.concatenate([seq_lstm, flatten])
     hidden = Dense(250, activation='elu', kernel_initializer='he_uniform')(concat_layer)
-    out_layer = Dense(96, activation='sigmoid')(hidden)
+    out_layer = Dense(32, activation='sigmoid')(hidden)
     model = Model(inputs=[seq_input, hand_input], outputs=out_layer)
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['mse'])
     return model
@@ -81,7 +81,7 @@ def main():
     parser.add_argument('--wider_lstm', help='use two lstm blocks of 250 cells', action='store_true')
     parser.add_argument('--deeper_lstm', help='use two lstm blocks of 250 cells', action='store_true')
     parser.add_argument('--soph_model', help='use the more sophisticated model with player hand as second input',
-                        actio='store_true')
+                        action='store_true')
     args = parser.parse_args()
 
     x_train, y_train, x_val, y_val, _, _ = load_data(args.data)
