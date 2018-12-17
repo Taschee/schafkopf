@@ -564,7 +564,11 @@ class HeuristicsPlayer(Player):
                     else:
                         return self.trumpcards_in_hand(public_info)[-1]
                 else:
-                    return random.choice(self.trumpcards_in_hand(public_info))
+                    trumpcards_in_hand = self.trumpcards_in_hand(public_info)
+                    if len(trumpcards_in_hand) > 0:
+                        return random.choice(trumpcards_in_hand)
+                    else:
+                        return random.choice(options)
 
     def sparrows_in_hand(self, public_info):
         sparrows = []
