@@ -520,8 +520,10 @@ class HeuristicsPlayer(Player):
             # play best trumpcard left if possible, random trumpcard otherwise
             if best_trump_left in options:
                 return best_trump_left
-            else:
+            elif len(trumpcards_in_hand) > 0:
                 return random.choice(trumpcards_in_hand)
+            else:
+                return random.choice(options)
         # play ACE or sparrow otherwise if possible
         else:
             aces = self.aces_in_hand(public_info)
