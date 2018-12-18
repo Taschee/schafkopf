@@ -51,7 +51,7 @@ def soph_model():
     flatten = Flatten()(hand_input)
     concat_layer = keras.layers.concatenate([seq_lstm, flatten])
     hidden = Dense(250, activation='elu', kernel_initializer='he_uniform')(concat_layer)
-    out_layer = Dense(32, activation='sigmoid')(hidden)
+    out_layer = Dense(32, activation='softmax')(hidden)
     model = Model(inputs=[seq_input, hand_input], outputs=out_layer)
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model

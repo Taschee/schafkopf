@@ -10,7 +10,6 @@ num_games_wenz = num_games_in_file('../data/test_data_wenz.p')
 num_games_partner = num_games_in_file('../data/test_data_partner.p')
 
 
-
 accuracies_solo = [0.18656352516150465, 0.25040410362252025, 0.2952363783856866, 0.3143047401174231, 0.3244600869148532,
                    0.3359061365963591, 0.3504456352045063, 0.375468472858878, 0.39238518241046705, 0.4063424391525894,
                    0.42030425231959606, 0.4363004822990868, 0.4558156091483492, 0.47930930568948893, 0.5070730125368429,
@@ -34,12 +33,23 @@ accuracies_partner = [0.23075312909419135, 0.3208712139203886, 0.332238305691406
 prediction_numbers_solo = [842855, 627933, 532536, 500072, 484152, 466806, 444534, 404239, 373745, 342455, 305010,
                            260834, 213503, 165920, 121801, 84906, 57174, 38789, 27142, 19797, 14800, 10874, 7642,
                            4990, 2629, 459]
+prediction_numbers_solo = [num / (num_games_solo * 26) for num in prediction_numbers_solo]
 prediction_numbers_wenz = [424742, 346290, 292899, 266745, 251855, 235584, 220211, 198774, 177717, 154589, 130440,
                            105717, 81943, 61391, 44340, 31257, 21626, 14919, 10283, 7150, 4895, 3387, 2305,
                            1461, 776, 142]
+prediction_numbers_wenz = [num / (num_games_wenz * 26) for num in prediction_numbers_wenz]
 prediction_numbers_partner = [3191259, 2294821, 2216078, 2192926, 2179229, 2159859, 2129500, 2050688, 1938178,
                               1771122, 1547885, 1265423, 945033, 643040, 415657, 271036, 183389, 127798, 90566,
                               64938, 46759, 33652, 23735, 15944, 9512, 3542]
+prediction_numbers_partner = [num / (num_games_partner * 26) for num in prediction_numbers_partner]
+
+print([(thresh, num) for thresh, num in zip(thresholds, prediction_numbers_solo)])
+print([(thresh, num) for thresh, num in zip(thresholds, prediction_numbers_wenz)])
+print([(thresh, num) for thresh, num in zip(thresholds, prediction_numbers_partner)])
+
+print([(thresh, acc * num - (1 - acc) * num) for thresh, acc, num in zip(thresholds, accuracies_solo, prediction_numbers_solo)])
+print([(thresh, acc * num - (1 - acc) * num) for thresh, acc, num in zip(thresholds, accuracies_wenz, prediction_numbers_wenz)])
+print([(thresh, acc * num - (1 - acc) * num) for thresh, acc, num in zip(thresholds, accuracies_partner, prediction_numbers_partner)])
 
 
 fig, (ax1, ax2) = plt.subplots(2, 1)
@@ -47,10 +57,10 @@ ax1.set_ylabel('Accuracy')
 ax1.plot(thresholds, accuracies_solo, c='blue', label='Solo')
 ax1.plot(thresholds, accuracies_wenz, c='red', label='Wenz')
 ax1.plot(thresholds, accuracies_partner, c='green', label='Partner Mode')
-ax2.set_ylabel('Numbers of predictions per game')
+ax2.set_ylabel('Predictions per game')
 ax2.set_xlabel('Thresholds')
-ax2.plot(thresholds, [num / (num_games_solo * 26) for num in prediction_numbers_solo], c='blue', label='Solo')
-ax2.plot(thresholds, [num / (num_games_wenz * 26) for num in prediction_numbers_wenz], c='red', label='Wenz')
-ax2.plot(thresholds, [num / (num_games_partner * 26) for num in prediction_numbers_partner], c='green', label='Partner Mode')
+ax2.plot(thresholds, prediction_numbers_solo, c='blue', label='Solo')
+ax2.plot(thresholds, prediction_numbers_wenz, c='red', label='Wenz')
+ax2.plot(thresholds, prediction_numbers_partner, c='green', label='Partner Mode')
 ax1.legend()
 plt.show()
