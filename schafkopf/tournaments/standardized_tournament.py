@@ -51,7 +51,7 @@ def main():
 
     playerlist = [  # UCTPlayer(num_samples=10, num_simulations=10, ucb_const=1, simulation_player_list=None),
                     # UCTPlayer(name="A", num_samples=10, num_simulations=100, ucb_const=1),
-                    NNPlayer(game_mode_nn='../players/models/bigger_classifier_sortedhands_lr0.02.hdf5',
+                    NNPlayer(game_mode_nn='../players/models/bigger_classifier200.hdf5',
                              partner_nn='../players/models/partner_model_wider_data_2.hdf5',
                              solo_nn='../players/models/solo_model_wider_data_10.hdf5',
                              wenz_nn='../players/models/wenz_model_wider_data_10.hdf5'),

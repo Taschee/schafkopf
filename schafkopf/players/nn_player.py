@@ -9,7 +9,7 @@ from schafkopf.suits import ACORNS, HEARTS
 
 
 class NNPlayer(Player):
-    def __init__(self, game_mode_nn=None, partner_nn=None, wenz_nn=None, solo_nn=None, use_extended_models=False, name='NNPlayer'):
+    def __init__(self, game_mode_nn=None, partner_nn=None, wenz_nn=None, solo_nn=None, use_extended_models=True, name='NNPlayer'):
         Player.__init__(self, name=name)
         self.use_extended_models = use_extended_models
         try:
