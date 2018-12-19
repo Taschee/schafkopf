@@ -7,7 +7,7 @@ class HumanConsolePlayer(Player):
         while True:
             mode_index = input("Hand : {} \n"
                          "Previous Proposals: {} \n"
-                         "Options : {}"
+                         "Options : {}\n"
                          "Choose Game Mode : ".format(self.hand, public_info["mode_proposals"], options))
             mode = options[int(mode_index)]
             if mode in options:
@@ -19,7 +19,7 @@ class HumanConsolePlayer(Player):
             card_index = input("Hand : {} \n"
                          "Previous tricks : {}"
                          "Current Trick : {}\n"
-                         "Options : {}" 
+                         "Options : {}\n" 
                          "Play card : ".format(self.hand, public_info['tricks'], public_info["current_trick"], options))
             card = options[int(card_index)]
             if card in self.hand:
