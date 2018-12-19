@@ -17,12 +17,16 @@ class HumanConsolePlayer(Player):
     def play_card(self, public_info, options=None):
         while True:
             card_index = input("Hand : {} \n"
-                         "Previous tricks : {}"
+                         "Previous tricks : {}\n"
                          "Current Trick : {}\n"
                          "Options : {}\n" 
-                         "Play card : ".format(self.hand, public_info['tricks'], public_info["current_trick"], options))
-            card = options[int(card_index)]
-            if card in self.hand:
+                         "Play card : ".format(self.hand,
+                                               [str(trick) for trick in public_info['tricks']],
+                                               public_info["current_trick"],
+                                               options))
+            card_index = int(card_index)
+            if card_index in range(len(options)):
                 break
+        card = options[card_index]
         self.hand.remove(card)
         return card
