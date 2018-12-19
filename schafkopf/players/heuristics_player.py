@@ -544,7 +544,11 @@ class HeuristicsPlayer(Player):
             if best_trumpcard_left in options:
                 return best_trumpcard_left
             else:
-                return [card for card in public_info["trumpcards"] if card in self.hand][-1]
+                trumps_in_hand = [card for card in public_info["trumpcards"] if card in self.hand]
+                if len(trumps_in_hand) > 0:
+                    return trumps_in_hand[-1]
+                else:
+                    return random.choice(options)
         else:
             played_suit_cards_in_hand = self.suit_in_hand(first_card[1])
             if len(played_suit_cards_in_hand) > 0:
