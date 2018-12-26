@@ -4,6 +4,7 @@ from schafkopf.players.player import Player
 class HumanConsolePlayer(Player):
     """Player for playing on console"""
     def choose_game_mode(self, public_info, options):
+        options = list(options)
         while True:
             mode_index = input("Hand : {} \n"
                          "Previous Proposals: {} \n"
@@ -17,10 +18,12 @@ class HumanConsolePlayer(Player):
     def play_card(self, public_info, options=None):
         while True:
             card_index = input("Hand : {} \n"
+                         "Game Mode : {}"
                          "Previous tricks : {}\n"
                          "Current Trick : {}\n"
                          "Options : {}\n" 
                          "Play card : ".format(self.hand,
+                                               public_info['game_mode'],
                                                [str(trick) for trick in public_info['tricks']],
                                                public_info["current_trick"],
                                                options))
