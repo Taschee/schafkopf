@@ -36,7 +36,7 @@ This submodule only contains some scripts that have been used for experiments wi
 #### GUI
 A little bit of work was put into the development of a simple graphical user interface using kivy and the kivy language. This work is still unfinished though. 
 
-### Monte Carlo Tree Analyzing
+#### Monte Carlo Tree Analyzing
 This provides only a few simple scripts which were used for the analysis and visualization of the partial game trees built during Monte Carlo Tree Search.
 
 
