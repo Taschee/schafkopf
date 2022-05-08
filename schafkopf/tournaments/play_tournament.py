@@ -50,7 +50,6 @@ def main():
         print('Results : ', [tournament.cumulative_rewards[i] - cum_rew_old[i] for i in range(4)])
         cum_rew_old = tournament.cumulative_rewards[:]
 
-
     end_time = time.time()
 
     print("Time : ", end_time - start_time, " seconds")

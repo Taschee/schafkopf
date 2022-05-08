@@ -11,8 +11,8 @@ wenz_filename = 'train_data_wenz.p'
 partner_filename = 'train_data_partner.p'
 
 
-def create_data_trickplay(infilename):
-    with open(infilename, 'rb') as infile:
+def create_data_trickplay(infile_name):
+    with open(infile_name, 'rb') as infile:
         while True:
             try:
                 data_dic = pickle.load(infile)

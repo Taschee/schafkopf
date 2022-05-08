@@ -16,7 +16,6 @@ from kivy.app import App
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.clock import Clock
 
-
 SUITS = {'0': 'Schellen', '1': 'Herz', '2': 'Gras', '3': 'Eichel'}
 SYMBOLS = {'0': '7', '1': '8', '2': '9', '3': 'U', '4': 'O', '5': 'K', '6': '10', '7': 'A'}
 BIDDING_IDS = {(NO_GAME, None): 'no_game', (PARTNER_MODE, ACORNS): 'partner_acorns',
@@ -27,6 +26,7 @@ GAME_MODE_TEXTS = {(NO_GAME, None): 'Weiter', (PARTNER_MODE, ACORNS): 'Mit der A
                    (PARTNER_MODE, LEAVES): 'Mit der Blauen!', (PARTNER_MODE, BELLS): 'Mit der Schellen',
                    (WENZ, None): 'Wenz', (SOLO, ACORNS): 'Eichel Solo', (SOLO, LEAVES): 'Gras Solo',
                    (SOLO, HEARTS): 'Herz Solo', (SOLO, BELLS): 'Schellen Solo'}
+
 
 class GameScreenManager(ScreenManager):
     def __init__(self, playerlist):
@@ -77,7 +77,6 @@ class PlayingScreen(Screen):
         for wid in player_hand_widget.children:
             if wid.text == card_str:
                 player_hand_widget.remove_widget(wid)
-
 
     def add_widget_to_display_by_id(self, widget_id, *args):
         widget = self.ids[widget_id]
@@ -345,7 +344,7 @@ class PlayingScreen(Screen):
                 result_screen.ids['winners'].text = '{} gewonnen von {} mit {} Punkten'.format(game_mode_str,
                                                                                                winners,
                                                                                                final_score)
-            result_screen.ids['rewards'].text = 'Auszahlung : '+format(rewards)
+            result_screen.ids['rewards'].text = 'Auszahlung : ' + format(rewards)
             self.manager.current = 'result_screen'
         else:
             game_mode_str = GAME_MODE_TEXTS[game_mode]
@@ -355,7 +354,6 @@ class PlayingScreen(Screen):
             result_screen.ids['winners'].text = 'Zamgschmissen'
             result_screen.ids['rewards'].text = 'Auszahlung : ' + format(rewards)
             self.manager.current = 'result_screen'
-
 
     def print_msg(self, string, *args):
         print(string)

@@ -26,6 +26,7 @@ def new_game_state():
                                 [(PARTNER_MODE, suit) for suit in [ACORNS, LEAVES, BELLS]] +
                                 [(SOLO, suit) for suit in SUITS]}
 
+
 def main():
     sim_player_list = [NNPlayer(game_mode_nn='../players/models/bigger_classifier200.hdf5',
                                 partner_nn='../players/models/partner_model_wider_data_2.hdf5',
@@ -66,7 +67,7 @@ def main():
         depth = mc_tree.max_depth()
         cum_depth += depth
 
-    print('Average tree depth without NN:', cum_depth / len(sample_game_states) )
+    print('Average tree depth without NN:', cum_depth / len(sample_game_states))
 
     cum_depth_with_nn = 0
     for game_state in sample_game_states:

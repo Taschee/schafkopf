@@ -32,7 +32,6 @@ def find_curr_player(seq):
 
 
 def evaluate_model_on_testdata(model, filepath, extended_model=True, threshold=0.7):
-
     num_games = num_games_in_file(filepath)
 
     with open(filepath, 'rb') as f:
@@ -69,6 +68,7 @@ def evaluate_model_on_testdata(model, filepath, extended_model=True, threshold=0
 
     return count_correct_positives / (count_correct_positives + count_false_positives), num_pred
 
+
 def main():
     filepath = '../data/test_data_partner.p'
 
@@ -93,7 +93,6 @@ def main():
     print('Thresholds: ', thresholds)
     print('Accuracies: ', accuracies)
     print('Number of predictions: ', numbers_of_predictions)
-
 
 
 if __name__ == '__main__':

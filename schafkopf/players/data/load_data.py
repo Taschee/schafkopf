@@ -87,7 +87,7 @@ def suit_permutations_hands_sw(declaring_player, game_mode, player_hands):
             remaining_suits = [s for s in other_suits if s != first_suit]
             for third_suit in remaining_suits:
                 new_player_hands = switch_suits_player_hands(new_player_hands, sec_suit, third_suit)
-                # now create trainingsexamples from switched hands
+                # now create trainings examples from switched hands
                 for hand, player_pos in zip(new_player_hands, range(len(player_hands))):
                     x, y = create_bidding_example(declaring_player, new_game_mode, hand, player_pos)
                     data_list.append((x, y))
@@ -233,7 +233,7 @@ def load_extended_data_trickplay(file, num_samples=1):
 
 
 def prepare_data_inference(game_data_dic, num_samples):
-    '''creates lists X, Y with X containing card_seq and Y containing encoded player_hands (starting player first)'''
+    """creates lists X, Y with X containing card_seq and Y containing encoded player_hands (starting player first)"""
     played_cards = game_data_dic['played_cards']
     player_hands = game_data_dic['player_hands']
 

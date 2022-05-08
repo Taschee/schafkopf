@@ -89,7 +89,6 @@ def train(model, x_train, y_train, x_val, y_val, epochs, modelname='model.hdf5')
 
 
 def main():
-
     parser = argparse.ArgumentParser()
     parser.add_argument('data', help='pickle file with the trainings data')
     parser.add_argument('--modelname', help='name of the model to be trained')

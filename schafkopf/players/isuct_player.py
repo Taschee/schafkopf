@@ -12,7 +12,6 @@ from schafkopf.suits import LEAVES, ACORNS, BELLS, HEARTS
 from schafkopf.trick import Trick
 
 
-
 class ISUCTPlayer(Player):
 
     def __init__(self, name="UCT", ucb_const=1, num_simulations=100, simulation_player_list=None):
@@ -107,7 +106,7 @@ class ISUCTPlayer(Player):
             sim_game_state['game_mode'] = (game_type, ran_suit)
         # if game_type is not known yet, but at least two proposals are made:
         elif game_type > PARTNER_MODE and len(sim_game_state['mode_proposals']) <= 4 \
-                and sim_game_state['declaring_player'] != sim_game_state['current_player_index'] - 1:
+            and sim_game_state['declaring_player'] != sim_game_state['current_player_index'] - 1:
             sim_game_state['game_mode'] = random.choice([(WENZ, None), (SOLO, ACORNS), (SOLO, HEARTS),
                                                          (SOLO, BELLS), (SOLO, LEAVES)])
         game_simulation = Game(players=playerlist, game_state=deepcopy(sim_game_state))

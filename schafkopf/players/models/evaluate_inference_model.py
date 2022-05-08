@@ -32,7 +32,6 @@ def find_curr_player(seq):
 
 
 def evaluate_model_on_testdata(model, filepath, extended_model=True, threshold=0.7):
-
     num_games = num_games_in_file(filepath)
 
     with open(filepath, 'rb') as f:
@@ -74,7 +73,6 @@ def evaluate_model_on_testdata(model, filepath, extended_model=True, threshold=0
                     predictions = model.predict(x)[0]
                     top_indices = top_k_indices(predictions, k=5)
                     correct_indices = np.where(y == 1)[0]
-
 
                     num_correct = 0
                     if top_indices[0] in correct_indices:
@@ -231,17 +229,22 @@ def evaluate_model_on_testdata(model, filepath, extended_model=True, threshold=0
 
     if not extended_model:
         print('Analysis all hands : ')
-        print(count_best_all_hands, ' / ', num_games * 26, ' Predicted best card in : ', count_best_all_hands / (num_games * 26))
-        print(count_two_all_hands, ' / ', num_games * 26, ' Predicted sec card in : ', count_two_all_hands / (num_games * 26))
-        print(count_three_all_hands, ' / ', num_games * 26, ' Predicted third card in : ', count_three_all_hands / (num_games * 26))
-        print(count_four_all_hands, ' / ', num_games * 26, ' Predicted fourth card in : ', count_four_all_hands / (num_games * 26))
-        print(count_five_all_hands, ' / ', num_games * 26, ' Predicted fifth card in : ', count_five_all_hands / (num_games * 26))
+        print(count_best_all_hands, ' / ', num_games * 26, ' Predicted best card in : ',
+              count_best_all_hands / (num_games * 26))
+        print(count_two_all_hands, ' / ', num_games * 26, ' Predicted sec card in : ',
+              count_two_all_hands / (num_games * 26))
+        print(count_three_all_hands, ' / ', num_games * 26, ' Predicted third card in : ',
+              count_three_all_hands / (num_games * 26))
+        print(count_four_all_hands, ' / ', num_games * 26, ' Predicted fourth card in : ',
+              count_four_all_hands / (num_games * 26))
+        print(count_five_all_hands, ' / ', num_games * 26, ' Predicted fifth card in : ',
+              count_five_all_hands / (num_games * 26))
         print('Average number of correct predictions: ', count_num_correct_in_top_5_all_hands / (num_games * 26))
         print('Bigger then threshold {} : {} / {} correct, {}'.format(threshold,
                                                                       count_correct_positives_all_hands,
                                                                       count_correct_positives_all_hands + count_false_positives_all_hands,
                                                                       count_correct_positives_all_hands / (
-                                                                      count_correct_positives_all_hands + count_false_positives_all_hands)))
+                                                                          count_correct_positives_all_hands + count_false_positives_all_hands)))
 
     print('Analysis only opponent hands : ')
     print(count_best_card, ' / ', num_games * 26, ' Predicted best card in : ', count_best_card / (num_games * 26))
@@ -253,9 +256,11 @@ def evaluate_model_on_testdata(model, filepath, extended_model=True, threshold=0
     print('Bigger then threshold {} : {} / {} correct, {}'.format(threshold,
                                                                   count_correct_positives,
                                                                   count_correct_positives + count_false_positives,
-                                                                  count_correct_positives / (count_correct_positives + count_false_positives)))
+                                                                  count_correct_positives / (
+                                                                          count_correct_positives + count_false_positives)))
 
     return count_correct_positives / (count_correct_positives + count_false_positives)
+
 
 def main():
     filepath = '../data/test_data_solo.p'
@@ -277,7 +282,6 @@ def main():
     print('Took {} seconds'.format(time.time() - t))
     print('Thresholds: ', thresholds)
     print('Accuracies: ', accuracies)
-
 
 
 if __name__ == '__main__':

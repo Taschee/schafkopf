@@ -135,7 +135,7 @@ class DataScraper():
         return playerhands
 
     def scrape_played_cards(self, soup):
-        '''returns list of tuples: (played_card, corresponding playerindex)'''
+        """returns list of tuples: (played_card, corresponding playerindex)"""
         playernames = self.get_player_names(soup)
         game_prot_items = soup.find_all(class_='card-content game-protocol-trick game-protocol-item')
         played_cards = []
@@ -160,5 +160,5 @@ class DataScraper():
         game_mode = self.scrape_game_mode(soup)
         declaring_player = self.scrape_declaring_player_index(soup)
         played_cards = self.scrape_played_cards(soup)
-        return (player_hands, game_mode, declaring_player, played_cards)
+        return player_hands, game_mode, declaring_player, played_cards
 

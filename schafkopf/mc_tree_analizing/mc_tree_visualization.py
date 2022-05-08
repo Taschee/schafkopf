@@ -47,5 +47,6 @@ def main():
                                                                                 ucb_constant,
                                                                                 game_state["game_mode"]))
 
+
 if __name__ == "__main__":
     main()

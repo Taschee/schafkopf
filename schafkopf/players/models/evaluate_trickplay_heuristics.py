@@ -4,8 +4,8 @@ from schafkopf.suits import *
 from schafkopf.ranks import *
 import schafkopf.players.data.encodings as enc
 
-def main():
 
+def main():
     modelpath_partner = 'trickplay_model_partner_extended.hdf5'
     modelpath_solo = 'trickplay_model_solo_extended.hdf5'
     modelpath_wenz = 'trickplay_model_went_extended.hdf5'

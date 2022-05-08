@@ -20,14 +20,17 @@ def main():
 
                     if game.trick_game.current_trick.num_cards != 0:
                         current_player = game.trick_game.get_current_player()
-                        options = game.trick_game.possible_cards(game.trick_game.current_trick, current_player.get_hand())
+                        options = game.trick_game.possible_cards(game.trick_game.current_trick,
+                                                                 current_player.get_hand())
                         num_poss += len(options)
                         num_examples += 1
 
                 game.trick_game.play_next_card()
                 game.trick_game.trick_finished()
 
-    print('Average number of legal cards to play after {} situations is : {}'.format(num_examples, num_poss / num_examples))
+    print('Average number of legal cards to play after {} situations is : {}'.format(num_examples,
+                                                                                     num_poss / num_examples))
+
 
 if __name__ == '__main__':
     main()

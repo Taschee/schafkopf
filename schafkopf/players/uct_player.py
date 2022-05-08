@@ -95,7 +95,6 @@ class UCTPlayer(Player):
         return rewards
 
     def sample_game_state(self, public_info):
-
         # sample opponent hands
         if public_info["current_trick"] is None:
             current_trick = Trick(leading_player_index=public_info["leading_player_index"])
@@ -124,7 +123,6 @@ class UCTPlayer(Player):
         if len(options) == 1:
             return list(options)[0]
         else:
-
             sampled_states = [self.sample_game_state(public_info) for num in range(self.num_samples)]
 
             move_counts = {move: 0 for move in options}

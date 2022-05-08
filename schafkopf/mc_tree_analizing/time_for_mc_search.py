@@ -8,9 +8,9 @@ from schafkopf.ranks import *
 from schafkopf.suits import *
 
 sim_player_list = [NNPlayer(game_mode_nn='../players/models/bigger_classifier200.hdf5',
-                               partner_nn='../players/models/partner_model_bigger_1.hdf5',
-                               solo_nn='../players/models/solo_model_bigger_1.hdf5',
-                               wenz_nn='../players/models/wenz_model_bigger_1.hdf5'),
+                            partner_nn='../players/models/partner_model_bigger_1.hdf5',
+                            solo_nn='../players/models/solo_model_bigger_1.hdf5',
+                            wenz_nn='../players/models/wenz_model_bigger_1.hdf5'),
                    NNPlayer(game_mode_nn='../players/models/bigger_classifier200.hdf5',
                             partner_nn='../players/models/partner_model_bigger_1.hdf5',
                             solo_nn='../players/models/solo_model_bigger_1.hdf5',
@@ -29,7 +29,6 @@ playerlist = [UCTPlayer(name="A", num_samples=10, num_simulations=1000, simulati
               RandomPlayer(name="C"),
               RandomPlayer(name="D")]
 
-
 player_hands_partner = [[(OBER, ACORNS), (OBER, BELLS), (UNTER, BELLS), (ACE, BELLS),
                          (KING, LEAVES), (TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)],
                         [(OBER, LEAVES), (OBER, HEARTS), (UNTER, ACORNS), (ACE, HEARTS),
@@ -39,7 +38,6 @@ player_hands_partner = [[(OBER, ACORNS), (OBER, BELLS), (UNTER, BELLS), (ACE, BE
                         [(UNTER, HEARTS), (ACE, LEAVES), (TEN, BELLS), (EIGHT, HEARTS),
                          (EIGHT, LEAVES), (EIGHT, BELLS), (NINE, HEARTS), (NINE, LEAVES)]]
 
-
 leading_player = 0
 mode_proposals = [(NO_GAME, None), (PARTNER_MODE, BELLS), (NO_GAME, None), (NO_GAME, None)]
 game_mode = (PARTNER_MODE, BELLS)
@@ -48,7 +46,7 @@ declaring_player = 1
 tricks = []
 current_trick = None
 possible_actions = [(OBER, ACORNS), (OBER, BELLS), (UNTER, BELLS), (ACE, BELLS),
-                        (KING, LEAVES), (TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)]
+                    (KING, LEAVES), (TEN, ACORNS), (SEVEN, ACORNS), (NINE, ACORNS)]
 game_state_after_bidding = {"player_hands": player_hands_partner,
                             "leading_player_index": leading_player,
                             "mode_proposals": mode_proposals,
@@ -59,23 +57,24 @@ game_state_after_bidding = {"player_hands": player_hands_partner,
                             "current_trick": current_trick,
                             "possible_actions": possible_actions}
 
+
 def main():
     game = Game(game_state=game_state_after_bidding, players=playerlist)
     public_info = game.get_public_info()
-    current_player = game.trick_game.get_current_player()
-    game_state = current_player.sample_game_state(public_info)
+    curr_player = game.trick_game.get_current_player()
+    game_state = curr_player.sample_game_state(public_info)
 
     start_time = time.time()
 
     print('Start !')
 
-    best_action = current_player.uct_search(game_state=game_state)
+    best_action = curr_player.uct_search(game_state=game_state)
     end_time = time.time()
-
 
     print("possible actions : ", game.get_possible_actions())
     print("Best action", best_action)
     print("Simulation took {} seconds".format(end_time - start_time))
+
 
 if __name__ == "__main__":
     main()

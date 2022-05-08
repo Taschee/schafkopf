@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+selenium = "*"
+beautifulsoup4 = "*"
+kivy = "*"
+keras = "*"
+matplotlib = "*"
+numpy = "*"
+graphviz = "*"
+pydot = "*"
+pygame = "*"
+tensorflow = "*"
+
+[dev-packages]
+pytest = "*"
+
+[requires]
+python_version = "3.9"
