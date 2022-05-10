@@ -1,5 +1,6 @@
 from schafkopf.card_deck import CardDeck
 from schafkopf.game_modes import NO_GAME
+from schafkopf.helpers import sort_hand
 
 
 def random_player_hands(card_deck: CardDeck):
@@ -8,7 +9,7 @@ def random_player_hands(card_deck: CardDeck):
 
 def new_game_state(card_deck, leading_player_index):
     game_state = {
-        'player_hands': card_deck.shuffle_and_deal_hands(),
+        'player_hands': [sort_hand(h) for h in card_deck.shuffle_and_deal_hands()],
         'leading_player_index': leading_player_index,
         'current_player_index': leading_player_index,
         'mode_proposals': [],

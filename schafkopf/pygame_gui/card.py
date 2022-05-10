@@ -4,16 +4,29 @@ from schafkopf.ranks import *
 from schafkopf.suits import *
 
 
-class Card(pygame.sprite.Sprite):
-    def __init__(self, encoded_card):
+class OpenCard(pygame.sprite.Sprite):
+    def __init__(self, card_encoded):
         super().__init__()
-        pic_name = _get_card_image_name(encoded_card)
+        pic_name = self._get_card_image_name(card_encoded)
         self.image = pygame.image.load(pic_name).convert()
         self.rect = self.image.get_rect()
+        self.card_encoded = card_encoded
 
 
-def _get_card_image_name(encoded_card):
-    return "../images/" + rank_dict[encoded_card[0]] + suit_dict[encoded_card[1]] + ".jpg"
+    @staticmethod
+    def _get_card_image_name(encoded_card):
+        return "../images/" + rank_dict[encoded_card[0]] + suit_dict[encoded_card[1]] + ".jpg"
+
+
+class HiddenCard(pygame.sprite.Sprite):
+    def __init__(self, rotate: bool = False):
+        super().__init__()
+        pic_name = "../images/Rueckseite.jpg"
+        if rotate:
+            self.image = pygame.transform.rotate(pygame.image.load(pic_name).convert(), 90)
+        else:
+            self.image = pygame.image.load(pic_name).convert()
+        self.rect = self.image.get_rect()
 
 
 rank_dict: dict[int, str] = {
