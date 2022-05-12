@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 selenium = "*"
 beautifulsoup4 = "*"
-kivy = "*"
 keras = "*"
 matplotlib = "*"
 numpy = "*"

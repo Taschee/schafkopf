@@ -1,7 +1,7 @@
 import sys
 import pygame
 from schafkopf.pygame_gui.SchafkopfGame import SchafkopfGame
-from schafkopf.pygame_gui.cards import OpenCard, HiddenCard
+from schafkopf.pygame_gui.cards import OpenCard, HiddenCard, player_sprites
 
 pygame.init()
 
@@ -19,6 +19,9 @@ opposing_hand_position_height = height * 5 / 100 + card_height
 neighboring_hand_edge_distance = width * 5 / 100
 
 
+all_sprites = pygame.sprite.Group()
+
+
 def space_for_player_hand(num_cards):
     return num_cards * card_width + (num_cards - 1) * space_between
 
@@ -31,12 +34,47 @@ def neighboring_hand_position_height(num_cards):
     return (height - space_for_player_hand(num_cards)) / 2
 
 
-all_sprites = pygame.sprite.Group()
-player_spites = pygame.sprite.Group()
+def next_move(schafkopf_game, event_list):
+    for event in event_list:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            clicked_player_cards = [s for s in player_sprites if s.rect.collidepoint(pygame.mouse.get_pos())]
+            if len(clicked_player_cards) > 0:
+                print(clicked_player_cards[0].card_encoded)
 
 
-def next_move(game, event_list):
-    game.handle_events(event_list)
+def display_opponent_hands(schafkopf_game):
+    opponent_hand_sizes = [len(h) for h in schafkopf_game.game_state["player_hands"][1: 4]]
+    first_opponent_hand_sprites = [HiddenCard(rotate=True) for _ in range(opponent_hand_sizes[0])]
+    all_sprites.add(first_opponent_hand_sprites)
+    second_opponent_hand_sprites = [HiddenCard() for _ in range(opponent_hand_sizes[1])]
+    all_sprites.add(second_opponent_hand_sprites)
+    third_opponent_hand_sprites = [HiddenCard(rotate=True) for _ in range(opponent_hand_sizes[2])]
+    all_sprites.add(third_opponent_hand_sprites)
+    for i, card_sprite in enumerate(first_opponent_hand_sprites):
+        card_sprite.rect.bottomleft = (
+            neighboring_hand_edge_distance,
+            neighboring_hand_position_height(len(first_opponent_hand_sprites)) + i * (card_width + space_between)
+        )
+    for i, card_sprite in enumerate(second_opponent_hand_sprites):
+        card_sprite.rect.bottomleft = (
+            player_hand_position_left(len(second_opponent_hand_sprites)) + i * (card_width + space_between),
+            opposing_hand_position_height
+        )
+    for i, card_sprite in enumerate(third_opponent_hand_sprites):
+        card_sprite.rect.bottomleft = (
+            width - neighboring_hand_edge_distance - card_height,
+            neighboring_hand_position_height(len(third_opponent_hand_sprites)) + i * (card_width + space_between)
+        )
+
+
+def display_player_hand(schafkopf_game):
+    player_hand_sprites = [OpenCard(encoded_card) for encoded_card in schafkopf_game.game_state["player_hands"][0]]
+    all_sprites.add(player_hand_sprites)
+    for i, card_sprite in enumerate(player_hand_sprites):
+        card_sprite.rect.bottomleft = (
+            player_hand_position_left(len(player_hand_sprites)) + i * (card_width + space_between),
+            player_hand_position_height
+        )
 
 
 def main():
@@ -48,6 +86,7 @@ def main():
         event_list = pygame.event.get()
 
         all_sprites.empty()
+        player_sprites.empty()
 
         for event in event_list:
             if event.type == pygame.QUIT:
@@ -62,35 +101,8 @@ def main():
 
         screen.blit(background, (0, 0))
 
-        player_hand_sprites = [OpenCard(encoded_card) for encoded_card in schafkopf_game.game_state["player_hands"][0]]
-        all_sprites.add(player_hand_sprites)
-
-        opponent_hand_sizes = [len(h) for h in schafkopf_game.game_state["player_hands"][1: 4]]
-
-        first_opponent_hand_sprites = [HiddenCard(rotate=True) for _ in range(opponent_hand_sizes[0])]
-        all_sprites.add(first_opponent_hand_sprites)
-
-        second_opponent_hand_sprites = [HiddenCard() for _ in range(opponent_hand_sizes[1])]
-        all_sprites.add(second_opponent_hand_sprites)
-
-        third_opponent_hand_sprites = [HiddenCard(rotate=True) for _ in range(opponent_hand_sizes[2])]
-        all_sprites.add(third_opponent_hand_sprites)
-
-        for i, card_sprite in enumerate(player_hand_sprites):
-            card_sprite.rect.bottomleft = (player_hand_position_left(len(player_hand_sprites)) + i * (card_width + space_between),
-                                           player_hand_position_height)
-
-        for i, card_sprite in enumerate(first_opponent_hand_sprites):
-            card_sprite.rect.bottomleft = (neighboring_hand_edge_distance,
-                                           neighboring_hand_position_height(len(first_opponent_hand_sprites)) + i * (card_width + space_between))
-
-        for i, card_sprite in enumerate(second_opponent_hand_sprites):
-            card_sprite.rect.bottomleft = (player_hand_position_left(len(second_opponent_hand_sprites)) + i * (card_width + space_between),
-                                           opposing_hand_position_height)
-
-        for i, card_sprite in enumerate(third_opponent_hand_sprites):
-            card_sprite.rect.bottomleft = (width - neighboring_hand_edge_distance - card_height,
-                                           neighboring_hand_position_height(len(third_opponent_hand_sprites)) + i * (card_width + space_between))
+        display_player_hand(schafkopf_game)
+        display_opponent_hands(schafkopf_game)
 
         all_sprites.update()
         all_sprites.draw(screen)

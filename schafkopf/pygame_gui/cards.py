@@ -4,9 +4,13 @@ from schafkopf.ranks import *
 from schafkopf.suits import *
 
 
+player_sprites = pygame.sprite.Group()
+
+
 class OpenCard(pygame.sprite.Sprite):
     def __init__(self, card_encoded):
         super().__init__()
+        pygame.sprite.Sprite.__init__(self, player_sprites)
         pic_name = self._get_card_image_name(card_encoded)
         self.image = pygame.image.load(pic_name).convert()
         self.rect = self.image.get_rect()
