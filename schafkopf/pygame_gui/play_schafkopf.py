@@ -46,7 +46,6 @@ def main():
     done = False
     while not done:
         event_list = pygame.event.get()
-        keys = pygame.key.get_pressed()
 
         all_sprites.empty()
 
@@ -56,9 +55,10 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     done = True
-        if keys[pygame.K_n]:
-            leading_player_index = (leading_player_index + 1) % 4
-            schafkopf_game = SchafkopfGame(leading_player_index)
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_n:
+                    leading_player_index = (leading_player_index + 1) % 4
+                    schafkopf_game = SchafkopfGame(leading_player_index)
 
         screen.blit(background, (0, 0))
 
