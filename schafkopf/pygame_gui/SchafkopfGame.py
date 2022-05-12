@@ -1,18 +1,44 @@
-import pygame
-
 from schafkopf.card_deck import CardDeck
+from schafkopf.game import Game
 from schafkopf.game_modes import NO_GAME
 from schafkopf.helpers import sort_hand
+from schafkopf.players import HeuristicsPlayer, DummyPlayer
 
 
 class SchafkopfGame:
     def __init__(self, leading_player_index):
         self.game_state = self._new_game_state(leading_player_index)
 
-    def handle_events(self, event_list):
-        for event in event_list:
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                print(self.game_state)
+    def next_bidding_action(self, next_action):
+        players = [DummyPlayer(favorite_mode=next_action), HeuristicsPlayer(), HeuristicsPlayer(), HeuristicsPlayer()]
+        game = Game(players, self.game_state)
+        game.next_action()
+        self.game_state = game.get_game_state()
+        return self.game_state
+
+    def next_action(self, next_action):
+        players = [
+            DummyPlayer(favorite_cards=[next_action]), HeuristicsPlayer(), HeuristicsPlayer(), HeuristicsPlayer()
+        ]
+        game = Game(players, self.game_state)
+        game.next_action()
+        self.game_state = game.get_game_state()
+        return self.game_state
+
+    def possible_actions(self):
+        return Game(
+            [DummyPlayer(), DummyPlayer(), DummyPlayer(), DummyPlayer()], self.game_state
+        ).get_possible_actions()
+
+    def bidding_is_finished(self):
+        return Game(
+            [DummyPlayer(), DummyPlayer(), DummyPlayer(), DummyPlayer()], self.game_state
+        ).bidding_game.finished()
+
+    def finished(self):
+        return Game(
+            [DummyPlayer(), DummyPlayer(), DummyPlayer(), DummyPlayer()], self.game_state
+        ).finished()
 
     def _new_game_state(self, leading_player_index):
         game_state = {
