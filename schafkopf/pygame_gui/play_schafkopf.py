@@ -1,4 +1,3 @@
-import sys
 import pygame
 
 from schafkopf.pygame_gui.BiddingOption import BiddingOption
@@ -22,6 +21,11 @@ player_hand_position_height = height * 95 / 100
 opposing_hand_position_height = height * 5 / 100 + card_height
 neighboring_hand_edge_distance = width * 5 / 100
 
+bidding_option_position_left = int(width * 40 / 100)
+bidding_option_position_height = int(height * 30 / 100)
+bidding_font_size = int(height * 4 / 100)
+bidding_option_space_between = bidding_font_size + 15
+
 all_sprites = pygame.sprite.Group()
 player_sprites = pygame.sprite.Group()
 bidding_sprites = pygame.sprite.Group()
@@ -38,14 +42,6 @@ def player_hand_position_left(num_cards):
 
 def neighboring_hand_position_height(num_cards):
     return (height - space_for_player_hand(num_cards)) / 2
-
-
-def next_move(schafkopf_game, event_list):
-    for event in event_list:
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            clicked_player_cards = [s for s in player_sprites if s.rect.collidepoint(pygame.mouse.get_pos())]
-            if len(clicked_player_cards) > 0:
-                print(clicked_player_cards[0].card_encoded)
 
 
 def display_opponent_hands(schafkopf_game):
@@ -88,15 +84,21 @@ def display_possible_player_bids(options):
     bidding_options = [BiddingOption((200, 200), o) for o in options]
     bidding_sprites.add(bidding_options)
     all_sprites.add(bidding_options)
-    for i, card_sprite in enumerate(bidding_sprites):
-        card_sprite.rect.bottomleft = (
-            400,
-            300 + i * 50
-        )
+    for i, bid_sprite in enumerate(bidding_sprites):
+        bid_sprite.rect.bottomleft = (bidding_option_position_left,
+                                      bidding_option_position_height + i * bidding_option_space_between)
 
 
-def display_current_trick(trick):
-    pass
+def next_move(schafkopf_game, event_list):
+    if schafkopf_game.human_players_turn():
+        for event in event_list:
+            if event.type == pygame.MOUSEBUTTONUP:
+                for bid_sprite in bidding_sprites:
+                    if bid_sprite.rect.collidepoint(pygame.mouse.get_pos()):
+                        print(bid_sprite.option)
+                        schafkopf_game.next_human_bidding_action(bid_sprite.option)
+                        print(schafkopf_game.game_state)
+
 
 
 def main():
@@ -127,11 +129,9 @@ def main():
         display_player_hand(schafkopf_game)
         display_opponent_hands(schafkopf_game)
 
-        options = schafkopf_game.possible_actions()
-        if not schafkopf_game.bidding_is_finished():
+        if not schafkopf_game.bidding_is_finished() and schafkopf_game.human_players_turn():
+            options = schafkopf_game.possible_bids()
             display_possible_player_bids(options)
-        elif not schafkopf_game.finished():
-            display_current_trick(schafkopf_game.game_state["current_trick"])
 
         all_sprites.draw(screen)
 

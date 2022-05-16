@@ -1,17 +1,16 @@
 import pygame
+from pygame.font import Font
 
 from schafkopf.game_modes import *
 
-BUTTON_UP_IMG = pygame.Surface((50, 30))
-BUTTON_UP_IMG.fill('dodgerblue2')
-
 
 class BiddingOption(pygame.sprite.Sprite):
-    def __init__(self, pos, option):
+    def __init__(self, pos=(0, 0), option=(NO_GAME, None), font_size=40):
         pygame.sprite.Sprite.__init__(self)
-        font = pygame.font.Font(None, 30)
-        self.image = font.render(
-            self._get_bidding_option_as_text(option), True, pygame.Color('gray12'), (255, 255, 255)
+        self.option = option
+        self.font_size = font_size
+        self.image = Font(None, font_size).render(
+            self._get_bidding_option_as_text(self.option), True, pygame.Color('black'), pygame.Color('white')
         )
         self.rect = self.image.get_rect(topleft=pos)
 

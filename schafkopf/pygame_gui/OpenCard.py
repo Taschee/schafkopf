@@ -5,13 +5,13 @@ from schafkopf.suits import *
 
 
 class OpenCard(pygame.sprite.Sprite):
-    def __init__(self, card_encoded):
+    def __init__(self, card_encoded, position: tuple[int, int] = (0, 0)):
         super().__init__()
         pic_name = self._get_card_image_name(card_encoded)
         self.image = pygame.image.load(pic_name).convert()
         self.rect = self.image.get_rect()
         self.card_encoded = card_encoded
-
+        self.rect.bottomleft = position
 
     @staticmethod
     def _get_card_image_name(encoded_card):

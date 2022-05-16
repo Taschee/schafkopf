@@ -2,6 +2,7 @@ from schafkopf.suits import ACORNS, BELLS, LEAVES, HEARTS, SUITS
 from schafkopf.ranks import RANKS, SEVEN, EIGHT, NINE, TEN, UNTER, OBER, KING, ACE
 from schafkopf.helpers import sort_hand
 
+
 class Player:
     def __init__(self, name="Rando Calrissian"):
         self.name = name
@@ -43,7 +44,3 @@ class Player:
             hand = set(game_state['player_hands'][pos])
             if len(hand & set(self.starting_hand)) > 0:
                 return pos
-            
-
-
-
