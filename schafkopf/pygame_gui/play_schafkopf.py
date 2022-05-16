@@ -12,7 +12,8 @@ pygame.font.init()
 
 pygame.display.set_caption("Schafkopf AI")
 
-screen = pygame.display.set_mode((1440, 1020))
+# screen = pygame.display.set_mode((1440, 1020))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 screen_size = width, height = screen.get_size()
 background = pygame.transform.scale(pygame.image.load("../images/wood.jpg").convert(), screen_size)
 
@@ -34,6 +35,14 @@ current_trick_second_opp_pos = (int(width * 50 / 100), int(height * 40 / 100))
 current_trick_third_opp_pos = (int(width * 60 / 100), int(height * 50 / 100))
 current_trick_positions = [
     current_trick_human_pos, current_trick_first_opp_pos, current_trick_second_opp_pos, current_trick_third_opp_pos
+]
+
+game_mode_position_human = (int(width * 45 / 100), int(height * 80 / 100))
+game_mode_position_first_opp = (int(width * 15 / 100), int(height * 50 / 100))
+game_mode_position_second_opp = (int(width * 45 / 100), int(height * 20 / 100))
+game_mode_position_third_opp = (int(width * 78 / 100), int(height * 50 / 100))
+game_mode_positions = [
+    game_mode_position_human, game_mode_position_first_opp, game_mode_position_second_opp, game_mode_position_third_opp
 ]
 
 all_sprites = pygame.sprite.Group()
@@ -107,6 +116,12 @@ def display_current_trick(schafkopf_game):
     all_sprites.add(current_trick_sprites)
 
 
+def display_game_mode(schafkopf_game):
+    pos = game_mode_positions[schafkopf_game.game_state["declaring_player"]]
+    game_mode = BiddingOption(pos, schafkopf_game.game_state["game_mode"])
+    all_sprites.add(game_mode)
+
+
 def next_human_bid(schafkopf_game, event_list):
     if schafkopf_game.human_players_turn():
         for event in event_list:
@@ -167,14 +182,17 @@ def main():
             else:
                 schafkopf_game.next_action()
         elif not schafkopf_game.finished():
+            display_game_mode(schafkopf_game)
             display_current_trick(schafkopf_game)
             if schafkopf_game.human_players_turn():
                 next_human_card(schafkopf_game, event_list)
             else:
-                time.sleep(1)
                 schafkopf_game.next_action()
+                time.sleep(0.5)
         else:
             print(schafkopf_game.get_results())
+
+
 
         all_sprites.draw(screen)
         pygame.display.flip()

@@ -7,7 +7,6 @@ from schafkopf.players import HeuristicsPlayer, DummyPlayer
 
 class SchafkopfGame:
     def __init__(self, leading_player_index):
-        print("-------------------------------------------------")
         self.players = [DummyPlayer(), HeuristicsPlayer(), HeuristicsPlayer(), HeuristicsPlayer()]
         self.game_state = self._new_game_state(leading_player_index)
 
