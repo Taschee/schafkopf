@@ -7,6 +7,7 @@ from schafkopf.players import HeuristicsPlayer, DummyPlayer
 
 class SchafkopfGame:
     def __init__(self, leading_player_index):
+        print("-------------------------------------------------")
         self.players = [DummyPlayer(), HeuristicsPlayer(), HeuristicsPlayer(), HeuristicsPlayer()]
         self.game_state = self._new_game_state(leading_player_index)
 
@@ -16,14 +17,20 @@ class SchafkopfGame:
     def next_human_bidding_action(self, next_action):
         players = [DummyPlayer(favorite_mode=next_action), HeuristicsPlayer(), HeuristicsPlayer(), HeuristicsPlayer()]
         game = Game(players, self.game_state)
+        print("NEXT ACTION BY HUMAN")
         game.next_action()
+        print(self.game_state)
         self.game_state = game.get_game_state()
+        print(game.bidding_game.finished())
         return self.game_state
 
     def next_action(self):
         game = Game(self.players, self.game_state)
         game.next_action()
+        print("NEXT ACTION BY OPPONENTS")
         self.game_state = game.get_game_state()
+        print(self.game_state)
+        print(game.bidding_game.finished())
         return self.game_state
 
     def possible_bids(self):

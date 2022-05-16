@@ -89,7 +89,7 @@ def display_possible_player_bids(options):
                                       bidding_option_position_height + i * bidding_option_space_between)
 
 
-def next_move(schafkopf_game, event_list):
+def next_human_bid(schafkopf_game, event_list):
     if schafkopf_game.human_players_turn():
         for event in event_list:
             if event.type == pygame.MOUSEBUTTONUP:
@@ -135,7 +135,10 @@ def main():
 
         all_sprites.draw(screen)
 
-        next_move(schafkopf_game, event_list)
+        if schafkopf_game.human_players_turn():
+            next_human_bid(schafkopf_game, event_list)
+        else:
+            schafkopf_game.next_action()
 
         pygame.display.flip()
 
