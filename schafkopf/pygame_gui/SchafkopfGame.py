@@ -14,23 +14,24 @@ class SchafkopfGame:
     def human_players_turn(self):
         return self.game_state["current_player_index"] == 0
 
-    def next_human_bidding_action(self, next_action):
+    def next_human_bid(self, next_action):
         players = [DummyPlayer(favorite_mode=next_action), HeuristicsPlayer(), HeuristicsPlayer(), HeuristicsPlayer()]
         game = Game(players, self.game_state)
-        print("NEXT ACTION BY HUMAN")
         game.next_action()
-        print(self.game_state)
         self.game_state = game.get_game_state()
-        print(game.bidding_game.finished())
+        return self.game_state
+
+    def next_human_card(self, next_action):
+        players = [DummyPlayer(favorite_cards=[next_action]), HeuristicsPlayer(), HeuristicsPlayer(), HeuristicsPlayer()]
+        game = Game(players, self.game_state)
+        game.next_action()
+        self.game_state = game.get_game_state()
         return self.game_state
 
     def next_action(self):
         game = Game(self.players, self.game_state)
         game.next_action()
-        print("NEXT ACTION BY OPPONENTS")
         self.game_state = game.get_game_state()
-        print(self.game_state)
-        print(game.bidding_game.finished())
         return self.game_state
 
     def possible_bids(self):
@@ -52,6 +53,11 @@ class SchafkopfGame:
         return Game(
             [DummyPlayer(), DummyPlayer(), DummyPlayer(), DummyPlayer()], self.game_state
         ).finished()
+
+    def get_results(self):
+        return Game(
+            [DummyPlayer(), DummyPlayer(), DummyPlayer(), DummyPlayer()], self.game_state
+        ).get_payouts()
 
     def _new_game_state(self, leading_player_index):
         game_state = {

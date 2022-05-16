@@ -96,9 +96,19 @@ def next_human_bid(schafkopf_game, event_list):
                 for bid_sprite in bidding_sprites:
                     if bid_sprite.rect.collidepoint(pygame.mouse.get_pos()):
                         print(bid_sprite.option)
-                        schafkopf_game.next_human_bidding_action(bid_sprite.option)
+                        schafkopf_game.next_human_bid(bid_sprite.option)
                         print(schafkopf_game.game_state)
 
+
+def next_human_card(schafkopf_game, event_list):
+    if schafkopf_game.human_players_turn():
+        for event in event_list:
+            if event.type == pygame.MOUSEBUTTONUP:
+                for card_sprite in player_sprites:
+                    if card_sprite.rect.collidepoint(pygame.mouse.get_pos()):
+                        print(card_sprite.card_encoded)
+                        schafkopf_game.next_human_card(card_sprite.card_encoded)
+                        print(schafkopf_game.game_state)
 
 
 def main():
@@ -129,17 +139,23 @@ def main():
         display_player_hand(schafkopf_game)
         display_opponent_hands(schafkopf_game)
 
-        if not schafkopf_game.bidding_is_finished() and schafkopf_game.human_players_turn():
-            options = schafkopf_game.possible_bids()
-            display_possible_player_bids(options)
+        if not schafkopf_game.bidding_is_finished():
+            if schafkopf_game.human_players_turn():
+                options = schafkopf_game.possible_bids()
+                display_possible_player_bids(options)
+
+                next_human_bid(schafkopf_game, event_list)
+            else:
+                schafkopf_game.next_action()
+        elif not schafkopf_game.finished():
+            if schafkopf_game.human_players_turn():
+                next_human_card(schafkopf_game, event_list)
+            else:
+                schafkopf_game.next_action()
+        else:
+            print(schafkopf_game.get_results())
 
         all_sprites.draw(screen)
-
-        if schafkopf_game.human_players_turn():
-            next_human_bid(schafkopf_game, event_list)
-        else:
-            schafkopf_game.next_action()
-
         pygame.display.flip()
 
 
