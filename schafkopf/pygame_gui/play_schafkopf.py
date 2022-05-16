@@ -1,3 +1,5 @@
+import time
+
 import pygame
 
 from schafkopf.pygame_gui.BiddingOption import BiddingOption
@@ -26,10 +28,18 @@ bidding_option_position_height = int(height * 30 / 100)
 bidding_font_size = int(height * 4 / 100)
 bidding_option_space_between = bidding_font_size + 15
 
+current_trick_human_pos = (int(width * 50 / 100), int(height * 60 / 100))
+current_trick_first_opp_pos = (int(width * 40 / 100), int(height * 50 / 100))
+current_trick_second_opp_pos = (int(width * 50 / 100), int(height * 40 / 100))
+current_trick_third_opp_pos = (int(width * 60 / 100), int(height * 50 / 100))
+current_trick_positions = [
+    current_trick_human_pos, current_trick_first_opp_pos, current_trick_second_opp_pos, current_trick_third_opp_pos
+]
+
 all_sprites = pygame.sprite.Group()
 player_sprites = pygame.sprite.Group()
 bidding_sprites = pygame.sprite.Group()
-trick_sprites = pygame.sprite.Group()
+current_trick_sprites = pygame.sprite.Group()
 
 
 def space_for_player_hand(num_cards):
@@ -89,6 +99,14 @@ def display_possible_player_bids(options):
                                       bidding_option_position_height + i * bidding_option_space_between)
 
 
+def display_current_trick(schafkopf_game):
+    current_trick = schafkopf_game.game_state["current_trick"].cards
+    for i, card_encoded in enumerate(current_trick):
+        if card_encoded is not None:
+            current_trick_sprites.add(OpenCard(card_encoded, current_trick_positions[i]))
+    all_sprites.add(current_trick_sprites)
+
+
 def next_human_bid(schafkopf_game, event_list):
     if schafkopf_game.human_players_turn():
         for event in event_list:
@@ -122,6 +140,7 @@ def main():
         all_sprites.empty()
         player_sprites.empty()
         bidding_sprites.empty()
+        current_trick_sprites.empty()
 
         for event in event_list:
             if event.type == pygame.QUIT:
@@ -148,9 +167,11 @@ def main():
             else:
                 schafkopf_game.next_action()
         elif not schafkopf_game.finished():
+            display_current_trick(schafkopf_game)
             if schafkopf_game.human_players_turn():
                 next_human_card(schafkopf_game, event_list)
             else:
+                time.sleep(1)
                 schafkopf_game.next_action()
         else:
             print(schafkopf_game.get_results())
