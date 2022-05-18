@@ -2,7 +2,9 @@ import time
 
 import pygame
 
+from schafkopf.game_modes import NO_GAME
 from schafkopf.pygame_gui.BiddingOption import BiddingOption
+from schafkopf.pygame_gui.BiddingProposal import BiddingProposal
 from schafkopf.pygame_gui.HiddenCard import HiddenCard
 from schafkopf.pygame_gui.ResultWidget import ResultWidget
 from schafkopf.pygame_gui.SchafkopfGame import SchafkopfGame
@@ -112,6 +114,21 @@ def display_possible_player_bids(options):
                                       bidding_option_position_height + i * bidding_option_space_between)
 
 
+def display_last_opponent_bids(schafkopf_game):
+    leading_player_index = schafkopf_game.game_state["leading_player_index"]
+    proposals = schafkopf_game.game_state["mode_proposals"]
+    for i, proposal in enumerate(proposals):
+        if proposal is not None:
+            screen.blit(
+                BiddingProposal(
+                    proposal[0] == NO_GAME,
+                    screen_width // 10,
+                    screen_height // 20
+                ),
+                game_mode_positions[(leading_player_index + i) % 4]
+            )
+
+
 def display_current_trick(schafkopf_game):
     current_trick = schafkopf_game.game_state["current_trick"].cards
     for i, card_encoded in enumerate(current_trick):
@@ -191,15 +208,18 @@ def main():
 
                 next_human_bid(schafkopf_game, event_list)
             else:
+                time.sleep(1)
                 schafkopf_game.next_action()
+
+            display_last_opponent_bids(schafkopf_game)
         elif not schafkopf_game.finished():
             display_game_mode(schafkopf_game)
             display_current_trick(schafkopf_game)
             if schafkopf_game.human_players_turn():
                 next_human_card(schafkopf_game, event_list)
             else:
+                time.sleep(0.5)
                 schafkopf_game.next_action()
-                time.sleep(0.1)
         else:
             display_results(schafkopf_game)
 
