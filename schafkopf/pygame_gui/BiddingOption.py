@@ -1,3 +1,5 @@
+from typing import Union
+
 import pygame
 from pygame.font import Font
 
@@ -10,16 +12,16 @@ class BiddingOption(pygame.sprite.Sprite):
         self.option = option
         self.font_size = font_size
         self.image = Font(None, font_size).render(
-            self._get_bidding_option_as_text(self.option), True, pygame.Color('black'), pygame.Color('white')
+            get_bidding_option_as_text(self.option), True, pygame.Color('black'), pygame.Color('white')
         )
         self.rect = self.image.get_rect(topleft=pos)
 
-    @staticmethod
-    def _get_bidding_option_as_text(option):
-        if option[1] is None:
-            return game_mode_dict[option[0]]
-        else:
-            return game_mode_dict[option[0]] + " " + suit_dict[option[1]]
+
+def get_bidding_option_as_text(option: tuple[int, Union[int, None]]):
+    if option[1] is None:
+        return game_mode_dict[option[0]]
+    else:
+        return game_mode_dict[option[0]] + " " + suit_dict[option[1]]
 
 
 game_mode_dict: dict[int, str] = {

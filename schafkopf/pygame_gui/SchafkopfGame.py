@@ -1,8 +1,19 @@
+from dataclasses import dataclass
+from typing import List, Tuple, Union
+
 from schafkopf.card_deck import CardDeck
 from schafkopf.game import Game
 from schafkopf.game_modes import NO_GAME
 from schafkopf.helpers import sort_hand
 from schafkopf.players import HeuristicsPlayer, DummyPlayer
+
+
+@dataclass
+class GameResult:
+    payouts: Tuple[int, int, int, int]
+    winners: List[int]
+    declaring_player: Union[int, None]
+    game_mode: tuple[int, Union[int, None]]
 
 
 class SchafkopfGame:
@@ -21,7 +32,8 @@ class SchafkopfGame:
         return self.game_state
 
     def next_human_card(self, next_action):
-        players = [DummyPlayer(favorite_cards=[next_action]), HeuristicsPlayer(), HeuristicsPlayer(), HeuristicsPlayer()]
+        players = [DummyPlayer(favorite_cards=[next_action]), HeuristicsPlayer(), HeuristicsPlayer(),
+                   HeuristicsPlayer()]
         game = Game(players, self.game_state)
         game.next_action()
         self.game_state = game.get_game_state()
@@ -53,10 +65,17 @@ class SchafkopfGame:
             [DummyPlayer(), DummyPlayer(), DummyPlayer(), DummyPlayer()], self.game_state
         ).finished()
 
-    def get_results(self):
-        return Game(
+    def get_results(self) -> GameResult:
+        game = Game(
             [DummyPlayer(), DummyPlayer(), DummyPlayer(), DummyPlayer()], self.game_state
-        ).get_payouts()
+        )
+        if not game.finished():
+            raise RuntimeError("No results yet")
+        if self.game_state["game_mode"][0] == NO_GAME:
+            return GameResult((0, 0, 0, 0), [], None, self.game_state["game_mode"])
+        else:
+            return GameResult(tuple(game.get_payouts()), game.determine_winners(), game.trick_game.offensive_players,
+                              self.game_state["game_mode"])
 
     def _new_game_state(self, leading_player_index):
         game_state = {

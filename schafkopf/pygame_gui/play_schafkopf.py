@@ -4,8 +4,10 @@ import pygame
 
 from schafkopf.pygame_gui.BiddingOption import BiddingOption
 from schafkopf.pygame_gui.HiddenCard import HiddenCard
+from schafkopf.pygame_gui.ResultWidget import ResultWidget
 from schafkopf.pygame_gui.SchafkopfGame import SchafkopfGame
 from schafkopf.pygame_gui.OpenCard import OpenCard
+from schafkopf.pygame_gui.colors import WHITE
 
 pygame.init()
 pygame.font.init()
@@ -14,36 +16,39 @@ pygame.display.set_caption("Schafkopf AI")
 
 # screen = pygame.display.set_mode((1440, 1020))
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-screen_size = width, height = screen.get_size()
+clock = pygame.time.Clock()
+screen_size = screen_width, screen_height = screen.get_size()
 background = pygame.transform.scale(pygame.image.load("../images/wood.jpg").convert(), screen_size)
 
 space_between = 15
 card_size = card_width, card_height = HiddenCard().rect.size
 
-player_hand_position_height = height * 95 / 100
-opposing_hand_position_height = height * 5 / 100 + card_height
-neighboring_hand_edge_distance = width * 5 / 100
+player_hand_position_height = screen_height * 95 / 100
+opposing_hand_position_height = screen_height * 5 / 100 + card_height
+neighboring_hand_edge_distance = screen_width * 5 / 100
 
-bidding_option_position_left = int(width * 40 / 100)
-bidding_option_position_height = int(height * 30 / 100)
-bidding_font_size = int(height * 4 / 100)
+bidding_option_position_left = int(screen_width * 40 / 100)
+bidding_option_position_height = int(screen_height * 30 / 100)
+bidding_font_size = int(screen_height * 4 / 100)
 bidding_option_space_between = bidding_font_size + 15
 
-current_trick_human_pos = (int(width * 50 / 100), int(height * 60 / 100))
-current_trick_first_opp_pos = (int(width * 40 / 100), int(height * 50 / 100))
-current_trick_second_opp_pos = (int(width * 50 / 100), int(height * 40 / 100))
-current_trick_third_opp_pos = (int(width * 60 / 100), int(height * 50 / 100))
+current_trick_human_pos = (int(screen_width * 50 / 100), int(screen_height * 60 / 100))
+current_trick_first_opp_pos = (int(screen_width * 40 / 100), int(screen_height * 50 / 100))
+current_trick_second_opp_pos = (int(screen_width * 50 / 100), int(screen_height * 40 / 100))
+current_trick_third_opp_pos = (int(screen_width * 60 / 100), int(screen_height * 50 / 100))
 current_trick_positions = [
     current_trick_human_pos, current_trick_first_opp_pos, current_trick_second_opp_pos, current_trick_third_opp_pos
 ]
 
-game_mode_position_human = (int(width * 45 / 100), int(height * 80 / 100))
-game_mode_position_first_opp = (int(width * 15 / 100), int(height * 50 / 100))
-game_mode_position_second_opp = (int(width * 45 / 100), int(height * 20 / 100))
-game_mode_position_third_opp = (int(width * 78 / 100), int(height * 50 / 100))
+game_mode_position_human = (int(screen_width * 45 / 100), int(screen_height * 80 / 100))
+game_mode_position_first_opp = (int(screen_width * 15 / 100), int(screen_height * 50 / 100))
+game_mode_position_second_opp = (int(screen_width * 45 / 100), int(screen_height * 20 / 100))
+game_mode_position_third_opp = (int(screen_width * 78 / 100), int(screen_height * 50 / 100))
 game_mode_positions = [
     game_mode_position_human, game_mode_position_first_opp, game_mode_position_second_opp, game_mode_position_third_opp
 ]
+
+result_widget_position = (screen_width // 4, screen_height // 4)
 
 all_sprites = pygame.sprite.Group()
 player_sprites = pygame.sprite.Group()
@@ -56,11 +61,11 @@ def space_for_player_hand(num_cards):
 
 
 def player_hand_position_left(num_cards):
-    return (width - space_for_player_hand(num_cards)) / 2
+    return (screen_width - space_for_player_hand(num_cards)) / 2
 
 
 def neighboring_hand_position_height(num_cards):
-    return (height - space_for_player_hand(num_cards)) / 2
+    return (screen_height - space_for_player_hand(num_cards)) / 2
 
 
 def display_opponent_hands(schafkopf_game):
@@ -83,7 +88,7 @@ def display_opponent_hands(schafkopf_game):
         )
     for i, card_sprite in enumerate(third_opponent_hand_sprites):
         card_sprite.rect.bottomleft = (
-            width - neighboring_hand_edge_distance - card_height,
+            screen_width - neighboring_hand_edge_distance - card_height,
             neighboring_hand_position_height(len(third_opponent_hand_sprites)) + i * (card_width + space_between)
         )
 
@@ -120,6 +125,13 @@ def display_game_mode(schafkopf_game):
     pos = game_mode_positions[schafkopf_game.game_state["declaring_player"]]
     game_mode = BiddingOption(pos, schafkopf_game.game_state["game_mode"])
     all_sprites.add(game_mode)
+
+
+def display_results(schafkopf_game):
+    screen.blit(
+        ResultWidget(schafkopf_game, screen_width // 2, screen_height // 2),
+        result_widget_position
+    )
 
 
 def next_human_bid(schafkopf_game, event_list):
@@ -188,14 +200,13 @@ def main():
                 next_human_card(schafkopf_game, event_list)
             else:
                 schafkopf_game.next_action()
-                time.sleep(0.5)
+                time.sleep(0.1)
         else:
-            print(schafkopf_game.get_results())
-
-
+            display_results(schafkopf_game)
 
         all_sprites.draw(screen)
         pygame.display.flip()
+        clock.tick(30)
 
 
 if __name__ == "__main__":
