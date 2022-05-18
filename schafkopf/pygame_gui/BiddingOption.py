@@ -14,6 +14,7 @@ class BiddingOption(pygame.sprite.Sprite):
         self.image = Font(None, font_size).render(
             get_bidding_option_as_text(self.option), True, pygame.Color('black'), pygame.Color('white')
         )
+        self.image.set_alpha(200)
         self.rect = self.image.get_rect(topleft=pos)
 
 

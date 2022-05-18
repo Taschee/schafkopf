@@ -7,7 +7,6 @@ from schafkopf.pygame_gui.HiddenCard import HiddenCard
 from schafkopf.pygame_gui.ResultWidget import ResultWidget
 from schafkopf.pygame_gui.SchafkopfGame import SchafkopfGame
 from schafkopf.pygame_gui.OpenCard import OpenCard
-from schafkopf.pygame_gui.colors import WHITE
 
 pygame.init()
 pygame.font.init()
@@ -105,7 +104,7 @@ def display_player_hand(schafkopf_game):
 
 
 def display_possible_player_bids(options):
-    bidding_options = [BiddingOption((200, 200), o) for o in options]
+    bidding_options = [BiddingOption((200, 200), o, screen_height // 25) for o in options]
     bidding_sprites.add(bidding_options)
     all_sprites.add(bidding_options)
     for i, bid_sprite in enumerate(bidding_sprites):
@@ -123,7 +122,7 @@ def display_current_trick(schafkopf_game):
 
 def display_game_mode(schafkopf_game):
     pos = game_mode_positions[schafkopf_game.game_state["declaring_player"]]
-    game_mode = BiddingOption(pos, schafkopf_game.game_state["game_mode"])
+    game_mode = BiddingOption(pos, schafkopf_game.game_state["game_mode"], screen_height // 25)
     all_sprites.add(game_mode)
 
 
