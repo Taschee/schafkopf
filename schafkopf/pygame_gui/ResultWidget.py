@@ -41,8 +41,8 @@ class ResultWidget(pygame.Surface):
         description = self._get_description_text(results)
         self.blit(description, self._get_description_position(description.get_width()))
 
-    def _get_description_position(self, results):
-        return 10, self._get_heading_height() + 20
+    def _get_description_position(self, text_width):
+        return self.get_width() // 2 - text_width // 2, self._get_heading_height() + 20
 
     def _get_description_text(self, results):
         if results.game_mode[0] == NO_GAME:
@@ -53,7 +53,7 @@ class ResultWidget(pygame.Surface):
             else:
                 victory_status = "verloren"
             if results.game_mode[0] == PARTNER_MODE:
-                text = f'Spieler {results.declaring_player + 1} hat das Rufspiel ' \
+                text = f'Spieler {results.declaring_player + 1} hat das Sauspiel ' \
                        f'mit Spieler {results.offensive_players[1] + 1} {victory_status}. ' \
                        f'Erreichte Punkte: {results.offensive_points}'
             elif results.game_mode[0] == WENZ:

@@ -5,8 +5,9 @@ import pygame
 from schafkopf.game_modes import NO_GAME
 from schafkopf.pygame_gui.BiddingOption import BiddingOption
 from schafkopf.pygame_gui.BiddingProposal import BiddingProposal
+from schafkopf.pygame_gui.GameResult import GameResult
 from schafkopf.pygame_gui.HiddenCard import HiddenCard
-from schafkopf.pygame_gui.PlayerName import PlayerName
+from schafkopf.pygame_gui.PlayerInfoWidget import PlayerInfoWidget
 from schafkopf.pygame_gui.ResultWidget import ResultWidget
 from schafkopf.pygame_gui.SchafkopfGame import SchafkopfGame
 from schafkopf.pygame_gui.OpenCard import OpenCard
@@ -16,8 +17,10 @@ pygame.font.init()
 
 pygame.display.set_caption("Schafkopf AI")
 
-screen = pygame.display.set_mode((1440, 1020))
-# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+total_scores = [0, 0, 0, 0]
+
+# screen = pygame.display.set_mode((1440, 1020))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 screen_size = screen_width, screen_height = screen.get_size()
 background = pygame.transform.scale(pygame.image.load("../images/wood.jpg").convert(), screen_size)
@@ -43,7 +46,7 @@ def neighboring_hand_position_height(num_cards):
 
 
 player_name_height = screen_height // 20
-player_name_width = PlayerName(4).get_width()
+player_name_width = PlayerInfoWidget().get_width()
 player_name_offset_horizontal = screen_width // 25
 player_name_offset_vertical = screen_height // 25
 player_name_human_position = (
@@ -60,7 +63,7 @@ player_name_second_opp_position = (
 )
 player_name_third_opp_position = (
     screen_width - neighboring_hand_edge_distance - card_height,
-    neighboring_hand_position_height(8) - player_name_offset_horizontal - player_name_height
+    neighboring_hand_position_height(8) - 2 * player_name_offset_horizontal - player_name_height
 )
 player_name_positions = [player_name_human_position, player_name_first_opp_position, player_name_second_opp_position,
                          player_name_third_opp_position]
@@ -108,9 +111,9 @@ bidding_sprites = pygame.sprite.Group()
 current_trick_sprites = pygame.sprite.Group()
 
 
-def display_player_names():
+def display_player_info_widgets():
     for i in range(4):
-        player_name = PlayerName(player_index=i)
+        player_name = PlayerInfoWidget(player_index=i, score=total_scores[i])
         screen.blit(player_name, player_name_positions[i])
 
 
@@ -238,9 +241,15 @@ def unpause_game_after_click(schafkopf_game, event_list):
             schafkopf_game.unpause()
 
 
+def update_total_scores(results: GameResult):
+    for i, payout in enumerate(results.payouts):
+        total_scores[i] += payout
+
+
 def main():
     leading_player_index = 0
     schafkopf_game = SchafkopfGame(leading_player_index)
+    scores_updated = False
 
     done = False
     while not done:
@@ -261,9 +270,10 @@ def main():
                 if event.key == pygame.K_n:
                     leading_player_index = (leading_player_index + 1) % 4
                     schafkopf_game = SchafkopfGame(leading_player_index)
+                    scores_updated = False
 
         screen.blit(background, (0, 0))
-        display_player_names()
+        display_player_info_widgets()
 
         display_player_hand(schafkopf_game)
         display_opponent_hands(schafkopf_game)
@@ -290,13 +300,15 @@ def main():
                     next_human_card(schafkopf_game, event_list)
                 else:
                     schafkopf_game.next_action()
-                    time.sleep(0.5)
         else:
             display_results(schafkopf_game)
+            if not scores_updated:
+                update_total_scores(schafkopf_game.get_results())
+                scores_updated = True
 
         all_sprites.draw(screen)
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(30)
 
 
 if __name__ == "__main__":
