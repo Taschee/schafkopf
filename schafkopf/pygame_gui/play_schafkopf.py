@@ -15,8 +15,8 @@ pygame.font.init()
 
 pygame.display.set_caption("Schafkopf AI")
 
-screen = pygame.display.set_mode((1440, 1020))
-# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+# screen = pygame.display.set_mode((1440, 1020))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 screen_size = screen_width, screen_height = screen.get_size()
 background = pygame.transform.scale(pygame.image.load("../images/wood.jpg").convert(), screen_size)
@@ -257,8 +257,8 @@ def main():
                 if schafkopf_game.human_players_turn():
                     next_human_card(schafkopf_game, event_list)
                 else:
-                    time.sleep(0.5)
                     schafkopf_game.next_action()
+                    time.sleep(0.5)
         else:
             display_results(schafkopf_game)
 
