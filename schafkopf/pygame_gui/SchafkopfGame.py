@@ -95,8 +95,12 @@ class SchafkopfGame:
         if self.game_state["game_mode"][0] == NO_GAME:
             return GameResult((0, 0, 0, 0), [], None, self.game_state["game_mode"])
         else:
-            return GameResult(tuple(game.get_payouts()), game.determine_winners(), game.trick_game.offensive_players,
-                              self.game_state["game_mode"])
+            return GameResult(
+                payouts=tuple(game.get_payouts()),
+                winners=game.determine_winners(),
+                declaring_player=self.game_state["declaring_player"],
+                game_mode=self.game_state["game_mode"]
+            )
 
     def _new_game_state(self, leading_player_index):
         game_state = {
