@@ -1,9 +1,5 @@
-from typing import Union
-
 import pygame
-from pygame.font import Font
 
-from schafkopf.game_modes import *
 from schafkopf.pygame_gui.colors import WHITE, BLACK
 
 

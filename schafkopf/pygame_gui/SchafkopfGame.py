@@ -20,9 +20,26 @@ class SchafkopfGame:
     def __init__(self, leading_player_index):
         self.players = [DummyPlayer(), HeuristicsPlayer(), HeuristicsPlayer(), HeuristicsPlayer()]
         self.game_state = self._new_game_state(leading_player_index)
+        self.paused_on_last_trick = False
 
     def human_players_turn(self):
         return self.game_state["current_player_index"] == 0
+
+    def no_cards_in_current_trick(self):
+        current_trick = self.game_state["current_trick"]
+        if current_trick is None:
+            return True
+        else:
+            return len([c for c in current_trick.cards if c is not None]) == 0
+
+    def at_least_one_previous_trick(self):
+        return len(self.game_state["tricks"]) > 0
+
+    def pause(self):
+        self.paused_on_last_trick = True
+
+    def unpause(self):
+        self.paused_on_last_trick = False
 
     def next_human_bid(self, next_action):
         players = [DummyPlayer(favorite_mode=next_action), HeuristicsPlayer(), HeuristicsPlayer(), HeuristicsPlayer()]
@@ -37,12 +54,16 @@ class SchafkopfGame:
         game = Game(players, self.game_state)
         game.next_action()
         self.game_state = game.get_game_state()
+        if self.at_least_one_previous_trick() and self.no_cards_in_current_trick():
+            self.pause()
         return self.game_state
 
     def next_action(self):
         game = Game(self.players, self.game_state)
         game.next_action()
         self.game_state = game.get_game_state()
+        if self.at_least_one_previous_trick() and self.no_cards_in_current_trick():
+            self.pause()
         return self.game_state
 
     def possible_bids(self):

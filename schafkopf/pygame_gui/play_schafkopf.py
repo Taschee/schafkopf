@@ -15,8 +15,8 @@ pygame.font.init()
 
 pygame.display.set_caption("Schafkopf AI")
 
-# screen = pygame.display.set_mode((1440, 1020))
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((1440, 1020))
+# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 screen_size = screen_width, screen_height = screen.get_size()
 background = pygame.transform.scale(pygame.image.load("../images/wood.jpg").convert(), screen_size)
@@ -33,6 +33,8 @@ bidding_option_position_height = int(screen_height * 30 / 100)
 bidding_font_size = int(screen_height * 4 / 100)
 bidding_option_space_between = bidding_font_size + 15
 
+bidding_proposal_size = bidding_proposal_width, bidding_proposal_height = (screen_width // 10, screen_height // 20)
+
 current_trick_human_pos = (int(screen_width * 50 / 100), int(screen_height * 60 / 100))
 current_trick_first_opp_pos = (int(screen_width * 40 / 100), int(screen_height * 50 / 100))
 current_trick_second_opp_pos = (int(screen_width * 50 / 100), int(screen_height * 40 / 100))
@@ -41,10 +43,22 @@ current_trick_positions = [
     current_trick_human_pos, current_trick_first_opp_pos, current_trick_second_opp_pos, current_trick_third_opp_pos
 ]
 
-game_mode_position_human = (int(screen_width * 45 / 100), int(screen_height * 80 / 100))
-game_mode_position_first_opp = (int(screen_width * 15 / 100), int(screen_height * 50 / 100))
-game_mode_position_second_opp = (int(screen_width * 45 / 100), int(screen_height * 20 / 100))
-game_mode_position_third_opp = (int(screen_width * 78 / 100), int(screen_height * 50 / 100))
+game_mode_position_human = (
+    int(screen_width * 45 / 100),
+    player_hand_position_height - card_height - space_between - bidding_proposal_height
+)
+game_mode_position_first_opp = (
+    neighboring_hand_edge_distance + card_height + space_between,
+    int(screen_height * 50 / 100)
+)
+game_mode_position_second_opp = (
+    int(screen_width * 45 / 100),
+    opposing_hand_position_height + space_between
+)
+game_mode_position_third_opp = (
+    screen_width - neighboring_hand_edge_distance - card_height - bidding_proposal_width - space_between,
+    int(screen_height * 50 / 100)
+)
 game_mode_positions = [
     game_mode_position_human, game_mode_position_first_opp, game_mode_position_second_opp, game_mode_position_third_opp
 ]
@@ -122,8 +136,8 @@ def display_last_opponent_bids(schafkopf_game):
             screen.blit(
                 BiddingProposal(
                     proposal[0] == NO_GAME,
-                    screen_width // 10,
-                    screen_height // 20
+                    bidding_proposal_width,
+                    bidding_proposal_height
                 ),
                 game_mode_positions[(leading_player_index + i) % 4]
             )
@@ -135,6 +149,24 @@ def display_current_trick(schafkopf_game):
         if card_encoded is not None:
             current_trick_sprites.add(OpenCard(card_encoded, current_trick_positions[i]))
     all_sprites.add(current_trick_sprites)
+
+
+def display_last_trick(schafkopf_game):
+    tricks = schafkopf_game.game_state["tricks"]
+    if len(tricks) == 0:
+        return
+    else:
+        last_trick = schafkopf_game.game_state["tricks"][-1].cards
+        for i, card_encoded in enumerate(last_trick):
+            if card_encoded is not None:
+                current_trick_sprites.add(OpenCard(card_encoded, current_trick_positions[i]))
+        all_sprites.add(current_trick_sprites)
+
+
+def trigger_action_after_mouse_click(event_list, callback):
+    for event in event_list:
+        if event.type == pygame.MOUSEBUTTONUP:
+            callback()
 
 
 def display_game_mode(schafkopf_game):
@@ -156,9 +188,7 @@ def next_human_bid(schafkopf_game, event_list):
             if event.type == pygame.MOUSEBUTTONUP:
                 for bid_sprite in bidding_sprites:
                     if bid_sprite.rect.collidepoint(pygame.mouse.get_pos()):
-                        print(bid_sprite.option)
                         schafkopf_game.next_human_bid(bid_sprite.option)
-                        print(schafkopf_game.game_state)
 
 
 def next_human_card(schafkopf_game, event_list):
@@ -167,9 +197,14 @@ def next_human_card(schafkopf_game, event_list):
             if event.type == pygame.MOUSEBUTTONUP:
                 for card_sprite in player_sprites:
                     if card_sprite.rect.collidepoint(pygame.mouse.get_pos()):
-                        print(card_sprite.card_encoded)
+                        # ToDo only possible cards
                         schafkopf_game.next_human_card(card_sprite.card_encoded)
-                        print(schafkopf_game.game_state)
+
+
+def unpause_game_after_click(schafkopf_game, event_list):
+    for event in event_list:
+        if event.type == pygame.MOUSEBUTTONUP:
+            schafkopf_game.unpause()
 
 
 def main():
@@ -208,18 +243,22 @@ def main():
 
                 next_human_bid(schafkopf_game, event_list)
             else:
-                time.sleep(1)
                 schafkopf_game.next_action()
+                time.sleep(0.5)
 
             display_last_opponent_bids(schafkopf_game)
         elif not schafkopf_game.finished():
             display_game_mode(schafkopf_game)
-            display_current_trick(schafkopf_game)
-            if schafkopf_game.human_players_turn():
-                next_human_card(schafkopf_game, event_list)
+            if schafkopf_game.paused_on_last_trick:
+                display_last_trick(schafkopf_game)
+                unpause_game_after_click(schafkopf_game, event_list)
             else:
-                time.sleep(0.5)
-                schafkopf_game.next_action()
+                display_current_trick(schafkopf_game)
+                if schafkopf_game.human_players_turn():
+                    next_human_card(schafkopf_game, event_list)
+                else:
+                    time.sleep(0.5)
+                    schafkopf_game.next_action()
         else:
             display_results(schafkopf_game)
 
