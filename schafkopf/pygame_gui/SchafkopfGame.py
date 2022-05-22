@@ -39,13 +39,17 @@ class SchafkopfGame:
         return self.game_state
 
     def next_human_card(self, next_action):
-        players = [DummyPlayer(favorite_cards=[next_action]), HeuristicsPlayer(), HeuristicsPlayer(),
-                   HeuristicsPlayer()]
-        game = Game(players, self.game_state)
-        game.next_action()
-        self.game_state = game.get_game_state()
-        if self.at_least_one_previous_trick() and self.no_cards_in_current_trick():
-            self.pause()
+        if not self.game_state["current_player_index"] == 0:
+            raise ValueError("Not human players turn")
+        possible_cards = self.possible_cards()
+        if next_action in possible_cards:
+            players = [DummyPlayer(favorite_cards=[next_action]), HeuristicsPlayer(), HeuristicsPlayer(),
+                       HeuristicsPlayer()]
+            game = Game(players, self.game_state)
+            game.next_action()
+            self.game_state = game.get_game_state()
+            if self.at_least_one_previous_trick() and self.no_cards_in_current_trick():
+                self.pause()
         return self.game_state
 
     def next_action(self):
@@ -65,6 +69,14 @@ class SchafkopfGame:
         possible_modes = list(game.bidding_game.determine_possible_game_modes(hand=hand, mode_to_beat=mode_to_beat))
         possible_modes.sort()
         return possible_modes
+
+    def possible_cards(self):
+        game = Game(
+            [DummyPlayer(), DummyPlayer(), DummyPlayer(), DummyPlayer()], self.game_state
+        )
+        hand = game.playerlist[0].hand
+        current_trick = self.game_state["current_trick"]
+        return game.trick_game.possible_cards(current_trick, hand)
 
     def bidding_is_finished(self):
         return Game(

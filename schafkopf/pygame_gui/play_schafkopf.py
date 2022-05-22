@@ -231,7 +231,6 @@ def next_human_card(schafkopf_game, event_list):
             if event.type == pygame.MOUSEBUTTONUP:
                 for card_sprite in player_sprites:
                     if card_sprite.rect.collidepoint(pygame.mouse.get_pos()):
-                        # ToDo only possible cards
                         schafkopf_game.next_human_card(card_sprite.card_encoded)
 
 
