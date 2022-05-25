@@ -18,8 +18,9 @@ class PlayerCard(Button):
         self.card_encoded = card_encoded
         pic_name = self._get_card_image_name(card_encoded)
         self.image = pygame.image.load(pic_name).convert()
-        self.image.set_alpha(200)
+        self.image.set_alpha(220)
         self.hover_image = pygame.image.load(pic_name).convert()
+        self.hover_image.set_alpha(220)
         if hover_effect:
             self.hover_image.set_alpha(None)
         super().__init__(

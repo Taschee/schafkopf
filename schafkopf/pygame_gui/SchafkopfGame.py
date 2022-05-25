@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 from schafkopf.card_deck import CardDeck
 from schafkopf.game import Game
 from schafkopf.game_modes import NO_GAME
@@ -21,6 +23,12 @@ class SchafkopfGame:
             return True
         else:
             return len([c for c in current_trick.cards if c is not None]) == 0
+
+    def get_player_hand(self) -> List[Tuple[int, int]]:
+        return self.game_state["player_hands"][0]
+
+    def get_opponent_hands(self) -> List[List[Tuple[int, int]]]:
+        return self.game_state["player_hands"][1:4]
 
     def at_least_one_previous_trick(self):
         return len(self.game_state["tricks"]) > 0

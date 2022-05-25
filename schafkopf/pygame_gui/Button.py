@@ -2,8 +2,10 @@ from typing import Tuple, Callable
 
 import pygame
 
+from schafkopf.pygame_gui.Widget import Widget
 
-class Button:
+
+class Button(Widget):
     def __init__(
         self,
         topleft: Tuple[int, int],
@@ -12,8 +14,7 @@ class Button:
         hover_image: pygame.Surface = None,
         callback: Callable = None
     ):
-        self.image = image
-        self.rect = self.image.get_rect(topleft=topleft)
+        super().__init__(topleft, image)
         self.pressed = False
         self.callback = callback
         self.button_up_image = image
@@ -25,9 +26,6 @@ class Button:
             self.hover_image = hover_image
         else:
             self.hover_image = image
-
-    def draw(self, screen: pygame.Surface):
-        screen.blit(self.image, self.rect.topleft)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
