@@ -2,13 +2,13 @@ from typing import List
 
 import pygame
 
+from schafkopf.pygame_gui.BidOption import BidOption
 from schafkopf.pygame_gui.Button import Button
 from schafkopf.pygame_gui.NextGameButton import NextGameButton
 from schafkopf.pygame_gui.OpponentCard import OpponentCard
 from schafkopf.pygame_gui.PlayerCard import PlayerCard
 from schafkopf.pygame_gui.SchafkopfGame import SchafkopfGame
 from schafkopf.pygame_gui.Widget import Widget
-from schafkopf.pygame_gui.colors import BLACK
 
 pygame.init()
 FONT = pygame.font.Font(None, 30)
@@ -25,6 +25,13 @@ card_size = card_width, card_height = OpponentCard().rect.size
 player_hand_position_height = screen_height * 95 / 100 - card_height
 opposing_hand_position_height = screen_height * 5 / 100
 neighboring_hand_edge_distance = screen_width * 5 / 100
+
+bidding_option_position_left = int(screen_width * 40 / 100)
+bidding_option_position_height = int(screen_height * 30 / 100)
+font_size = screen_height // 25
+bidding_option_space_between = font_size + 15
+
+bidding_proposal_size = bidding_proposal_width, bidding_proposal_height = (screen_width // 10, screen_height // 20)
 
 
 def space_for_player_hand(num_cards):
@@ -76,6 +83,9 @@ class GameRunner:
     def next_game(self):
         self.leading_player_index += 1
         self.schafkopf_game = SchafkopfGame(self.leading_player_index)
+        self.update_widgets()
+
+    def update_widgets(self):
         self.widgets = self.get_widgets()
 
     def handle_events(self):
@@ -100,11 +110,14 @@ class GameRunner:
         return self.get_other_widgets() + self.get_buttons()
 
     def get_buttons(self) -> List[Button]:
-        buttons = self.get_player_cards()
-        if not self.schafkopf_game.bidding_is_finished():
-            buttons += self.get_mode_proposals()
-        buttons.append(NextGameButton((0, 0), self.next_game))
-        return buttons
+        if self.schafkopf_game.finished():
+            return [NextGameButton((0, 0), self.next_game)]
+        else:
+            buttons = self.get_player_cards()
+            buttons.append(NextGameButton((0, 0), self.next_game, font_size))
+            if not self.schafkopf_game.bidding_is_finished():
+                buttons += self.get_mode_proposals()
+            return buttons
 
     def get_other_widgets(self) -> List[Widget]:
         if not self.schafkopf_game.finished():
@@ -155,7 +168,16 @@ class GameRunner:
         return first_opponent_cards + second_opponent_cards + third_opponent_cards
 
     def get_mode_proposals(self) -> List[Button]:
-        return []
+        possible_modes = self.schafkopf_game.possible_bids()
+        return [
+            BidOption(
+                topleft=(bidding_option_position_left,
+                         bidding_option_position_height + i * bidding_option_space_between),
+                bidding_option=option,
+                callback=self.foo(option),
+                font_size=font_size
+            ) for i, option in enumerate(possible_modes)
+        ]
 
 
 if __name__ == "__main__":
