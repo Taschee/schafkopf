@@ -27,6 +27,9 @@ class SchafkopfGame:
     def get_player_hand(self) -> List[Tuple[int, int]]:
         return self.game_state["player_hands"][0]
 
+    def get_mode_proposals(self):
+        return self.game_state["mode_proposals"]
+
     def get_opponent_hands(self) -> List[List[Tuple[int, int]]]:
         return self.game_state["player_hands"][1:4]
 

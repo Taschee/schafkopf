@@ -2,7 +2,9 @@ from typing import List
 
 import pygame
 
+from schafkopf.game_modes import NO_GAME
 from schafkopf.pygame_gui.BidOption import BidOption
+from schafkopf.pygame_gui.BidProposal import BidProposal
 from schafkopf.pygame_gui.Button import Button
 from schafkopf.pygame_gui.NextGameButton import NextGameButton
 from schafkopf.pygame_gui.OpponentCard import OpponentCard
@@ -33,6 +35,25 @@ bidding_option_space_between = font_size + 15
 
 bidding_proposal_size = bidding_proposal_width, bidding_proposal_height = (screen_width // 10, screen_height // 20)
 
+game_mode_position_human = (
+    int(screen_width * 45 / 100),
+    player_hand_position_height - card_height - space_between - bidding_proposal_height
+)
+game_mode_position_first_opp = (
+    neighboring_hand_edge_distance + card_height + space_between,
+    int(screen_height * 50 / 100)
+)
+game_mode_position_second_opp = (
+    int(screen_width * 45 / 100),
+    opposing_hand_position_height + space_between
+)
+game_mode_position_third_opp = (
+    screen_width - neighboring_hand_edge_distance - card_height - bidding_proposal_width - space_between,
+    int(screen_height * 50 / 100)
+)
+game_mode_positions = [
+    game_mode_position_human, game_mode_position_first_opp, game_mode_position_second_opp, game_mode_position_third_opp
+]
 
 def space_for_player_hand(num_cards):
     return num_cards * card_width + (num_cards - 1) * space_between
@@ -72,7 +93,6 @@ def calculate_ith_card_position_third_opponent(num_cards, i):
     )
 
 
-
 class GameRunner:
     def __init__(self):
         self.leading_player_index = 0
@@ -81,7 +101,7 @@ class GameRunner:
         self.done = False
 
     def next_game(self):
-        self.leading_player_index += 1
+        self.leading_player_index = (self.leading_player_index + 1) % 4
         self.schafkopf_game = SchafkopfGame(self.leading_player_index)
         self.update_widgets()
 
@@ -103,7 +123,6 @@ class GameRunner:
         screen.blit(background, (0, 0))
         for b in self.widgets:
             b.draw(screen)
-
         pygame.display.flip()
 
     def get_widgets(self) -> List[Widget]:
@@ -116,12 +135,12 @@ class GameRunner:
             buttons = self.get_player_cards()
             buttons.append(NextGameButton((0, 0), self.next_game, font_size))
             if not self.schafkopf_game.bidding_is_finished():
-                buttons += self.get_mode_proposals()
+                buttons += self.get_bid_options()
             return buttons
 
     def get_other_widgets(self) -> List[Widget]:
         if not self.schafkopf_game.finished():
-            return self.get_opponent_cards()
+            return self.get_opponent_cards() + self.get_bid_proposals()
         else:
             return []
 
@@ -167,17 +186,30 @@ class GameRunner:
         ]
         return first_opponent_cards + second_opponent_cards + third_opponent_cards
 
-    def get_mode_proposals(self) -> List[Button]:
-        possible_modes = self.schafkopf_game.possible_bids()
-        return [
-            BidOption(
-                topleft=(bidding_option_position_left,
-                         bidding_option_position_height + i * bidding_option_space_between),
-                bidding_option=option,
-                callback=self.foo(option),
-                font_size=font_size
-            ) for i, option in enumerate(possible_modes)
-        ]
+    def get_bid_options(self) -> List[BidOption]:
+        if self.schafkopf_game.human_players_turn():
+            possible_modes = self.schafkopf_game.possible_bids()
+            return [
+                BidOption(
+                    topleft=(bidding_option_position_left,
+                             bidding_option_position_height + i * bidding_option_space_between),
+                    bidding_option=option,
+                    callback=self.foo(option),
+                    font_size=font_size
+                ) for i, option in enumerate(possible_modes)
+            ]
+        else:
+            return []
+
+    def get_bid_proposals(self) -> List[Widget]:
+        proposals = self.schafkopf_game.get_mode_proposals()
+        return [BidProposal(
+            topleft=game_mode_positions[(self.leading_player_index + i) % 4],
+            player_passes=proposal[0] == NO_GAME,
+            width=bidding_proposal_width,
+            height=bidding_proposal_height,
+            font_size=font_size
+        ) for i, proposal in enumerate(proposals)]
 
 
 if __name__ == "__main__":
