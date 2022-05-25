@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from schafkopf.card_deck import CardDeck
 from schafkopf.game import Game
@@ -14,10 +14,10 @@ class SchafkopfGame:
         self.game_state = self._new_game_state(leading_player_index)
         self.paused_on_last_trick = False
 
-    def human_players_turn(self):
+    def human_players_turn(self) -> bool:
         return self.game_state["current_player_index"] == 0
 
-    def no_cards_in_current_trick(self):
+    def no_cards_in_current_trick(self) -> bool:
         current_trick = self.game_state["current_trick"]
         if current_trick is None:
             return True
@@ -27,13 +27,19 @@ class SchafkopfGame:
     def get_player_hand(self) -> List[Tuple[int, int]]:
         return self.game_state["player_hands"][0]
 
-    def get_mode_proposals(self):
+    def get_mode_proposals(self) -> List[Tuple[int, Union[int, None]]]:
         return self.game_state["mode_proposals"]
+
+    def get_declaring_player(self) -> Union[int, None]:
+        return self.game_state["declaring_player"]
+
+    def get_game_mode(self) -> Tuple[int, Union[int, None]]:
+        return self.game_state["game_mode"]
 
     def get_opponent_hands(self) -> List[List[Tuple[int, int]]]:
         return self.game_state["player_hands"][1:4]
 
-    def at_least_one_previous_trick(self):
+    def at_least_one_previous_trick(self) -> bool:
         return len(self.game_state["tricks"]) > 0
 
     def pause(self):

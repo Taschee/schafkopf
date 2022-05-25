@@ -55,6 +55,7 @@ game_mode_positions = [
     game_mode_position_human, game_mode_position_first_opp, game_mode_position_second_opp, game_mode_position_third_opp
 ]
 
+
 def space_for_player_hand(num_cards):
     return num_cards * card_width + (num_cards - 1) * space_between
 
@@ -139,8 +140,11 @@ class GameRunner:
             return buttons
 
     def get_other_widgets(self) -> List[Widget]:
-        if not self.schafkopf_game.finished():
-            return self.get_opponent_cards() + self.get_bid_proposals()
+        opponent_cards: List[Widget] = self.get_opponent_cards()
+        if not self.schafkopf_game.bidding_is_finished():
+            return opponent_cards + self.get_bid_proposals()
+        elif not self.schafkopf_game.finished():
+            return opponent_cards.append(self.get_game_mode())
         else:
             return []
 
@@ -210,6 +214,14 @@ class GameRunner:
             height=bidding_proposal_height,
             font_size=font_size
         ) for i, proposal in enumerate(proposals)]
+
+    def get_game_mode(self) -> Widget:
+        declaring_player = self.schafkopf_game.get_declaring_player()
+        return BidOption(
+            topleft=game_mode_positions[declaring_player],
+            bidding_option=self.schafkopf_game.get_game_mode(),
+            font_size=font_size
+        )
 
 
 if __name__ == "__main__":
