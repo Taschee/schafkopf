@@ -3,7 +3,7 @@ from typing import Tuple
 import pygame
 
 from schafkopf.game_modes import NO_GAME, PARTNER_MODE, WENZ
-from schafkopf.pygame_gui.BiddingOption import get_bidding_option_as_text
+from schafkopf.pygame_gui.GameModeWidget import get_bidding_option_as_text
 from schafkopf.pygame_gui.SchafkopfGame import GameResult
 from schafkopf.pygame_gui.Widget import Widget
 from schafkopf.pygame_gui.colors import WHITE, BLACK

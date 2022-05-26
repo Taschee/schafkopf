@@ -6,7 +6,7 @@ from schafkopf.pygame_gui.Widget import Widget
 from schafkopf.pygame_gui.colors import WHITE, BLACK
 
 
-class BidProposal(Widget):
+class BiddingProposalWidget(Widget):
     def __init__(
         self,
         topleft: Tuple[int, int],

@@ -5,7 +5,7 @@ import pygame
 from schafkopf.pygame_gui.Widget import Widget
 
 
-class OpponentCard(Widget):
+class HiddenCardWidget(Widget):
     def __init__(
         self,
         topleft: Tuple[int, int] = (0, 0),

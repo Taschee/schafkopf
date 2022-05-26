@@ -3,14 +3,14 @@ from typing import List, Tuple
 import pygame
 
 from schafkopf.game_modes import NO_GAME
-from schafkopf.pygame_gui.BidProposal import BidProposal
+from schafkopf.pygame_gui.BiddingProposalWidget import BiddingProposalWidget
 from schafkopf.pygame_gui.Button import Button
 from schafkopf.pygame_gui.GameModeWidget import GameModeWidget
 from schafkopf.pygame_gui.GameResult import GameResult
 from schafkopf.pygame_gui.NextGameButton import NextGameButton
-from schafkopf.pygame_gui.OpponentCard import OpponentCard
-from schafkopf.pygame_gui.PlayerCard import PlayerCard
-from schafkopf.pygame_gui.PlayerStatsWidget import PlayerStatsWidget
+from schafkopf.pygame_gui.HiddenCardWidget import HiddenCardWidget
+from schafkopf.pygame_gui.OpenCardWidget import OpenCardWidget
+from schafkopf.pygame_gui.PlayerInfoWidget import PlayerInfoWidget
 from schafkopf.pygame_gui.ResultsWidget import ResultsWidget
 from schafkopf.pygame_gui.SchafkopfGame import SchafkopfGame
 from schafkopf.pygame_gui.Widget import Widget
@@ -26,7 +26,7 @@ screen_size = screen_width, screen_height = screen.get_size()
 background = pygame.transform.scale(pygame.image.load("../images/wood.jpg").convert(), screen_size)
 
 space_between = 15
-card_size = card_width, card_height = OpponentCard().rect.size
+card_size = card_width, card_height = HiddenCardWidget().rect.size
 
 player_hand_position_top = screen_height * 95 / 100 - card_height
 opposing_hand_position_top = screen_height * 5 / 100
@@ -221,11 +221,11 @@ class GameRunner:
     def get_player_cards_on_players_turn(self):
         player_hand = self.schafkopf_game.get_player_hand()
         possible_cards = self.schafkopf_game.possible_cards()
-        player_cards: List[PlayerCard] = []
+        player_cards: List[OpenCardWidget] = []
         for i, card_encoded in enumerate(player_hand):
             if card_encoded in possible_cards:
                 player_cards.append(
-                    PlayerCard(
+                    OpenCardWidget(
                         topleft=calculate_ith_card_position_player(i, player_hand),
                         card_encoded=card_encoded,
                         hover_effect=True,
@@ -234,7 +234,7 @@ class GameRunner:
                 )
             else:
                 player_cards.append(
-                    PlayerCard(
+                    OpenCardWidget(
                         topleft=calculate_ith_card_position_player(i, player_hand),
                         card_encoded=card_encoded,
                         hover_effect=False,
@@ -245,7 +245,7 @@ class GameRunner:
     def get_player_cards_without_possible_actions(self):
         player_hand = self.schafkopf_game.get_player_hand()
         return [
-            PlayerCard(
+            OpenCardWidget(
                 topleft=calculate_ith_card_position_player(i, player_hand),
                 card_encoded=card_encoded,
                 hover_effect=False,
@@ -255,19 +255,19 @@ class GameRunner:
     def get_opponent_card_widgets(self) -> List[Widget]:
         first_opponent_hand, second_opponent_hand, third_opponent_hand = self.schafkopf_game.get_opponent_hands()
         first_opponent_cards = [
-            OpponentCard(
+            HiddenCardWidget(
                 rotate=True,
                 topleft=calculate_ith_card_position_first_opponent(len(first_opponent_hand), i)
             ) for i, _ in enumerate(first_opponent_hand)
         ]
         second_opponent_cards = [
-            OpponentCard(
+            HiddenCardWidget(
                 rotate=False,
                 topleft=calculate_ith_card_position_second_opponent(len(second_opponent_hand), i)
             ) for i, _ in enumerate(second_opponent_hand)
         ]
         third_opponent_cards = [
-            OpponentCard(
+            HiddenCardWidget(
                 rotate=True,
                 topleft=calculate_ith_card_position_third_opponent(len(third_opponent_hand), i)
             ) for i, _ in enumerate(third_opponent_hand)
@@ -280,7 +280,7 @@ class GameRunner:
         for i, card_encoded in enumerate(current_trick_cards):
             if card_encoded is not None:
                 current_trick.append(
-                    PlayerCard(
+                    OpenCardWidget(
                         topleft=current_trick_positions[i],
                         card_encoded=card_encoded,
                         hover_effect=False,
@@ -313,7 +313,7 @@ class GameRunner:
 
     def get_bid_proposal_widgets(self) -> List[Widget]:
         proposals = self.schafkopf_game.get_mode_proposals()
-        return [BidProposal(
+        return [BiddingProposalWidget(
             topleft=game_mode_positions[(self.leading_player_index + i) % 4],
             player_passes=proposal[0] == NO_GAME,
             width=bidding_proposal_width,
@@ -332,7 +332,7 @@ class GameRunner:
 
     def get_player_info_widgets(self):
         return [
-            PlayerStatsWidget(
+            PlayerInfoWidget(
                 topleft=player_info_positions[i],
                 player_index=i,
                 score=self.total_scores[i],

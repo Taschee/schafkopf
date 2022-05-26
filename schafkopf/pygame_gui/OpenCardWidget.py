@@ -7,7 +7,7 @@ from schafkopf.ranks import SEVEN, EIGHT, TEN, NINE, UNTER, OBER, KING, ACE
 from schafkopf.suits import ACORNS, LEAVES, HEARTS, BELLS
 
 
-class PlayerCard(Button):
+class OpenCardWidget(Button):
     def __init__(
         self,
         topleft: Tuple[int, int],
