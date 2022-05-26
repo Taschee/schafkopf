@@ -18,8 +18,8 @@ FONT = pygame.font.Font(None, 30)
 
 clock = pygame.time.Clock()
 
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-# screen = pygame.display.set_mode((1500, 1000))
+# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((1500, 1000))
 screen_size = screen_width, screen_height = screen.get_size()
 background = pygame.transform.scale(pygame.image.load("../images/wood.jpg").convert(), screen_size)
 
@@ -125,9 +125,10 @@ class GameRunner:
 
     def run(self):
         while not self.done:
-            if self.schafkopf_game.human_players_turn():
+            if self.schafkopf_game.human_players_turn() or self.schafkopf_game.finished():
                 self.handle_events()
             else:
+                pygame.time.wait(500)
                 self.next_opponent_action()
             self.draw()
             clock.tick(30)
