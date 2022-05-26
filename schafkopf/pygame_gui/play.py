@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Tuple
 
 import pygame
 
 from schafkopf.game_modes import NO_GAME
-from schafkopf.pygame_gui.BidOption import BidOption
 from schafkopf.pygame_gui.BidProposal import BidProposal
 from schafkopf.pygame_gui.Button import Button
+from schafkopf.pygame_gui.GameModeWidget import GameModeWidget
 from schafkopf.pygame_gui.NextGameButton import NextGameButton
 from schafkopf.pygame_gui.OpponentCard import OpponentCard
 from schafkopf.pygame_gui.PlayerCard import PlayerCard
@@ -17,7 +17,8 @@ FONT = pygame.font.Font(None, 30)
 
 clock = pygame.time.Clock()
 
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((1500, 1000))
 screen_size = screen_width, screen_height = screen.get_size()
 background = pygame.transform.scale(pygame.image.load("../images/wood.jpg").convert(), screen_size)
 
@@ -37,7 +38,7 @@ bidding_proposal_size = bidding_proposal_width, bidding_proposal_height = (scree
 
 game_mode_position_human = (
     int(screen_width * 45 / 100),
-    player_hand_position_height - card_height - space_between - bidding_proposal_height
+    player_hand_position_height - space_between - bidding_proposal_height
 )
 game_mode_position_first_opp = (
     neighboring_hand_edge_distance + card_height + space_between,
@@ -45,7 +46,7 @@ game_mode_position_first_opp = (
 )
 game_mode_position_second_opp = (
     int(screen_width * 45 / 100),
-    opposing_hand_position_height + space_between
+    opposing_hand_position_height + space_between + card_height
 )
 game_mode_position_third_opp = (
     screen_width - neighboring_hand_edge_distance - card_height - bidding_proposal_width - space_between,
@@ -101,13 +102,14 @@ class GameRunner:
         self.widgets = self.get_widgets()
         self.done = False
 
-    def next_game(self):
-        self.leading_player_index = (self.leading_player_index + 1) % 4
-        self.schafkopf_game = SchafkopfGame(self.leading_player_index)
-        self.update_widgets()
-
-    def update_widgets(self):
-        self.widgets = self.get_widgets()
+    def run(self):
+        while not self.done:
+            if self.schafkopf_game.human_players_turn():
+                self.handle_events()
+            else:
+                self.next_opponent_action()
+            self.draw()
+            clock.tick(30)
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -127,7 +129,10 @@ class GameRunner:
         pygame.display.flip()
 
     def get_widgets(self) -> List[Widget]:
-        return self.get_other_widgets() + self.get_buttons()
+        return self.get_simple_widgets() + self.get_buttons()
+
+    def update_widgets(self):
+        self.widgets = self.get_widgets()
 
     def get_buttons(self) -> List[Button]:
         if self.schafkopf_game.finished():
@@ -139,34 +144,69 @@ class GameRunner:
                 buttons += self.get_bid_options()
             return buttons
 
-    def get_other_widgets(self) -> List[Widget]:
+    def get_simple_widgets(self) -> List[Widget]:
         opponent_cards: List[Widget] = self.get_opponent_cards()
         if not self.schafkopf_game.bidding_is_finished():
             return opponent_cards + self.get_bid_proposals()
         elif not self.schafkopf_game.finished():
-            return opponent_cards.append(self.get_game_mode())
+            return opponent_cards + [self.get_game_mode()]
         else:
             return []
 
-    def foo(self, b):
-        return lambda: print(b)
-
-    def run(self):
-        while not self.done:
-            self.handle_events()
-            self.draw()
-            clock.tick(30)
-
     def get_player_cards(self) -> List[Button]:
+        if self.schafkopf_game.bidding_is_finished() and self.schafkopf_game.human_players_turn():
+            return self.get_player_cards_on_players_turn()
+        else:
+            return self.get_player_cards_without_possible_actions()
+
+    def get_player_cards_on_players_turn(self):
+        player_hand = self.schafkopf_game.get_player_hand()
+        possible_cards = self.schafkopf_game.possible_cards()
+        player_cards: List[PlayerCard] = []
+        for i, card_encoded in enumerate(player_hand):
+            if card_encoded in possible_cards:
+                player_cards.append(
+                    PlayerCard(
+                        topleft=calculate_ith_card_position_player(i, player_hand),
+                        card_encoded=card_encoded,
+                        hover_effect=True,
+                        callback=self.next_player_card_callback(card_encoded)
+                    )
+                )
+            else:
+                player_cards.append(
+                    PlayerCard(
+                        topleft=calculate_ith_card_position_player(i, player_hand),
+                        card_encoded=card_encoded,
+                        hover_effect=False,
+                    )
+                )
+        return player_cards
+
+    def get_player_cards_without_possible_actions(self):
         player_hand = self.schafkopf_game.get_player_hand()
         return [
             PlayerCard(
                 topleft=calculate_ith_card_position_player(i, player_hand),
                 card_encoded=card_encoded,
                 hover_effect=False,
-                callback=self.foo(card_encoded)
             ) for i, card_encoded in enumerate(player_hand)
         ]
+
+    def get_bid_options(self) -> List[GameModeWidget]:
+        if self.schafkopf_game.human_players_turn():
+            possible_modes = self.schafkopf_game.possible_bids()
+            return [
+                GameModeWidget(
+                    topleft=(bidding_option_position_left,
+                             bidding_option_position_height + i * bidding_option_space_between),
+                    bidding_option=option,
+                    callback=self.make_proposal_callback(option),
+                    font_size=font_size
+                ) for i, option in enumerate(possible_modes)
+            ]
+        else:
+            return []
 
     def get_opponent_cards(self) -> List[Widget]:
         first_opponent_hand, second_opponent_hand, third_opponent_hand = self.schafkopf_game.get_opponent_hands()
@@ -190,21 +230,6 @@ class GameRunner:
         ]
         return first_opponent_cards + second_opponent_cards + third_opponent_cards
 
-    def get_bid_options(self) -> List[BidOption]:
-        if self.schafkopf_game.human_players_turn():
-            possible_modes = self.schafkopf_game.possible_bids()
-            return [
-                BidOption(
-                    topleft=(bidding_option_position_left,
-                             bidding_option_position_height + i * bidding_option_space_between),
-                    bidding_option=option,
-                    callback=self.foo(option),
-                    font_size=font_size
-                ) for i, option in enumerate(possible_modes)
-            ]
-        else:
-            return []
-
     def get_bid_proposals(self) -> List[Widget]:
         proposals = self.schafkopf_game.get_mode_proposals()
         return [BidProposal(
@@ -217,11 +242,33 @@ class GameRunner:
 
     def get_game_mode(self) -> Widget:
         declaring_player = self.schafkopf_game.get_declaring_player()
-        return BidOption(
+        return GameModeWidget(
             topleft=game_mode_positions[declaring_player],
             bidding_option=self.schafkopf_game.get_game_mode(),
-            font_size=font_size
+            clickable=False,
+            font_size=font_size,
         )
+
+    def next_player_card_callback(self, card_encoded: Tuple[int, int]):
+        def callback():
+            self.schafkopf_game.next_human_card(card_encoded)
+            self.update_widgets()
+        return callback
+
+    def make_proposal_callback(self, mode_proposal: Tuple[int, int]):
+        def callback():
+            self.schafkopf_game.next_human_bid(mode_proposal)
+            self.update_widgets()
+        return callback
+
+    def next_opponent_action(self):
+        self.schafkopf_game.next_action()
+        self.update_widgets()
+
+    def next_game(self):
+        self.leading_player_index = (self.leading_player_index + 1) % 4
+        self.schafkopf_game = SchafkopfGame(self.leading_player_index)
+        self.update_widgets()
 
 
 if __name__ == "__main__":

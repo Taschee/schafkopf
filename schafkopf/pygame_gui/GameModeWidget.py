@@ -7,13 +7,14 @@ from schafkopf.pygame_gui.Button import Button
 from schafkopf.pygame_gui.colors import WHITE, BLACK, RED
 
 
-class BidOption(Button):
+class GameModeWidget(Button):
     def __init__(
         self,
         topleft: Tuple[int, int] = (0, 0),
         bidding_option: Tuple[int, Union[int, None]] = (NO_GAME, None),
         callback: Callable = None,
-        font_size: int = 40
+        font_size: int = 40,
+        clickable: bool = True
     ):
         margin = 10
         font = pygame.font.Font(None, font_size)
@@ -24,14 +25,18 @@ class BidOption(Button):
         image.fill(WHITE)
         image.set_alpha(180)
         image.blit(text, (margin, margin))
-        button_down_image = pygame.Surface((width, height))
-        button_down_image.fill(pygame.Color('grey'))
-        button_down_image.set_alpha(180)
-        button_down_image.blit(text, (margin, margin))
-        hover_image = pygame.Surface((width + 5, height + 5))
-        hover_image.fill(pygame.Color("lightgrey"))
-        hover_image.set_alpha(180)
-        hover_image.blit(text, (margin + 2, margin + 2))
+        if clickable:
+            button_down_image = pygame.Surface((width, height))
+            button_down_image.fill(pygame.Color('grey'))
+            button_down_image.set_alpha(180)
+            button_down_image.blit(text, (margin, margin))
+            hover_image = pygame.Surface((width + 5, height + 5))
+            hover_image.fill(pygame.Color("lightgrey"))
+            hover_image.set_alpha(180)
+            hover_image.blit(text, (margin + 2, margin + 2))
+        else:
+            button_down_image = image
+            hover_image = image
         super().__init__(
             topleft=topleft,
             image=image,
