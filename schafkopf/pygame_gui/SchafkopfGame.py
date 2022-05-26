@@ -43,7 +43,10 @@ class SchafkopfGame:
     def get_current_trick(self) -> List[Union[Tuple[int, int], None]]:
         current_trick: Union[Trick, None] = self.game_state["current_trick"]
         if current_trick is not None:
-            return current_trick.cards
+            if self.paused_on_last_trick:
+                return self.game_state["tricks"][-1].cards
+            else:
+                return current_trick.cards
         else:
             return []
 

@@ -125,13 +125,18 @@ class GameRunner:
 
     def run(self):
         while not self.done:
-            if self.schafkopf_game.human_players_turn() or self.schafkopf_game.finished():
+            if self.human_player_needs_to_act():
                 self.handle_events()
             else:
                 pygame.time.wait(500)
                 self.next_opponent_action()
             self.draw()
             clock.tick(30)
+
+    def human_player_needs_to_act(self):
+        return self.schafkopf_game.human_players_turn() or \
+               self.schafkopf_game.finished() or \
+               self.schafkopf_game.paused_on_last_trick
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -140,6 +145,9 @@ class GameRunner:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.done = True
+            if self.schafkopf_game.paused_on_last_trick and event.type == pygame.MOUSEBUTTONUP:
+                self.schafkopf_game.unpause()
+                self.update_widgets()
             buttons = [w for w in self.widgets if isinstance(w, Button)]
             for button in buttons:
                 button.handle_event(event)
@@ -296,12 +304,14 @@ class GameRunner:
         def callback():
             self.schafkopf_game.next_human_card(card_encoded)
             self.update_widgets()
+
         return callback
 
     def make_proposal_callback(self, mode_proposal: Tuple[int, int]):
         def callback():
             self.schafkopf_game.next_human_bid(mode_proposal)
             self.update_widgets()
+
         return callback
 
     def next_opponent_action(self):
