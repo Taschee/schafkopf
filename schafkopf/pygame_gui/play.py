@@ -3,6 +3,7 @@ from typing import List, Tuple
 import pygame
 
 from schafkopf.game_modes import NO_GAME
+from schafkopf.pygame_gui.ResultsWidget import ResultsWidget
 from schafkopf.pygame_gui.BidProposal import BidProposal
 from schafkopf.pygame_gui.Button import Button
 from schafkopf.pygame_gui.GameModeWidget import GameModeWidget
@@ -17,8 +18,8 @@ FONT = pygame.font.Font(None, 30)
 
 clock = pygame.time.Clock()
 
-# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-screen = pygame.display.set_mode((1500, 1000))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+# screen = pygame.display.set_mode((1500, 1000))
 screen_size = screen_width, screen_height = screen.get_size()
 background = pygame.transform.scale(pygame.image.load("../images/wood.jpg").convert(), screen_size)
 
@@ -54,6 +55,26 @@ game_mode_position_third_opp = (
 )
 game_mode_positions = [
     game_mode_position_human, game_mode_position_first_opp, game_mode_position_second_opp, game_mode_position_third_opp
+]
+
+current_trick_human_pos = (
+    screen_width // 2 - card_width // 2,
+    screen_height // 2 + space_between
+)
+current_trick_first_opp_pos = (
+    screen_width // 2 - 2 * card_width - space_between,
+    screen_height // 2 - card_height // 2
+)
+current_trick_second_opp_pos = (
+    screen_width // 2 - card_width // 2,
+    screen_height // 2 - card_height - space_between
+)
+current_trick_third_opp_pos = (
+    screen_width // 2 + card_width + space_between,
+    screen_height // 2 - card_height // 2
+)
+current_trick_positions = [
+    current_trick_human_pos, current_trick_first_opp_pos, current_trick_second_opp_pos, current_trick_third_opp_pos
 ]
 
 
@@ -139,7 +160,6 @@ class GameRunner:
             return [NextGameButton((0, 0), self.next_game)]
         else:
             buttons = self.get_player_cards()
-            buttons.append(NextGameButton((0, 0), self.next_game, font_size))
             if not self.schafkopf_game.bidding_is_finished():
                 buttons += self.get_bid_options()
             return buttons
@@ -149,9 +169,9 @@ class GameRunner:
         if not self.schafkopf_game.bidding_is_finished():
             return opponent_cards + self.get_bid_proposals()
         elif not self.schafkopf_game.finished():
-            return opponent_cards + [self.get_game_mode()]
+            return opponent_cards + [self.get_game_mode()] + self.get_current_trick()
         else:
-            return []
+            return [self.get_results_widget()]
 
     def get_player_cards(self) -> List[Button]:
         if self.schafkopf_game.bidding_is_finished() and self.schafkopf_game.human_players_turn():
@@ -193,21 +213,6 @@ class GameRunner:
             ) for i, card_encoded in enumerate(player_hand)
         ]
 
-    def get_bid_options(self) -> List[GameModeWidget]:
-        if self.schafkopf_game.human_players_turn():
-            possible_modes = self.schafkopf_game.possible_bids()
-            return [
-                GameModeWidget(
-                    topleft=(bidding_option_position_left,
-                             bidding_option_position_height + i * bidding_option_space_between),
-                    bidding_option=option,
-                    callback=self.make_proposal_callback(option),
-                    font_size=font_size
-                ) for i, option in enumerate(possible_modes)
-            ]
-        else:
-            return []
-
     def get_opponent_cards(self) -> List[Widget]:
         first_opponent_hand, second_opponent_hand, third_opponent_hand = self.schafkopf_game.get_opponent_hands()
         first_opponent_cards = [
@@ -229,6 +234,43 @@ class GameRunner:
             ) for i, _ in enumerate(third_opponent_hand)
         ]
         return first_opponent_cards + second_opponent_cards + third_opponent_cards
+
+    def get_current_trick(self) -> List[Widget]:
+        current_trick_cards = self.schafkopf_game.get_current_trick()
+        current_trick = []
+        for i, card_encoded in enumerate(current_trick_cards):
+            if card_encoded is not None:
+                current_trick.append(
+                    PlayerCard(
+                        topleft=current_trick_positions[i],
+                        card_encoded=card_encoded,
+                        hover_effect=False,
+                    )
+                )
+        return current_trick
+
+    def get_bid_options(self) -> List[GameModeWidget]:
+        if self.schafkopf_game.human_players_turn():
+            possible_modes = self.schafkopf_game.possible_bids()
+            return [
+                GameModeWidget(
+                    topleft=(bidding_option_position_left,
+                             bidding_option_position_height + i * bidding_option_space_between),
+                    bidding_option=option,
+                    callback=self.make_proposal_callback(option),
+                    font_size=font_size
+                ) for i, option in enumerate(possible_modes)
+            ]
+        else:
+            return []
+
+    def get_results_widget(self) -> Widget:
+        return ResultsWidget(
+            topleft=(screen_width // 4, screen_height // 4),
+            width=screen_width // 2,
+            height=screen_height // 2,
+            game_results=self.schafkopf_game.get_results()
+        )
 
     def get_bid_proposals(self) -> List[Widget]:
         proposals = self.schafkopf_game.get_mode_proposals()

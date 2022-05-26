@@ -6,6 +6,7 @@ from schafkopf.game_modes import NO_GAME
 from schafkopf.helpers import sort_hand
 from schafkopf.players import HeuristicsPlayer, DummyPlayer
 from schafkopf.pygame_gui.GameResult import GameResult
+from schafkopf.trick import Trick
 
 
 class SchafkopfGame:
@@ -38,6 +39,13 @@ class SchafkopfGame:
 
     def get_opponent_hands(self) -> List[List[Tuple[int, int]]]:
         return self.game_state["player_hands"][1:4]
+
+    def get_current_trick(self) -> List[Union[Tuple[int, int], None]]:
+        current_trick: Union[Trick, None] = self.game_state["current_trick"]
+        if current_trick is not None:
+            return current_trick.cards
+        else:
+            return []
 
     def at_least_one_previous_trick(self) -> bool:
         return len(self.game_state["tricks"]) > 0
