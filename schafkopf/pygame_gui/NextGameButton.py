@@ -5,7 +5,7 @@ from schafkopf.pygame_gui.colors import BLACK, WHITE
 
 
 class NextGameButton(Button):
-    def __init__(self, topleft: Tuple[int, int], callback: Callable, font_size: int = 40):
+    def __init__(self, topleft: Tuple[int, int] = (0, 0), callback: Callable = None, font_size: int = 40):
         margin = 10
         font = pygame.font.Font(None, font_size)
         text = font.render("Neues Spiel", True, BLACK)

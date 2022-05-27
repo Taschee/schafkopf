@@ -140,6 +140,11 @@ player_info_third_opp_position = (
 player_info_positions = [player_info_human_position, player_info_first_opp_position, player_info_second_opp_position,
                          player_info_third_opp_position]
 
+next_game_button_position = (
+    screen_width * 3 // 8,
+    screen_height * 13 // 16
+)
+
 
 class GameRunner:
     def __init__(self):
@@ -192,7 +197,13 @@ class GameRunner:
 
     def get_buttons(self) -> List[Button]:
         if self.schafkopf_game.finished():
-            return [NextGameButton((0, 0), self.next_game)]
+            return [
+                NextGameButton(
+                    topleft=next_game_button_position,
+                    callback=self.next_game,
+                    font_size=font_size * 2
+                )
+            ]
         else:
             buttons = self.get_player_card_widgets()
             if not self.schafkopf_game.bidding_is_finished():
